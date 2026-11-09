@@ -17,9 +17,11 @@
 
 namespace pg {
 
-// The default of the World option: Stitched, chosen after the critical-path replay compared
-// both modes (NOTES.md "The stitched world": story globals identical at every milestone).
-bool World::stitched_by_default() { return true; }
+// The default of the World option: Original maps (0.25.1). The story runs the same both ways
+// (NOTES.md "The stitched world": story globals identical at every milestone), but the Tenebrae
+// maps overlap far more than a seam, and the neighbours' scenery shows over the live map's water
+// and banks (NOTES.md "Stitched world: overlap in Tenebrae"). Stitched stays an option.
+bool World::stitched_by_default() { return false; }
 
 bool World::set_world_mode(bool on, const std::string& path) {
     pending_cross_ = pending_cross_egg_ = -1;

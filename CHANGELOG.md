@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+## 0.25.1 - 2026-11-09
+- The world now uses the original maps by default: each part of Tenebrae loads on its own, as in the original game.
+  The joined-up world showed parts of neighbouring districts drawn over Central Tenebrae's river and banks. It is
+  still there to try (Options, Game, World: Stitched) while that is being fixed; if you switched it on yourself,
+  your choice is kept.
+
 ## 0.25.0 - 2026-11-09
 - New games always start from the very beginning, from your copy's own new-game save (SAVEGAME/U8SAVE.000), as the
   original does. A copy you have played in DOS (whose GAMEDAT folder holds that old game) now starts fresh, keeps all

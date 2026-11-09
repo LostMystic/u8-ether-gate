@@ -83,7 +83,7 @@ All in the game's Options (O, or Esc then Options); most have a command-line swi
 | Companions, including Nerissa | On | Companions | `--companions off` |
 | New dialogue for original NPCs | On | New Dialogue | `--npc-dialog off` |
 | Turn-based combat | On | Controls: Combat | `--combat realtime` |
-| The stitched world (maps joined without loading screens) | On | Game: World | `--world original` |
+| The stitched world (maps joined without loading screens; in progress: parts of Tenebrae overlap) | Off | Game: World | `--world stitched` |
 | Item powers (Skull of Quakes) | On | Game: Item powers | |
 | Responsive controls, smooth scrolling, zoom, controller | On | Controls | `--controls classic`, `--no-smooth` |
 | HUD side panel | Setting | Display | `--hud classic` |
