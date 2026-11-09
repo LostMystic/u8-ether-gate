@@ -1,0 +1,36 @@
+{
+  "comment": "Small sample for the engine tests (tests/test_debug.cpp), in the format of specs/data/critpath.json + map_links.json. Positions are real ones from map 3 / 40, the story facts are only examples.",
+  "chains": {"a": {"after": []}, "b": {"after": ["a"]}},
+  "steps": [
+    {"id": "execution", "chain": "a", "milestone": true, "act": "1", "title": "Watch the execution at the dock", "hint": "Walk down the road south of the gate to the dock",
+     "done_when": {"global": [89, 1], "eq": 1},
+     "target": {"type": "point", "map": 3, "x": 11732, "y": 5844, "z": 48}, "evidence": "sample", "confidence": "high"},
+    {"id": "enter_city", "chain": "a", "milestone": true, "act": "1", "title": "Enter Tenebrae", "hint": "Through the open gate",
+     "done_when": {"visited_map": 40},
+     "target": {"type": "point", "map": 40, "x": 13038, "y": 15042, "z": 48}},
+    {"id": "east_town", "chain": "a", "milestone": false, "act": "1", "title": "Visit East Tenebrae", "hint": "",
+     "done_when": {"any": [{"on_map": 41}, {"global": [120, 2], "ge": 2}]},
+     "target": {"type": "point", "map": 41, "x": 20000, "y": 15000, "z": 0}},
+    {"id": "talk", "chain": "b", "milestone": false, "act": "1", "title": "Talk to Devon", "hint": "He follows you around",
+     "done_when": {"all": [{"has_item": 79}, {"not": {"npc_dead": 2}}]},
+     "target": {"type": "npc", "npc": 2}},
+    {"id": "sword", "chain": "b", "milestone": false, "act": "2", "title": "Equip a sword", "hint": "",
+     "done_when": {"any": [{"equipped": 1300}, {"has_item": 395, "frame": 6, "qty": 5}]},
+     "target": {"type": "item", "shape": 633, "map": 3, "x": 11775, "y": 2015, "z": 0}},
+    {"id": "gone", "chain": "b", "milestone": true, "act": "2", "title": "The portcullis is gone", "hint": "",
+     "done_when": {"item_gone": {"shape": 633, "map": 3, "x": 11775, "y": 2015, "z": 0}},
+     "target": {"type": "point", "map": 3, "x": 11775, "y": 2015, "z": 0}}
+  ],
+  "links": [
+    {"from_map": 3, "x": 11516, "y": 1660, "z": 48, "to_map": 40, "to_x": 13038, "to_y": 15042, "to_z": 48,
+     "kind": "teleporter", "condition": {"global": [89, 1], "eq": 1}, "note": "the city gate"},
+    {"from_map": 3, "x": 11000, "y": 6000, "z": 0, "to_map": 5, "to_x": 100, "to_y": 100, "to_z": 0,
+     "kind": "walk", "condition": null, "note": "the east road"},
+    {"from_map": 3, "x": 9000, "y": 9000, "z": 0, "to_map": 40, "to_x": 13000, "to_y": 15000, "to_z": 0,
+     "kind": "teleporter", "condition": {"global": [130, 1], "eq": 1}, "note": "a far side door"},
+    {"from_map": 40, "x": 13038, "y": 15042, "z": 48, "to_map": 3, "to_x": 11516, "to_y": 1660, "to_z": 48,
+     "kind": "teleporter", "condition": null, "note": "back out"},
+    {"from_map": 40, "x": 15000, "y": 15000, "z": 0, "to_map": 41, "to_x": 1000, "to_y": 15000, "to_z": 0,
+     "kind": "walk", "condition": null, "note": "the east street"}
+  ]
+}

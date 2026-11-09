@@ -1,0 +1,868 @@
+{
+ "notes": [
+  "Monster levels, XP and stats (PLAN-LEVELING.md 2 and 6, PLAN-CREATURES.md; NOTES.md 'Stat effects and monster tuning'). Read by game/leveling.cpp and game/stat_effects.cpp; only used with Leveling on.",
+  "One level per type (PLAN-CREATURES.md, 2026-11-07): 'level' is the type's level and its stats. Where the original places a type on a map whose story stage is below that level, 'maps' keeps the weaker variant that map had, shown with 'weak_prefix' ('young troll', 'lesser ghost'): the same sprite, other stats. Maps not listed get the type's level. A spawned monster keeps its level (saved with it).",
+  "Stats: hp [lo, hi], dex [lo, hi], str (damage + STR/5, as the Avatar's weapon blows), int (spell damage x (1 + (INT-10)/20) for casters), damage [lo, hi]. Armour and damage / defence types stay the original table's. hp and damage were tuned with tests/test_balance.cpp (mode tune) to the plan's targets; DEX follows a level-N Avatar's DEX, shifted by the type's own, at most 24.",
+  "xp by level 1..8: 1, 2, 3, 5, 22, 24, 152, 176 (fire skulls 30%), the same for every type of a level (the late levels raised once more for one level per type: the late maps now hold lower-level types; checked by test_leveling's budget and pacing, which also count data/creatures.json). Paid in full to the Avatar and every companion walking with him, once per body. Peasants, children and guards pay nothing. A shape not listed pays nothing and keeps its original stats.",
+  "level_difference_percent: what a kill pays, by (earner's level - monster's level); the last value repeats for anything further below. Never less than 1 XP."
+ ],
+ "level_difference_percent": [
+  100,
+  100,
+  50,
+  25,
+  10
+ ],
+ "monsters": [
+  {
+   "name": "small lizard",
+   "shape": 806,
+   "level": 1,
+   "xp": 1
+  },
+  {
+   "name": "small spider",
+   "shape": 807,
+   "level": 1,
+   "xp": 1
+  },
+  {
+   "name": "air servant",
+   "shape": 377,
+   "level": 7,
+   "xp": 152,
+   "hp": [
+    72,
+    108
+   ],
+   "dex": [
+    19,
+    24
+   ],
+   "str": 18,
+   "int": 0,
+   "damage": [
+    11,
+    22
+   ],
+   "variants": [],
+   "maps": {},
+   "weak_prefix": "lesser"
+  },
+  {
+   "name": "changeling",
+   "shape": 357,
+   "level": 3,
+   "xp": 3,
+   "hp": [
+    26,
+    38
+   ],
+   "dex": [
+    10,
+    14
+   ],
+   "str": 8,
+   "int": 0,
+   "damage": [
+    6,
+    9
+   ],
+   "variants": [
+    {
+     "level": 1,
+     "xp": 1,
+     "hp": [
+      15,
+      23
+     ],
+     "dex": [
+      7,
+      11
+     ],
+     "str": 4,
+     "int": 0,
+     "damage": [
+      3,
+      6
+     ]
+    }
+   ],
+   "maps": {
+    "4": 1
+   },
+   "weak_prefix": "lesser"
+  },
+  {
+   "name": "demon",
+   "shape": 96,
+   "level": 8,
+   "xp": 176,
+   "hp": [
+    62,
+    77
+   ],
+   "dex": [
+    19,
+    24
+   ],
+   "str": 24,
+   "int": 26,
+   "damage": [
+    9,
+    14
+   ],
+   "variants": [
+    {
+     "level": 4,
+     "xp": 5,
+     "hp": [
+      37,
+      46
+     ],
+     "dex": [
+      13,
+      20
+     ],
+     "str": 16,
+     "int": 18,
+     "damage": [
+      5,
+      8
+     ]
+    },
+    {
+     "level": 6,
+     "xp": 24,
+     "hp": [
+      37,
+      46
+     ],
+     "dex": [
+      16,
+      23
+     ],
+     "str": 20,
+     "int": 22,
+     "damage": [
+      6,
+      8
+     ]
+    },
+    {
+     "level": 7,
+     "xp": 152,
+     "hp": [
+      44,
+      55
+     ],
+     "dex": [
+      18,
+      24
+     ],
+     "str": 22,
+     "int": 24,
+     "damage": [
+      7,
+      10
+     ]
+    }
+   ],
+   "maps": {
+    "12": 6,
+    "14": 7,
+    "62": 4
+   },
+   "weak_prefix": "lesser"
+  },
+  {
+   "name": "fireskull",
+   "shape": 413,
+   "level": 2,
+   "xp": 1,
+   "hp": [
+    2,
+    5
+   ],
+   "dex": [
+    8,
+    11
+   ],
+   "str": 4,
+   "int": 0,
+   "damage": [
+    1,
+    3
+   ],
+   "variants": [
+    {
+     "level": 1,
+     "xp": 1,
+     "hp": [
+      2,
+      5
+     ],
+     "dex": [
+      7,
+      10
+     ],
+     "str": 2,
+     "int": 0,
+     "damage": [
+      1,
+      3
+     ]
+    }
+   ],
+   "maps": {
+    "50": 1
+   },
+   "weak_prefix": "lesser"
+  },
+  {
+   "name": "ghost",
+   "shape": 411,
+   "level": 6,
+   "xp": 24,
+   "hp": [
+    120,
+    142
+   ],
+   "dex": [
+    17,
+    23
+   ],
+   "str": 12,
+   "int": 22,
+   "damage": [
+    0,
+    0
+   ],
+   "variants": [
+    {
+     "level": 1,
+     "xp": 1,
+     "hp": [
+      28,
+      33
+     ],
+     "dex": [
+      10,
+      16
+     ],
+     "str": 2,
+     "int": 12,
+     "damage": [
+      0,
+      0
+     ]
+    },
+    {
+     "level": 2,
+     "xp": 2,
+     "hp": [
+      40,
+      48
+     ],
+     "dex": [
+      11,
+      17
+     ],
+     "str": 4,
+     "int": 14,
+     "damage": [
+      0,
+      0
+     ]
+    },
+    {
+     "level": 3,
+     "xp": 3,
+     "hp": [
+      48,
+      57
+     ],
+     "dex": [
+      13,
+      19
+     ],
+     "str": 6,
+     "int": 16,
+     "damage": [
+      0,
+      0
+     ]
+    },
+    {
+     "level": 5,
+     "xp": 22,
+     "hp": [
+      96,
+      114
+     ],
+     "dex": [
+      16,
+      22
+     ],
+     "str": 10,
+     "int": 20,
+     "damage": [
+      0,
+      0
+     ]
+    }
+   ],
+   "maps": {
+    "4": 2,
+    "6": 3,
+    "8": 3,
+    "37": 5,
+    "39": 1,
+    "49": 5,
+    "54": 5,
+    "63": 3
+   },
+   "weak_prefix": "lesser"
+  },
+  {
+   "name": "ghoul",
+   "shape": 142,
+   "level": 3,
+   "xp": 3,
+   "hp": [
+    21,
+    29
+   ],
+   "dex": [
+    12,
+    14
+   ],
+   "str": 10,
+   "int": 0,
+   "damage": [
+    4,
+    7
+   ],
+   "variants": [
+    {
+     "level": 1,
+     "xp": 1,
+     "hp": [
+      13,
+      19
+     ],
+     "dex": [
+      9,
+      11
+     ],
+     "str": 6,
+     "int": 0,
+     "damage": [
+      2,
+      4
+     ]
+    },
+    {
+     "level": 2,
+     "xp": 2,
+     "hp": [
+      16,
+      22
+     ],
+     "dex": [
+      10,
+      12
+     ],
+     "str": 8,
+     "int": 0,
+     "damage": [
+      3,
+      5
+     ]
+    }
+   ],
+   "maps": {
+    "4": 1,
+    "5": 2,
+    "6": 2,
+    "8": 2
+   },
+   "weak_prefix": "lesser"
+  },
+  {
+   "name": "golem",
+   "shape": 214,
+   "level": 5,
+   "xp": 22,
+   "hp": [
+    78,
+    91
+   ],
+   "dex": [
+    8,
+    9
+   ],
+   "str": 24,
+   "int": 0,
+   "damage": [
+    8,
+    13
+   ],
+   "variants": [],
+   "maps": {},
+   "weak_prefix": "lesser"
+  },
+  {
+   "name": "invisible",
+   "shape": 808,
+   "level": 3,
+   "xp": 3,
+   "hp": [
+    37,
+    60
+   ],
+   "dex": [
+    6,
+    10
+   ],
+   "str": 6,
+   "int": 0,
+   "damage": [
+    10,
+    14
+   ],
+   "variants": [
+    {
+     "level": 1,
+     "xp": 1,
+     "hp": [
+      20,
+      36
+     ],
+     "dex": [
+      3,
+      7
+     ],
+     "str": 2,
+     "int": 0,
+     "damage": [
+      4,
+      8
+     ]
+    },
+    {
+     "level": 2,
+     "xp": 2,
+     "hp": [
+      32,
+      48
+     ],
+     "dex": [
+      4,
+      8
+     ],
+     "str": 4,
+     "int": 0,
+     "damage": [
+      8,
+      12
+     ]
+    }
+   ],
+   "maps": {
+    "8": 1,
+    "50": 2
+   },
+   "weak_prefix": "lesser"
+  },
+  {
+   "name": "kith",
+   "shape": 76,
+   "level": 4,
+   "xp": 5,
+   "hp": [
+    56,
+    69
+   ],
+   "dex": [
+    13,
+    17
+   ],
+   "str": 16,
+   "int": 0,
+   "damage": [
+    8,
+    10
+   ],
+   "variants": [
+    {
+     "level": 2,
+     "xp": 2,
+     "hp": [
+      10,
+      12
+     ],
+     "dex": [
+      10,
+      14
+     ],
+     "str": 12,
+     "int": 0,
+     "damage": [
+      1,
+      2
+     ]
+    },
+    {
+     "level": 3,
+     "xp": 3,
+     "hp": [
+      23,
+      29
+     ],
+     "dex": [
+      12,
+      16
+     ],
+     "str": 14,
+     "int": 0,
+     "damage": [
+      3,
+      5
+     ]
+    }
+   ],
+   "maps": {
+    "4": 2,
+    "5": 3,
+    "7": 2
+   },
+   "weak_prefix": "young"
+  },
+  {
+   "name": "seeker",
+   "shape": 509,
+   "level": 5,
+   "xp": 22,
+   "hp": [
+    53,
+    72
+   ],
+   "dex": [
+    18,
+    24
+   ],
+   "str": 16,
+   "int": 11,
+   "damage": [
+    8,
+    11
+   ],
+   "variants": [
+    {
+     "level": 3,
+     "xp": 3,
+     "hp": [
+      18,
+      24
+     ],
+     "dex": [
+      15,
+      23
+     ],
+     "str": 12,
+     "int": 9,
+     "damage": [
+      3,
+      4
+     ]
+    },
+    {
+     "level": 4,
+     "xp": 5,
+     "hp": [
+      47,
+      62
+     ],
+     "dex": [
+      16,
+      24
+     ],
+     "str": 14,
+     "int": 10,
+     "damage": [
+      7,
+      10
+     ]
+    }
+   ],
+   "maps": {
+    "8": 3,
+    "15": 4,
+    "62": 4
+   },
+   "weak_prefix": "young"
+  },
+  {
+   "name": "skeleton",
+   "shape": 119,
+   "level": 2,
+   "xp": 2,
+   "hp": [
+    12,
+    14
+   ],
+   "dex": [
+    11,
+    16
+   ],
+   "str": 8,
+   "int": 0,
+   "damage": [
+    3,
+    4
+   ],
+   "variants": [
+    {
+     "level": 1,
+     "xp": 1,
+     "hp": [
+      9,
+      12
+     ],
+     "dex": [
+      10,
+      15
+     ],
+     "str": 6,
+     "int": 0,
+     "damage": [
+      1,
+      4
+     ]
+    }
+   ],
+   "maps": {
+    "4": 1
+   },
+   "weak_prefix": "lesser"
+  },
+  {
+   "name": "small insect",
+   "shape": 824,
+   "level": 1,
+   "xp": 1,
+   "hp": [
+    15,
+    20
+   ],
+   "dex": [
+    10,
+    18
+   ],
+   "str": 2,
+   "int": 0,
+   "damage": [
+    3,
+    5
+   ],
+   "variants": [],
+   "maps": {},
+   "weak_prefix": "young"
+  },
+  {
+   "name": "torax",
+   "shape": 120,
+   "level": 1,
+   "xp": 1,
+   "hp": [
+    4,
+    5
+   ],
+   "dex": [
+    3,
+    7
+   ],
+   "str": 8,
+   "int": 0,
+   "damage": [
+    1,
+    2
+   ],
+   "variants": [],
+   "maps": {},
+   "weak_prefix": "young"
+  },
+  {
+   "name": "troll",
+   "shape": 83,
+   "level": 6,
+   "xp": 24,
+   "hp": [
+    133,
+    200
+   ],
+   "dex": [
+    9,
+    12
+   ],
+   "str": 24,
+   "int": 0,
+   "damage": [
+    9,
+    25
+   ],
+   "variants": [
+    {
+     "level": 1,
+     "xp": 1,
+     "hp": [
+      16,
+      25
+     ],
+     "dex": [
+      2,
+      5
+     ],
+     "str": 14,
+     "int": 0,
+     "damage": [
+      1,
+      3
+     ]
+    },
+    {
+     "level": 2,
+     "xp": 2,
+     "hp": [
+      15,
+      22
+     ],
+     "dex": [
+      3,
+      6
+     ],
+     "str": 16,
+     "int": 0,
+     "damage": [
+      1,
+      3
+     ]
+    },
+    {
+     "level": 3,
+     "xp": 3,
+     "hp": [
+      39,
+      59
+     ],
+     "dex": [
+      5,
+      8
+     ],
+     "str": 18,
+     "int": 0,
+     "damage": [
+      3,
+      7
+     ]
+    },
+    {
+     "level": 4,
+     "xp": 5,
+     "hp": [
+      104,
+      157
+     ],
+     "dex": [
+      6,
+      9
+     ],
+     "str": 20,
+     "int": 0,
+     "damage": [
+      7,
+      19
+     ]
+    },
+    {
+     "level": 5,
+     "xp": 22,
+     "hp": [
+      124,
+      185
+     ],
+     "dex": [
+      8,
+      11
+     ],
+     "str": 22,
+     "int": 0,
+     "damage": [
+      8,
+      23
+     ]
+    }
+   ],
+   "maps": {
+    "7": 2,
+    "8": 3,
+    "15": 4,
+    "31": 5,
+    "39": 1,
+    "49": 5,
+    "51": 4,
+    "62": 4
+   },
+   "weak_prefix": "young"
+  },
+  {
+   "name": "peasant 1",
+   "shape": 707,
+   "level": 1,
+   "xp": 0
+  },
+  {
+   "name": "child",
+   "shape": 708,
+   "level": 1,
+   "xp": 0
+  },
+  {
+   "name": "peasant 2",
+   "shape": 835,
+   "level": 1,
+   "xp": 0
+  },
+  {
+   "name": "peasant 3",
+   "shape": 836,
+   "level": 1,
+   "xp": 0
+  },
+  {
+   "name": "guard",
+   "shape": 574,
+   "level": 4,
+   "xp": 0
+  },
+  {
+   "name": "theurgist",
+   "shape": 269,
+   "level": 5,
+   "xp": 12
+  },
+  {
+   "name": "sorcerer",
+   "shape": 200,
+   "level": 6,
+   "xp": 22
+  },
+  {
+   "name": "Malchir",
+   "shape": 187,
+   "level": 7,
+   "xp": 32
+  }
+ ]
+}

@@ -1,0 +1,57 @@
+{
+ "id": "darion",
+ "name": "Darion",
+ "npc": 5,
+ "about": "Darion (class 1029), the Tenebrae soldier who trains fighters. With Leveling on (game/stat_growth.h) his paid training raises STR or DEX by one a session, for the Avatar or a companion walking with him; the lines and prices are in data/stat_growth.json. His original 'I need training.' sparring session gives nothing with Leveling on (specs/world/leveling_facts.md 4), so it is taken out of his menu then and ours, in the same words, takes its place. With Leveling off his menu is the original's. INT-gated topic (PLAN-LEVELING.md 5; game/npc_dialog.h 'avatar_int'): shown only when the Avatar's INT is at least the number, behind New Dialogue.",
+ "menu": {
+  "max_entries": 2,
+  "first_menu": true,
+  "exits_only_menu": true,
+  "back": "Back.",
+  "leave": "Something else."
+ },
+ "hide": [
+  {
+   "text": "I need training.",
+   "feature": "leveling"
+  }
+ ],
+ "topics": [
+  {
+   "id": "training",
+   "label": "I need training.",
+   "feature": "leveling",
+   "action": "train"
+  },
+  {
+   "id": "loyalty",
+   "slot": "mind",
+   "label": "Whom does the guard protect if the Tempest is unjust?",
+   "when": {
+    "cond": [
+     {
+      "global": [
+       89,
+       1
+      ],
+      "eq": 1
+     },
+     {
+      "global": [
+       86,
+       1
+      ],
+      "eq": 0
+     }
+    ],
+    "avatar_int": 18
+   },
+   "say": [
+    "Hah! That is a question for a philosopher, not a soldier. I serve the Tempestry, friend. The Tempest holds Hydros' power. That is the law.",
+    "A guard who picks and chooses his orders is no guard at all. He's a mob with a nice helmet.",
+    "...But I'll tell you this, and only once. A man can keep his oath and still keep his eyes open.",
+    "Now. Official policy and all. We never spoke of it."
+   ]
+  }
+ ]
+}

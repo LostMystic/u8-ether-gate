@@ -1,0 +1,53 @@
+{
+ "id": "vardion",
+ "name": "Vardion",
+ "npc": 28,
+ "about": "Vardion (class 1052), First Acolyte of the Enclave on Daemon's Crag, one of the two mentors; dies if Bane wins (G[142:2] = 2). INT-gated topic (PLAN-LEVELING.md 5; game/npc_dialog.h 'avatar_int'): shown only when the Avatar's INT is at least the number, behind New Dialogue.",
+ "menu": {
+  "max_entries": 1,
+  "first_menu": true,
+  "exits_only_menu": true,
+  "back": "Back.",
+  "leave": "Something else."
+ },
+ "topics": [
+  {
+   "id": "mordra",
+   "slot": "mind",
+   "label": "Your grandmother believed in other worlds. What did she study?",
+   "when": {
+    "cond": [
+     {
+      "global": [
+       142,
+       2
+      ],
+      "ne": 2
+     }
+    ],
+    "avatar_int": 22
+   },
+   "say": [
+    "You are bold to ask after my family, stranger. Bold, or clever. I have not decided which.",
+    "Mordra studied the edges of things. Where the fire meets the stone, where one place ends and another begins. She said every wall has a far side.",
+    "Then one day she was gone. No body, no ash. Some said a daemon took her. I prefer to think she found a far side and walked through it.",
+    "Honesty can be as deadly as deceit, if it is not tempered by wisdom. So I will say only this: if you find her road, you will tell me. That is not a request."
+   ],
+   "alt": [
+    {
+     "when": {
+      "mark": [
+       "known_avatar"
+      ]
+     },
+     "say": [
+      "You are bold to ask after my family, Avatar of Tenebrae. Bold, or clever. I have not decided which.",
+      "Mordra studied the edges of things. Where the fire meets the stone, where one place ends and another begins. She said every wall has a far side.",
+      "Then one day she was gone. No body, no ash. Some said a daemon took her. I prefer to think she found a far side and walked through it.",
+      "Honesty can be as deadly as deceit, if it is not tempered by wisdom. So I will say only this: if you find her road, you will tell me. That is not a request."
+     ]
+    }
+   ]
+  }
+ ]
+}

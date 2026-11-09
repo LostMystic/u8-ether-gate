@@ -1,0 +1,2253 @@
+{
+ "version": 1,
+ "game": "Ultima 8 v2.10 English",
+ "notes": [
+  "kind 'egg' links come from every teleporter egg (shape 508, frame != 1) in FIXED.DAT/NONFIXED.DAT; to_x/to_y/to_z is the frame-1 arrival egg with the same id on the target map; trigger_range = [x range, y range] from the egg's npcnum field (high nibble, low nibble)",
+  "from_map -1 means 'from any map' (an inventory item or spell); x/y/z null means there is no fixed source point",
+  "same-map links (from_map == to_map) are included: they matter for routing inside large maps such as 8, 14, 50 and 57",
+  "condition uses the critpath.json condition language; links without a condition are always open (doors, keys and puzzles in front of an egg are not modelled except where noted)"
+ ],
+ "links": [
+  {
+   "from_map": 3,
+   "x": 11516,
+   "y": 1660,
+   "z": 48,
+   "to_map": 40,
+   "kind": "egg",
+   "egg_id": 0,
+   "trigger_range": [
+    8,
+    6
+   ],
+   "to_x": 13038,
+   "to_y": 15042,
+   "to_z": 48,
+   "note": "teleporter egg (shape 508 frame 0, fixed) -> map 40 egg id 0"
+  },
+  {
+   "from_map": 4,
+   "x": 13311,
+   "y": 2527,
+   "z": 56,
+   "to_map": 4,
+   "kind": "egg",
+   "egg_id": 5,
+   "trigger_range": [
+    2,
+    3
+   ],
+   "to_x": 4319,
+   "to_y": 2815,
+   "to_z": 0,
+   "note": "teleporter egg (shape 508 frame 0, fixed) -> map 4 egg id 5"
+  },
+  {
+   "from_map": 4,
+   "x": 4511,
+   "y": 2911,
+   "z": 0,
+   "to_map": 4,
+   "kind": "egg",
+   "egg_id": 6,
+   "trigger_range": [
+    2,
+    10
+   ],
+   "to_x": 13634,
+   "to_y": 2614,
+   "to_z": 56,
+   "note": "teleporter egg (shape 508 frame 0, fixed) -> map 4 egg id 6"
+  },
+  {
+   "from_map": 4,
+   "x": 8808,
+   "y": 4296,
+   "z": 48,
+   "to_map": 4,
+   "kind": "egg",
+   "egg_id": 7,
+   "trigger_range": [
+    2,
+    4
+   ],
+   "to_x": 12351,
+   "to_y": 4319,
+   "to_z": 48,
+   "note": "teleporter egg (shape 508 frame 0, fixed) -> map 4 egg id 7"
+  },
+  {
+   "from_map": 4,
+   "x": 12160,
+   "y": 4320,
+   "z": 56,
+   "to_map": 4,
+   "kind": "egg",
+   "egg_id": 8,
+   "trigger_range": [
+    2,
+    5
+   ],
+   "to_x": 8592,
+   "to_y": 4232,
+   "to_z": 48,
+   "note": "teleporter egg (shape 508 frame 0, fixed) -> map 4 egg id 8"
+  },
+  {
+   "from_map": 4,
+   "x": 15908,
+   "y": 6900,
+   "z": 48,
+   "to_map": 39,
+   "kind": "egg",
+   "egg_id": 2,
+   "trigger_range": [
+    4,
+    8
+   ],
+   "to_x": 9272,
+   "to_y": 11016,
+   "to_z": 48,
+   "note": "teleporter egg (shape 508 frame 0, fixed) -> map 39 egg id 2"
+  },
+  {
+   "from_map": 5,
+   "x": 7423,
+   "y": 10943,
+   "z": 48,
+   "to_map": 6,
+   "kind": "egg",
+   "egg_id": 1,
+   "trigger_range": [
+    5,
+    4
+   ],
+   "to_x": 5375,
+   "to_y": 29823,
+   "to_z": 8,
+   "note": "teleporter egg (shape 508 frame 0, fixed) -> map 6 egg id 1"
+  },
+  {
+   "from_map": 5,
+   "x": 4748,
+   "y": 22772,
+   "z": 48,
+   "to_map": 41,
+   "kind": "egg",
+   "egg_id": 2,
+   "trigger_range": [
+    6,
+    4
+   ],
+   "to_x": 22655,
+   "to_y": 10975,
+   "to_z": 48,
+   "note": "teleporter egg (shape 508 frame 0, fixed) -> map 41 egg id 2"
+  },
+  {
+   "from_map": 5,
+   "x": 4831,
+   "y": 26335,
+   "z": 48,
+   "to_map": 41,
+   "kind": "egg",
+   "egg_id": 2,
+   "trigger_range": [
+    3,
+    4
+   ],
+   "to_x": 22655,
+   "to_y": 10975,
+   "to_z": 48,
+   "note": "teleporter egg (shape 508 frame 0, fixed) -> map 41 egg id 2"
+  },
+  {
+   "from_map": 6,
+   "x": 5375,
+   "y": 30367,
+   "z": 8,
+   "to_map": 5,
+   "kind": "egg",
+   "egg_id": 1,
+   "trigger_range": [
+    4,
+    10
+   ],
+   "to_x": 7424,
+   "to_y": 11264,
+   "to_z": 48,
+   "note": "teleporter egg (shape 508 frame 0, fixed) -> map 5 egg id 1"
+  },
+  {
+   "from_map": 6,
+   "x": 7676,
+   "y": 19316,
+   "z": 8,
+   "to_map": 50,
+   "kind": "egg",
+   "egg_id": 10,
+   "trigger_range": [
+    4,
+    1
+   ],
+   "to_x": 2948,
+   "to_y": 10612,
+   "to_z": 48,
+   "note": "teleporter egg (shape 508 frame 0, fixed) -> map 50 egg id 10"
+  },
+  {
+   "from_map": 7,
+   "x": 9498,
+   "y": 19702,
+   "z": 8,
+   "to_map": 8,
+   "kind": "egg",
+   "egg_id": 0,
+   "trigger_range": [
+    4,
+    2
+   ],
+   "to_x": 31583,
+   "to_y": 19135,
+   "to_z": 0,
+   "note": "teleporter egg (shape 508 frame 0, fixed) -> map 8 egg id 0"
+  },
+  {
+   "from_map": 7,
+   "x": 15103,
+   "y": 26815,
+   "z": 8,
+   "to_map": 40,
+   "kind": "egg",
+   "egg_id": 3,
+   "trigger_range": [
+    4,
+    11
+   ],
+   "to_x": 13070,
+   "to_y": 2618,
+   "to_z": 48,
+   "note": "teleporter egg (shape 508 frame 0, fixed) -> map 40 egg id 3"
+  },
+  {
+   "from_map": 7,
+   "x": 13055,
+   "y": 16415,
+   "z": 8,
+   "to_map": 63,
+   "kind": "egg",
+   "egg_id": 5,
+   "trigger_range": [
+    2,
+    1
+   ],
+   "to_x": 16127,
+   "to_y": 18879,
+   "to_z": 0,
+   "note": "teleporter egg (shape 508 frame 0, fixed) -> map 63 egg id 5"
+  },
+  {
+   "from_map": 8,
+   "x": 31871,
+   "y": 19167,
+   "z": 0,
+   "to_map": 7,
+   "kind": "egg",
+   "egg_id": 1,
+   "trigger_range": [
+    5,
+    4
+   ],
+   "to_x": 9823,
+   "to_y": 19743,
+   "to_z": 8,
+   "note": "teleporter egg (shape 508 frame 0, fixed) -> map 7 egg id 1"
+  },
+  {
+   "from_map": 8,
+   "x": 4094,
+   "y": 1794,
+   "z": 0,
+   "to_map": 8,
+   "kind": "egg",
+   "egg_id": 4,
+   "trigger_range": [
+    2,
+    2
+   ],
+   "to_x": 2944,
+   "to_y": 1816,
+   "to_z": 0,
+   "note": "teleporter egg (shape 508 frame 0, fixed) -> map 8 egg id 4"
+  },
+  {
+   "from_map": 8,
+   "x": 14538,
+   "y": 8334,
+   "z": 0,
+   "to_map": 8,
+   "kind": "egg",
+   "egg_id": 27,
+   "trigger_range": [
+    5,
+    7
+   ],
+   "to_x": 7960,
+   "to_y": 12760,
+   "to_z": 48,
+   "note": "teleporter egg (shape 508 frame 0, fixed) -> map 8 egg id 27"
+  },
+  {
+   "from_map": 8,
+   "x": 14540,
+   "y": 11004,
+   "z": 48,
+   "to_map": 8,
+   "kind": "egg",
+   "egg_id": 2,
+   "trigger_range": [
+    3,
+    3
+   ],
+   "to_x": 29375,
+   "to_y": 30015,
+   "to_z": 0,
+   "note": "teleporter egg (shape 508 frame 0, fixed) -> map 8 egg id 2"
+  },
+  {
+   "from_map": 8,
+   "x": 7916,
+   "y": 12476,
+   "z": 48,
+   "to_map": 8,
+   "kind": "egg",
+   "egg_id": 26,
+   "trigger_range": [
+    4,
+    4
+   ],
+   "to_x": 14540,
+   "to_y": 7972,
+   "to_z": 0,
+   "note": "teleporter egg (shape 508 frame 0, fixed) -> map 8 egg id 26"
+  },
+  {
+   "from_map": 8,
+   "x": 29407,
+   "y": 30335,
+   "z": 0,
+   "to_map": 8,
+   "kind": "egg",
+   "egg_id": 1,
+   "trigger_range": [
+    4,
+    5
+   ],
+   "to_x": 14590,
+   "to_y": 11210,
+   "to_z": 48,
+   "note": "teleporter egg (shape 508 frame 0, fixed) -> map 8 egg id 1"
+  },
+  {
+   "from_map": 12,
+   "x": 9823,
+   "y": 15583,
+   "z": 64,
+   "to_map": 12,
+   "kind": "egg",
+   "egg_id": 100,
+   "trigger_range": [
+    2,
+    5
+   ],
+   "to_x": 5727,
+   "to_y": 18815,
+   "to_z": 96,
+   "note": "teleporter egg (shape 508 frame 0, fixed) -> map 12 egg id 100"
+  },
+  {
+   "from_map": 12,
+   "x": 5823,
+   "y": 18815,
+   "z": 96,
+   "to_map": 12,
+   "kind": "egg",
+   "egg_id": 101,
+   "trigger_range": [
+    2,
+    2
+   ],
+   "to_x": 9951,
+   "to_y": 15615,
+   "to_z": 64,
+   "note": "teleporter egg (shape 508 frame 0, fixed) -> map 12 egg id 101"
+  },
+  {
+   "from_map": 12,
+   "x": 3903,
+   "y": 18687,
+   "z": 56,
+   "to_map": 14,
+   "kind": "egg",
+   "egg_id": 1,
+   "trigger_range": [
+    1,
+    6
+   ],
+   "to_x": 15935,
+   "to_y": 2303,
+   "to_z": 8,
+   "note": "teleporter egg (shape 508 frame 0, fixed) -> map 14 egg id 1"
+  },
+  {
+   "from_map": 14,
+   "x": 16383,
+   "y": 2303,
+   "z": 104,
+   "to_map": 12,
+   "kind": "egg",
+   "egg_id": 102,
+   "trigger_range": [
+    1,
+    6
+   ],
+   "to_x": 4095,
+   "to_y": 18687,
+   "to_z": 96,
+   "note": "teleporter egg (shape 508 frame 0, fixed) -> map 12 egg id 102"
+  },
+  {
+   "from_map": 15,
+   "x": 8310,
+   "y": 6762,
+   "z": 0,
+   "to_map": 5,
+   "kind": "egg",
+   "egg_id": 10,
+   "trigger_range": [
+    3,
+    3
+   ],
+   "to_x": 3871,
+   "to_y": 12031,
+   "to_z": 48,
+   "note": "teleporter egg (shape 508 frame 0, fixed) -> map 5 egg id 10"
+  },
+  {
+   "from_map": 16,
+   "x": 17764,
+   "y": 18124,
+   "z": 104,
+   "to_map": 28,
+   "kind": "egg",
+   "egg_id": 1,
+   "trigger_range": [
+    1,
+    3
+   ],
+   "to_x": 14980,
+   "to_y": 8108,
+   "to_z": 104,
+   "note": "teleporter egg (shape 508 frame 0, fixed) -> map 28 egg id 1"
+  },
+  {
+   "from_map": 16,
+   "x": 19246,
+   "y": 9474,
+   "z": 104,
+   "to_map": 49,
+   "kind": "egg",
+   "egg_id": 4,
+   "trigger_range": [
+    3,
+    1
+   ],
+   "to_x": 22740,
+   "to_y": 22388,
+   "to_z": 48,
+   "note": "teleporter egg (shape 508 frame 0, fixed) -> map 49 egg id 4"
+  },
+  {
+   "from_map": 21,
+   "x": 4383,
+   "y": 1887,
+   "z": 0,
+   "to_map": 31,
+   "kind": "egg",
+   "egg_id": 0,
+   "trigger_range": [
+    3,
+    2
+   ],
+   "to_x": 27850,
+   "to_y": 23350,
+   "to_z": 128,
+   "note": "teleporter egg (shape 508 frame 0, fixed) -> map 31 egg id 0"
+  },
+  {
+   "from_map": 21,
+   "x": 3324,
+   "y": 1884,
+   "z": 0,
+   "to_map": 49,
+   "kind": "egg",
+   "egg_id": 8,
+   "trigger_range": [
+    3,
+    2
+   ],
+   "to_x": 17631,
+   "to_y": 24735,
+   "to_z": 48,
+   "note": "teleporter egg (shape 508 frame 0, fixed) -> map 49 egg id 8"
+  },
+  {
+   "from_map": 21,
+   "x": 5374,
+   "y": 1890,
+   "z": 0,
+   "to_map": 57,
+   "kind": "egg",
+   "egg_id": 1,
+   "trigger_range": [
+    3,
+    2
+   ],
+   "to_x": 30495,
+   "to_y": 28127,
+   "to_z": 48,
+   "note": "teleporter egg (shape 508 frame 0, fixed) -> map 57 egg id 1"
+  },
+  {
+   "from_map": 26,
+   "x": 17770,
+   "y": 18126,
+   "z": 104,
+   "to_map": 28,
+   "kind": "egg",
+   "egg_id": 1,
+   "trigger_range": [
+    1,
+    3
+   ],
+   "to_x": 14980,
+   "to_y": 8108,
+   "to_z": 104,
+   "note": "teleporter egg (shape 508 frame 0, fixed) -> map 28 egg id 1"
+  },
+  {
+   "from_map": 26,
+   "x": 19254,
+   "y": 9434,
+   "z": 104,
+   "to_map": 49,
+   "kind": "egg",
+   "egg_id": 4,
+   "trigger_range": [
+    3,
+    1
+   ],
+   "to_x": 22740,
+   "to_y": 22388,
+   "to_z": 48,
+   "note": "teleporter egg (shape 508 frame 0, fixed) -> map 49 egg id 4"
+  },
+  {
+   "from_map": 28,
+   "x": 14498,
+   "y": 7542,
+   "z": 0,
+   "to_map": 16,
+   "kind": "egg",
+   "egg_id": 0,
+   "trigger_range": [
+    0,
+    0
+   ],
+   "note": "teleporter egg -> map 16 egg id 0; no frame-1 arrival egg with that id exists on the target map, so the teleport fails (dead link)",
+   "dead": true
+  },
+  {
+   "from_map": 28,
+   "x": 10591,
+   "y": 6367,
+   "z": 104,
+   "to_map": 28,
+   "kind": "egg",
+   "egg_id": 4,
+   "trigger_range": [
+    1,
+    5
+   ],
+   "to_x": 5598,
+   "to_y": 6810,
+   "to_z": 56,
+   "note": "teleporter egg (shape 508 frame 0, fixed) -> map 28 egg id 4"
+  },
+  {
+   "from_map": 28,
+   "x": 5872,
+   "y": 6808,
+   "z": 56,
+   "to_map": 28,
+   "kind": "egg",
+   "egg_id": 5,
+   "trigger_range": [
+    1,
+    14
+   ],
+   "to_x": 10847,
+   "to_y": 6399,
+   "to_z": 104,
+   "note": "teleporter egg (shape 508 frame 0, fixed) -> map 28 egg id 5"
+  },
+  {
+   "from_map": 28,
+   "x": 14175,
+   "y": 7903,
+   "z": 104,
+   "to_map": 28,
+   "kind": "egg",
+   "egg_id": 2,
+   "trigger_range": [
+    1,
+    5
+   ],
+   "to_x": 10776,
+   "to_y": 13376,
+   "to_z": 56,
+   "note": "teleporter egg (shape 508 frame 0, fixed) -> map 28 egg id 2"
+  },
+  {
+   "from_map": 28,
+   "x": 11076,
+   "y": 13396,
+   "z": 56,
+   "to_map": 28,
+   "kind": "egg",
+   "egg_id": 3,
+   "trigger_range": [
+    2,
+    8
+   ],
+   "to_x": 14358,
+   "to_y": 7946,
+   "to_z": 104,
+   "note": "teleporter egg (shape 508 frame 0, fixed) -> map 28 egg id 3"
+  },
+  {
+   "from_map": 31,
+   "x": 27894,
+   "y": 23642,
+   "z": 128,
+   "to_map": 21,
+   "kind": "egg",
+   "egg_id": 2,
+   "trigger_range": [
+    4,
+    3
+   ],
+   "to_x": 4342,
+   "to_y": 2138,
+   "to_z": 0,
+   "note": "teleporter egg (shape 508 frame 0, fixed) -> map 21 egg id 2"
+  },
+  {
+   "from_map": 31,
+   "x": 27894,
+   "y": 23642,
+   "z": 128,
+   "to_map": 21,
+   "kind": "egg",
+   "egg_id": 2,
+   "trigger_range": [
+    4,
+    3
+   ],
+   "to_x": 4342,
+   "to_y": 2138,
+   "to_z": 0,
+   "note": "teleporter egg (shape 508 frame 0, fixed) -> map 21 egg id 2"
+  },
+  {
+   "from_map": 31,
+   "x": 12006,
+   "y": 3338,
+   "z": 16,
+   "to_map": 31,
+   "kind": "egg",
+   "egg_id": 14,
+   "trigger_range": [
+    2,
+    2
+   ],
+   "to_x": 27152,
+   "to_y": 20888,
+   "to_z": 184,
+   "note": "teleporter egg (shape 508 frame 0, fixed) -> map 31 egg id 14"
+  },
+  {
+   "from_map": 31,
+   "x": 2796,
+   "y": 6252,
+   "z": 16,
+   "to_map": 31,
+   "kind": "egg",
+   "egg_id": 14,
+   "trigger_range": [
+    2,
+    2
+   ],
+   "to_x": 27152,
+   "to_y": 20888,
+   "to_z": 184,
+   "note": "teleporter egg (shape 508 frame 0, fixed) -> map 31 egg id 14"
+  },
+  {
+   "from_map": 37,
+   "x": 5894,
+   "y": 2586,
+   "z": 96,
+   "to_map": 37,
+   "kind": "egg",
+   "egg_id": 12,
+   "trigger_range": [
+    3,
+    1
+   ],
+   "to_x": 17023,
+   "to_y": 18047,
+   "to_z": 56,
+   "note": "teleporter egg (shape 508 frame 0, fixed) -> map 37 egg id 12"
+  },
+  {
+   "from_map": 37,
+   "x": 16954,
+   "y": 18262,
+   "z": 8,
+   "to_map": 37,
+   "kind": "egg",
+   "egg_id": 5,
+   "trigger_range": [
+    2,
+    2
+   ],
+   "to_x": 5951,
+   "to_y": 2751,
+   "to_z": 64,
+   "note": "teleporter egg (shape 508 frame 0, fixed) -> map 37 egg id 5"
+  },
+  {
+   "from_map": 37,
+   "x": 26442,
+   "y": 26886,
+   "z": 56,
+   "to_map": 49,
+   "kind": "egg",
+   "egg_id": 5,
+   "trigger_range": [
+    3,
+    2
+   ],
+   "to_x": 19199,
+   "to_y": 16191,
+   "to_z": 48,
+   "note": "teleporter egg (shape 508 frame 0, fixed) -> map 49 egg id 5"
+  },
+  {
+   "from_map": 39,
+   "x": 8888,
+   "y": 11000,
+   "z": 48,
+   "to_map": 4,
+   "kind": "egg",
+   "egg_id": 0,
+   "trigger_range": [
+    5,
+    14
+   ],
+   "to_x": 15464,
+   "to_y": 6912,
+   "to_z": 48,
+   "note": "teleporter egg (shape 508 frame 0, fixed) -> map 4 egg id 0"
+  },
+  {
+   "from_map": 39,
+   "x": 19608,
+   "y": 3320,
+   "z": 48,
+   "to_map": 40,
+   "kind": "egg",
+   "egg_id": 4,
+   "trigger_range": [
+    10,
+    4
+   ],
+   "to_x": 10810,
+   "to_y": 3342,
+   "to_z": 48,
+   "note": "teleporter egg (shape 508 frame 0, fixed) -> map 40 egg id 4"
+  },
+  {
+   "from_map": 39,
+   "x": 19600,
+   "y": 14072,
+   "z": 48,
+   "to_map": 40,
+   "kind": "egg",
+   "egg_id": 5,
+   "trigger_range": [
+    9,
+    4
+   ],
+   "to_x": 10810,
+   "to_y": 14094,
+   "to_z": 48,
+   "note": "teleporter egg (shape 508 frame 0, fixed) -> map 40 egg id 5"
+  },
+  {
+   "from_map": 40,
+   "x": 13048,
+   "y": 15464,
+   "z": 48,
+   "to_map": 3,
+   "kind": "egg",
+   "egg_id": 0,
+   "trigger_range": [
+    10,
+    10
+   ],
+   "to_x": 11532,
+   "to_y": 1980,
+   "to_z": 48,
+   "note": "teleporter egg (shape 508 frame 0, fixed) -> map 3 egg id 0"
+  },
+  {
+   "from_map": 40,
+   "x": 13054,
+   "y": 2322,
+   "z": 48,
+   "to_map": 7,
+   "kind": "egg",
+   "egg_id": 0,
+   "trigger_range": [
+    4,
+    5
+   ],
+   "to_x": 15071,
+   "to_y": 26239,
+   "to_z": 8,
+   "note": "teleporter egg (shape 508 frame 0, fixed) -> map 7 egg id 0"
+  },
+  {
+   "from_map": 40,
+   "x": 10456,
+   "y": 3296,
+   "z": 48,
+   "to_map": 39,
+   "kind": "egg",
+   "egg_id": 1,
+   "trigger_range": [
+    5,
+    4
+   ],
+   "to_x": 19116,
+   "to_y": 3316,
+   "to_z": 48,
+   "note": "teleporter egg (shape 508 frame 0, fixed) -> map 39 egg id 1"
+  },
+  {
+   "from_map": 40,
+   "x": 10506,
+   "y": 14070,
+   "z": 48,
+   "to_map": 39,
+   "kind": "egg",
+   "egg_id": 0,
+   "trigger_range": [
+    5,
+    4
+   ],
+   "to_x": 19130,
+   "to_y": 14070,
+   "to_z": 48,
+   "note": "teleporter egg (shape 508 frame 0, fixed) -> map 39 egg id 0"
+  },
+  {
+   "from_map": 40,
+   "x": 1630,
+   "y": 5522,
+   "z": 40,
+   "to_map": 40,
+   "kind": "egg",
+   "egg_id": 13,
+   "trigger_range": [
+    2,
+    2
+   ],
+   "to_x": 11910,
+   "to_y": 8786,
+   "to_z": 48,
+   "note": "teleporter egg (shape 508 frame 0, fixed) -> map 40 egg id 13"
+  },
+  {
+   "from_map": 40,
+   "x": 11876,
+   "y": 8468,
+   "z": 8,
+   "to_map": 40,
+   "kind": "egg",
+   "egg_id": 12,
+   "trigger_range": [
+    2,
+    2
+   ],
+   "to_x": 1662,
+   "to_y": 5250,
+   "to_z": 0,
+   "note": "teleporter egg (shape 508 frame 0, fixed) -> map 40 egg id 12"
+  },
+  {
+   "from_map": 40,
+   "x": 15414,
+   "y": 3298,
+   "z": 48,
+   "to_map": 41,
+   "kind": "egg",
+   "egg_id": 1,
+   "trigger_range": [
+    10,
+    4
+   ],
+   "to_x": 12767,
+   "to_y": 3327,
+   "to_z": 48,
+   "note": "teleporter egg (shape 508 frame 0, fixed) -> map 41 egg id 1"
+  },
+  {
+   "from_map": 40,
+   "x": 15570,
+   "y": 14070,
+   "z": 48,
+   "to_map": 41,
+   "kind": "egg",
+   "egg_id": 0,
+   "trigger_range": [
+    11,
+    4
+   ],
+   "to_x": 12828,
+   "to_y": 14092,
+   "to_z": 48,
+   "note": "teleporter egg (shape 508 frame 0, fixed) -> map 41 egg id 0"
+  },
+  {
+   "from_map": 41,
+   "x": 23103,
+   "y": 11007,
+   "z": 48,
+   "to_map": 5,
+   "kind": "egg",
+   "egg_id": 0,
+   "trigger_range": [
+    8,
+    6
+   ],
+   "to_x": 5040,
+   "to_y": 22784,
+   "to_z": 48,
+   "note": "teleporter egg (shape 508 frame 0, fixed) -> map 5 egg id 0"
+  },
+  {
+   "from_map": 41,
+   "x": 12479,
+   "y": 3327,
+   "z": 48,
+   "to_map": 40,
+   "kind": "egg",
+   "egg_id": 2,
+   "trigger_range": [
+    5,
+    4
+   ],
+   "to_x": 15022,
+   "to_y": 3290,
+   "to_z": 48,
+   "note": "teleporter egg (shape 508 frame 0, fixed) -> map 40 egg id 2"
+  },
+  {
+   "from_map": 41,
+   "x": 12566,
+   "y": 14074,
+   "z": 48,
+   "to_map": 40,
+   "kind": "egg",
+   "egg_id": 1,
+   "trigger_range": [
+    6,
+    4
+   ],
+   "to_x": 15000,
+   "to_y": 14040,
+   "to_z": 48,
+   "note": "teleporter egg (shape 508 frame 0, fixed) -> map 40 egg id 1"
+  },
+  {
+   "from_map": 43,
+   "x": 13567,
+   "y": 15295,
+   "z": 16,
+   "to_map": 44,
+   "kind": "egg",
+   "egg_id": 0,
+   "trigger_range": [
+    4,
+    1
+   ],
+   "to_x": 27295,
+   "to_y": 30367,
+   "to_z": 16,
+   "note": "teleporter egg (shape 508 frame 0, fixed) -> map 44 egg id 0"
+  },
+  {
+   "from_map": 43,
+   "x": 14764,
+   "y": 14036,
+   "z": 16,
+   "to_map": 45,
+   "kind": "egg",
+   "egg_id": 1,
+   "trigger_range": [
+    1,
+    8
+   ],
+   "to_x": 21823,
+   "to_y": 14431,
+   "to_z": 8,
+   "note": "teleporter egg (shape 508 frame 0, fixed) -> map 45 egg id 1"
+  },
+  {
+   "from_map": 43,
+   "x": 14770,
+   "y": 19166,
+   "z": 16,
+   "to_map": 46,
+   "kind": "egg",
+   "egg_id": 0,
+   "trigger_range": [
+    1,
+    5
+   ],
+   "to_x": 13951,
+   "to_y": 7455,
+   "to_z": 176,
+   "note": "teleporter egg (shape 508 frame 0, fixed) -> map 46 egg id 0"
+  },
+  {
+   "from_map": 43,
+   "x": 18678,
+   "y": 15266,
+   "z": 16,
+   "to_map": 47,
+   "kind": "egg",
+   "egg_id": 0,
+   "trigger_range": [
+    4,
+    1
+   ],
+   "to_x": 25279,
+   "to_y": 13503,
+   "to_z": 0,
+   "note": "teleporter egg (shape 508 frame 0, fixed) -> map 47 egg id 0"
+  },
+  {
+   "from_map": 49,
+   "x": 17599,
+   "y": 24927,
+   "z": 48,
+   "to_map": 21,
+   "kind": "egg",
+   "egg_id": 6,
+   "trigger_range": [
+    8,
+    1
+   ],
+   "to_x": 3359,
+   "to_y": 2079,
+   "to_z": 8,
+   "note": "teleporter egg (shape 508 frame 0, fixed) -> map 21 egg id 6"
+  },
+  {
+   "from_map": 49,
+   "x": 19406,
+   "y": 16162,
+   "z": 48,
+   "to_map": 37,
+   "kind": "egg",
+   "egg_id": 0,
+   "trigger_range": [
+    2,
+    3
+   ],
+   "to_x": 26776,
+   "to_y": 26912,
+   "to_z": 56,
+   "note": "teleporter egg (shape 508 frame 0, fixed) -> map 37 egg id 0"
+  },
+  {
+   "from_map": 49,
+   "x": 22463,
+   "y": 6271,
+   "z": 48,
+   "to_map": 50,
+   "kind": "egg",
+   "egg_id": 23,
+   "trigger_range": [
+    1,
+    5
+   ],
+   "to_x": 22463,
+   "to_y": 6271,
+   "to_z": 48,
+   "note": "teleporter egg (shape 508 frame 0, fixed) -> map 50 egg id 23"
+  },
+  {
+   "from_map": 50,
+   "x": 22623,
+   "y": 6335,
+   "z": 48,
+   "to_map": 49,
+   "kind": "egg",
+   "egg_id": 24,
+   "trigger_range": [
+    1,
+    10
+   ],
+   "to_x": 22623,
+   "to_y": 6335,
+   "to_z": 48,
+   "note": "teleporter egg (shape 508 frame 0, fixed) -> map 49 egg id 24"
+  },
+  {
+   "from_map": 50,
+   "x": 10175,
+   "y": 2783,
+   "z": 48,
+   "to_map": 50,
+   "kind": "egg",
+   "egg_id": 13,
+   "trigger_range": [
+    2,
+    4
+   ],
+   "to_x": 14624,
+   "to_y": 13480,
+   "to_z": 48,
+   "note": "teleporter egg (shape 508 frame 0, fixed) -> map 50 egg id 13"
+  },
+  {
+   "from_map": 50,
+   "x": 14918,
+   "y": 13626,
+   "z": 96,
+   "to_map": 50,
+   "kind": "egg",
+   "egg_id": 12,
+   "trigger_range": [
+    3,
+    6
+   ],
+   "to_x": 10442,
+   "to_y": 2846,
+   "to_z": 48,
+   "note": "teleporter egg (shape 508 frame 0, fixed) -> map 50 egg id 12"
+  },
+  {
+   "from_map": 50,
+   "x": 11074,
+   "y": 8910,
+   "z": 48,
+   "to_map": 51,
+   "kind": "egg",
+   "egg_id": 7,
+   "trigger_range": [
+    6,
+    7
+   ],
+   "to_x": 28732,
+   "to_y": 4804,
+   "to_z": 0,
+   "note": "teleporter egg (shape 508 frame 0, fixed) -> map 51 egg id 7"
+  },
+  {
+   "from_map": 50,
+   "x": 11168,
+   "y": 11264,
+   "z": 48,
+   "to_map": 54,
+   "kind": "egg",
+   "egg_id": 0,
+   "trigger_range": [
+    14,
+    3
+   ],
+   "to_x": 15694,
+   "to_y": 14786,
+   "to_z": 8,
+   "note": "teleporter egg (shape 508 frame 0, fixed) -> map 54 egg id 0"
+  },
+  {
+   "from_map": 50,
+   "x": 24479,
+   "y": 2783,
+   "z": 136,
+   "to_map": 62,
+   "kind": "egg",
+   "egg_id": 5,
+   "trigger_range": [
+    1,
+    9
+   ],
+   "to_x": 1695,
+   "to_y": 14655,
+   "to_z": 48,
+   "note": "teleporter egg (shape 508 frame 0, fixed) -> map 62 egg id 5"
+  },
+  {
+   "from_map": 51,
+   "x": 28959,
+   "y": 4863,
+   "z": 0,
+   "to_map": 50,
+   "kind": "egg",
+   "egg_id": 7,
+   "trigger_range": [
+    4,
+    7
+   ],
+   "to_x": 11359,
+   "to_y": 8991,
+   "to_z": 48,
+   "note": "teleporter egg (shape 508 frame 0, fixed) -> map 50 egg id 7"
+  },
+  {
+   "from_map": 51,
+   "x": 25375,
+   "y": 2143,
+   "z": 64,
+   "to_map": 51,
+   "kind": "egg",
+   "egg_id": 1,
+   "trigger_range": [
+    1,
+    1
+   ],
+   "to_x": 25599,
+   "to_y": 11199,
+   "to_z": 32,
+   "note": "teleporter egg (shape 508 frame 0, fixed) -> map 51 egg id 1"
+  },
+  {
+   "from_map": 51,
+   "x": 25908,
+   "y": 11508,
+   "z": 0,
+   "to_map": 51,
+   "kind": "egg",
+   "egg_id": 8,
+   "trigger_range": [
+    2,
+    2
+   ],
+   "to_x": 25372,
+   "to_y": 2516,
+   "to_z": 0,
+   "note": "teleporter egg (shape 508 frame 0, fixed) -> map 51 egg id 8"
+  },
+  {
+   "from_map": 51,
+   "x": 11743,
+   "y": 8703,
+   "z": 0,
+   "to_map": 57,
+   "kind": "egg",
+   "egg_id": 17,
+   "trigger_range": [
+    4,
+    4
+   ],
+   "to_x": 9280,
+   "to_y": 12024,
+   "to_z": 0,
+   "note": "teleporter egg (shape 508 frame 0, fixed) -> map 57 egg id 17"
+  },
+  {
+   "from_map": 54,
+   "x": 15750,
+   "y": 15066,
+   "z": 8,
+   "to_map": 50,
+   "kind": "egg",
+   "egg_id": 2,
+   "trigger_range": [
+    14,
+    1
+   ],
+   "to_x": 11256,
+   "to_y": 11512,
+   "to_z": 48,
+   "note": "teleporter egg (shape 508 frame 0, fixed) -> map 50 egg id 2"
+  },
+  {
+   "from_map": 57,
+   "x": 30559,
+   "y": 28255,
+   "z": 48,
+   "to_map": 21,
+   "kind": "egg",
+   "egg_id": 7,
+   "trigger_range": [
+    4,
+    1
+   ],
+   "to_x": 5414,
+   "to_y": 2362,
+   "to_z": 8,
+   "note": "teleporter egg (shape 508 frame 0, fixed) -> map 21 egg id 7"
+  },
+  {
+   "from_map": 57,
+   "x": 9100,
+   "y": 11972,
+   "z": 0,
+   "to_map": 51,
+   "kind": "egg",
+   "egg_id": 16,
+   "trigger_range": [
+    1,
+    3
+   ],
+   "to_x": 11484,
+   "to_y": 8644,
+   "to_z": 0,
+   "note": "teleporter egg (shape 508 frame 0, fixed) -> map 51 egg id 16"
+  },
+  {
+   "from_map": 57,
+   "x": 19903,
+   "y": 27359,
+   "z": 0,
+   "to_map": 57,
+   "kind": "egg",
+   "egg_id": 11,
+   "trigger_range": [
+    3,
+    6
+   ],
+   "to_x": 22111,
+   "to_y": 27903,
+   "to_z": 0,
+   "note": "teleporter egg (shape 508 frame 0, fixed) -> map 57 egg id 11"
+  },
+  {
+   "from_map": 57,
+   "x": 21823,
+   "y": 27839,
+   "z": 0,
+   "to_map": 57,
+   "kind": "egg",
+   "egg_id": 5,
+   "trigger_range": [
+    2,
+    3
+   ],
+   "to_x": 19606,
+   "to_y": 27258,
+   "to_z": 0,
+   "note": "teleporter egg (shape 508 frame 0, fixed) -> map 57 egg id 5"
+  },
+  {
+   "from_map": 57,
+   "x": 23423,
+   "y": 29919,
+   "z": 8,
+   "to_map": 57,
+   "kind": "egg",
+   "egg_id": 10,
+   "trigger_range": [
+    1,
+    5
+   ],
+   "to_x": 21270,
+   "to_y": 30330,
+   "to_z": 0,
+   "note": "teleporter egg (shape 508 frame 0, fixed) -> map 57 egg id 10"
+  },
+  {
+   "from_map": 57,
+   "x": 21471,
+   "y": 30431,
+   "z": 8,
+   "to_map": 57,
+   "kind": "egg",
+   "egg_id": 9,
+   "trigger_range": [
+    2,
+    4
+   ],
+   "to_x": 23620,
+   "to_y": 29956,
+   "to_z": 0,
+   "note": "teleporter egg (shape 508 frame 0, fixed) -> map 57 egg id 9"
+  },
+  {
+   "from_map": 62,
+   "x": 1375,
+   "y": 14559,
+   "z": 48,
+   "to_map": 50,
+   "kind": "egg",
+   "egg_id": 17,
+   "trigger_range": [
+    1,
+    4
+   ],
+   "to_x": 24031,
+   "to_y": 2719,
+   "to_z": 136,
+   "note": "teleporter egg (shape 508 frame 0, fixed) -> map 50 egg id 17"
+  },
+  {
+   "from_map": 62,
+   "x": 25695,
+   "y": 2975,
+   "z": 0,
+   "to_map": 62,
+   "kind": "egg",
+   "egg_id": 1,
+   "trigger_range": [
+    4,
+    4
+   ],
+   "to_x": 19167,
+   "to_y": 3519,
+   "to_z": 48,
+   "note": "teleporter egg (shape 508 frame 0, fixed) -> map 62 egg id 1"
+  },
+  {
+   "from_map": 62,
+   "x": 13663,
+   "y": 3647,
+   "z": 64,
+   "to_map": 62,
+   "kind": "egg",
+   "egg_id": 22,
+   "trigger_range": [
+    4,
+    4
+   ],
+   "to_x": 26847,
+   "to_y": 10111,
+   "to_z": 0,
+   "note": "teleporter egg (shape 508 frame 0, fixed) -> map 62 egg id 22"
+  },
+  {
+   "from_map": 63,
+   "x": 16120,
+   "y": 19104,
+   "z": 0,
+   "to_map": 7,
+   "kind": "egg",
+   "egg_id": 5,
+   "trigger_range": [
+    2,
+    2
+   ],
+   "to_x": 13055,
+   "to_y": 16543,
+   "to_z": 8,
+   "note": "teleporter egg (shape 508 frame 0, fixed) -> map 7 egg id 5"
+  },
+  {
+   "from_map": 14,
+   "x": 8959,
+   "y": 2303,
+   "z": 24,
+   "to_map": 14,
+   "to_x": 13567,
+   "to_y": 2303,
+   "to_z": 24,
+   "kind": "maptele",
+   "note": "MAPTELE usecode egg (shape 73 quality 1, class 1152); hatches only while G[15:1]=0",
+   "condition": {
+    "global": [
+     353,
+     3
+    ],
+    "ge": 6
+   }
+  },
+  {
+   "from_map": 14,
+   "x": 13567,
+   "y": 2303,
+   "z": 24,
+   "to_map": 14,
+   "to_x": 8959,
+   "to_y": 2303,
+   "to_z": 24,
+   "kind": "maptele",
+   "note": "MAPTELE usecode egg (shape 73 quality 1, class 1152); hatches only while G[15:1]=0; goes back to (8959,2303,24) whenever G[144:1]=1. With G[144:1]=0 it goes to (15615,16639,88) only if G[145:1]=0 and G[232:1]=1 (link below); otherwise it does nothing. Condition corrected 2026-11-08 from any(G[144:1],G[232:1]) after reading class 1152",
+   "condition": {
+    "global": [
+     144,
+     1
+    ],
+    "eq": 1
+   }
+  },
+  {
+   "from_map": 14,
+   "x": 13567,
+   "y": 2303,
+   "z": 24,
+   "to_map": 14,
+   "to_x": 15615,
+   "to_y": 16639,
+   "to_z": 88,
+   "kind": "maptele",
+   "note": "MAPTELE usecode egg (shape 73 quality 1, class 1152); hatches only while G[15:1]=0; branch taken when G[144:1]=0, G[145:1]=0 and G[232:1]=1 (into Arcadion's trials)",
+   "condition": {
+    "all": [
+     {
+      "global": [
+       144,
+       1
+      ],
+      "eq": 0
+     },
+     {
+      "global": [
+       145,
+       1
+      ],
+      "eq": 0
+     },
+     {
+      "global": [
+       232,
+       1
+      ],
+      "eq": 1
+     }
+    ]
+   }
+  },
+  {
+   "from_map": 14,
+   "x": 15615,
+   "y": 16639,
+   "z": 88,
+   "to_map": 14,
+   "to_x": 13567,
+   "to_y": 2303,
+   "to_z": 24,
+   "kind": "maptele",
+   "note": "MAPTELE usecode egg (shape 73 quality 1, class 1152); hatches only while G[15:1]=0; needs four symbols (shape 397 frame 20) anywhere in the Avatar's inventory; sets G[145:1]",
+   "condition": {
+    "has_item": 397,
+    "frame": 20,
+    "qty": 4
+   }
+  },
+  {
+   "from_map": 24,
+   "x": 20287,
+   "y": 23807,
+   "z": 64,
+   "to_map": 49,
+   "to_x": 27367,
+   "to_y": 19719,
+   "to_z": 48,
+   "kind": "maptele",
+   "note": "MAPTELE usecode egg (shape 73 quality 1, class 1152); hatches only while G[15:1]=0; lava tunnel north exit to catacomb level 49",
+   "condition": {
+    "global": [
+     52,
+     2
+    ],
+    "eq": 0
+   }
+  },
+  {
+   "from_map": 24,
+   "x": 19263,
+   "y": 31487,
+   "z": 64,
+   "to_map": 12,
+   "to_x": 20275,
+   "to_y": 13904,
+   "to_z": 64,
+   "kind": "maptele",
+   "note": "MAPTELE usecode egg (shape 73 quality 1, class 1152); hatches only while G[15:1]=0; lava tunnel south exit to Daemon's Crag",
+   "condition": {
+    "global": [
+     52,
+     2
+    ],
+    "eq": 0
+   }
+  },
+  {
+   "from_map": 25,
+   "x": 20287,
+   "y": 23807,
+   "z": 64,
+   "to_map": 49,
+   "to_x": 27367,
+   "to_y": 19719,
+   "to_z": 48,
+   "kind": "maptele",
+   "note": "MAPTELE usecode egg (shape 73 quality 1, class 1152); hatches only while G[15:1]=0; lava tunnel north exit to catacomb level 49",
+   "condition": {
+    "global": [
+     52,
+     2
+    ],
+    "ne": 0
+   }
+  },
+  {
+   "from_map": 25,
+   "x": 19263,
+   "y": 31487,
+   "z": 64,
+   "to_map": 12,
+   "to_x": 20275,
+   "to_y": 13904,
+   "to_z": 64,
+   "kind": "maptele",
+   "note": "MAPTELE usecode egg (shape 73 quality 1, class 1152); hatches only while G[15:1]=0; lava tunnel south exit to Daemon's Crag",
+   "condition": {
+    "global": [
+     52,
+     2
+    ],
+    "ne": 0
+   }
+  },
+  {
+   "from_map": 49,
+   "x": 27359,
+   "y": 19935,
+   "z": 48,
+   "to_map": 24,
+   "to_x": 20287,
+   "to_y": 24191,
+   "to_z": 64,
+   "kind": "maptele",
+   "note": "MAPTELE usecode egg (shape 73 quality 1, class 1152); hatches only while G[15:1]=0; to lava tunnel state map 24 while G[52:2]=0",
+   "condition": {
+    "global": [
+     52,
+     2
+    ],
+    "eq": 0
+   }
+  },
+  {
+   "from_map": 49,
+   "x": 27359,
+   "y": 19935,
+   "z": 48,
+   "to_map": 25,
+   "to_x": 20287,
+   "to_y": 24191,
+   "to_z": 64,
+   "kind": "maptele",
+   "note": "MAPTELE usecode egg (shape 73 quality 1, class 1152); hatches only while G[15:1]=0; to lava tunnel state map 25 once G[52:2]!=0",
+   "condition": {
+    "global": [
+     52,
+     2
+    ],
+    "ne": 0
+   }
+  },
+  {
+   "from_map": 12,
+   "x": 20223,
+   "y": 13663,
+   "z": 56,
+   "to_map": 24,
+   "to_x": 19263,
+   "to_y": 31103,
+   "to_z": 64,
+   "kind": "maptele",
+   "note": "MAPTELE usecode egg (shape 73 quality 1, class 1152); hatches only while G[15:1]=0; Daemon's Crag into the lava tunnel (map 24 while G[52:2]=0)",
+   "condition": {
+    "global": [
+     52,
+     2
+    ],
+    "eq": 0
+   }
+  },
+  {
+   "from_map": 12,
+   "x": 20223,
+   "y": 13663,
+   "z": 56,
+   "to_map": 25,
+   "to_x": 19263,
+   "to_y": 31103,
+   "to_z": 64,
+   "kind": "maptele",
+   "note": "MAPTELE usecode egg (shape 73 quality 1, class 1152); hatches only while G[15:1]=0; Daemon's Crag into the lava tunnel (map 25 once G[52:2]!=0)",
+   "condition": {
+    "global": [
+     52,
+     2
+    ],
+    "ne": 0
+   }
+  },
+  {
+   "from_map": 50,
+   "x": 17311,
+   "y": 1919,
+   "z": 0,
+   "to_map": 62,
+   "to_x": 30079,
+   "to_y": 30975,
+   "to_z": 96,
+   "kind": "usecode",
+   "egg_id": 3,
+   "note": "HIDPAD (shape 735 quality 0, class 735): fall through the pit floor when the Avatar lands on the pad (gotHit)"
+  },
+  {
+   "from_map": 5,
+   "x": 10134,
+   "y": 21394,
+   "z": 1,
+   "to_map": 15,
+   "to_x": 15711,
+   "to_y": 15487,
+   "to_z": 0,
+   "kind": "usecode",
+   "egg_id": 1,
+   "note": "HIDPAD (shape 735 quality 1, class 735), one of four pads around (10134-10431, 21394-21695)"
+  },
+  {
+   "from_map": 50,
+   "x": 2943,
+   "y": 10879,
+   "z": 48,
+   "to_map": 6,
+   "to_x": 7679,
+   "to_y": 19551,
+   "to_z": 8,
+   "kind": "usecode",
+   "egg_id": 11,
+   "note": "GRAVEGG usecode egg (quality 65, class 1216): back up to the Cemetery; fades to black; source z corrected 0 -> 48 from the map data (the egg sits at z 48), 2026-11-08"
+  },
+  {
+   "from_map": 28,
+   "x": 15182,
+   "y": 8146,
+   "z": 104,
+   "to_map": 16,
+   "to_x": 17920,
+   "to_y": 18144,
+   "to_z": 104,
+   "kind": "usecode",
+   "egg_id": 2,
+   "note": "CARTHAXH usecode egg (quality 8, class 1159): to Carthax Lake map 16 while G[52:2]=0",
+   "condition": {
+    "global": [
+     52,
+     2
+    ],
+    "eq": 0
+   }
+  },
+  {
+   "from_map": 28,
+   "x": 15182,
+   "y": 8146,
+   "z": 104,
+   "to_map": 26,
+   "to_x": 17934,
+   "to_y": 18154,
+   "to_z": 104,
+   "kind": "usecode",
+   "egg_id": 2,
+   "note": "CARTHAXH usecode egg (quality 8, class 1159): to Carthax Lake map 26 once G[52:2]!=0",
+   "condition": {
+    "global": [
+     52,
+     2
+    ],
+    "ne": 0
+   }
+  },
+  {
+   "from_map": 49,
+   "x": 22744,
+   "y": 22944,
+   "z": 48,
+   "to_map": 16,
+   "to_x": 19263,
+   "to_y": 9631,
+   "to_z": 104,
+   "kind": "usecode",
+   "egg_id": 5,
+   "note": "CARTHAXH usecode egg (class 1159): catacombs door to Carthax Lake map 16 while G[52:2]=0 (door needs Key of the Scion, shape 232 frame 3)",
+   "condition": {
+    "global": [
+     52,
+     2
+    ],
+    "eq": 0
+   }
+  },
+  {
+   "from_map": 49,
+   "x": 22744,
+   "y": 22944,
+   "z": 48,
+   "to_map": 26,
+   "to_x": 19270,
+   "to_y": 9594,
+   "to_z": 104,
+   "kind": "usecode",
+   "egg_id": 5,
+   "note": "CARTHAXH usecode egg (class 1159): to Carthax Lake map 26 once G[52:2]!=0",
+   "condition": {
+    "global": [
+     52,
+     2
+    ],
+    "ne": 0
+   }
+  },
+  {
+   "from_map": 8,
+   "x": 13988,
+   "y": 15084,
+   "z": 48,
+   "to_map": 8,
+   "to_x": 6078,
+   "to_y": 1786,
+   "to_z": 0,
+   "kind": "usecode",
+   "egg_id": 20,
+   "trigger_range": [
+    2,
+    3
+   ],
+   "note": "MYTHAUS usecode egg (class 1222, egg id 1) at the house door: fade out, then to egg 20 (the gated corridor) while G[284:1]=0 (not yet met Mythran). Observed in the engine 2026-11-08; confirmed against class 1222 and the map data",
+   "condition": {
+    "global": [
+     284,
+     1
+    ],
+    "eq": 0
+   }
+  },
+  {
+   "from_map": 8,
+   "x": 13988,
+   "y": 15084,
+   "z": 48,
+   "to_map": 8,
+   "to_x": 2944,
+   "to_y": 1816,
+   "to_z": 0,
+   "kind": "usecode",
+   "egg_id": 4,
+   "trigger_range": [
+    2,
+    3
+   ],
+   "note": "MYTHAUS usecode egg (class 1222, egg id 1) at the house door: to egg 4 (his rooms) once G[284:1]=1 (Mythran set it at the first meeting). Observed in the engine 2026-11-08; confirmed against class 1222 and the map data",
+   "condition": {
+    "global": [
+     284,
+     1
+    ],
+    "eq": 1
+   }
+  },
+  {
+   "from_map": 8,
+   "x": 3071,
+   "y": 1791,
+   "z": 0,
+   "to_map": 8,
+   "to_x": 14138,
+   "to_y": 15118,
+   "to_z": 48,
+   "kind": "usecode",
+   "egg_id": 22,
+   "trigger_range": [
+    0,
+    0
+   ],
+   "note": "MYTHAUS usecode egg (class 1222, egg id 2) inside, by egg 4: out to egg 22 at the door whatever G[284:1] is; the class only acts while the Avatar's z is below 48, which is always true here (floor z 0). Observed in the engine 2026-11-08; confirmed against class 1222 and the map data"
+  },
+  {
+   "from_map": 40,
+   "x": null,
+   "y": null,
+   "z": null,
+   "to_map": 3,
+   "to_x": 11778,
+   "to_y": 4878,
+   "to_z": 48,
+   "kind": "usecode",
+   "egg_id": 66,
+   "note": "LOGBOOK (Bentic's journal, shape 607, class 607) anti-cheat branch: reading the journal before the execution (G[89:1]=0) has the guards take the Avatar to map 3 egg 66",
+   "condition": {
+    "global": [
+     89,
+     1
+    ],
+    "eq": 0
+   }
+  },
+  {
+   "from_map": -1,
+   "x": null,
+   "y": null,
+   "z": null,
+   "to_map": 40,
+   "to_x": 13087,
+   "to_y": 8607,
+   "to_z": 104,
+   "kind": "usecode",
+   "egg_id": 30,
+   "note": "Recall item (shape 833, class 833 RECALL): menu choice 'Central Tenebrae', offered once the waypoint flag G[68:1] is set; usable from (almost) any map, some areas such as the Obsidian Fortress block it",
+   "condition": {
+    "all": [
+     {
+      "has_item": 833
+     },
+     {
+      "global": [
+       68,
+       1
+      ],
+      "eq": 1
+     }
+    ]
+   }
+  },
+  {
+   "from_map": -1,
+   "x": null,
+   "y": null,
+   "z": null,
+   "to_map": 8,
+   "to_x": 2783,
+   "to_y": 1823,
+   "to_z": 56,
+   "kind": "usecode",
+   "egg_id": 30,
+   "note": "Recall item (shape 833, class 833 RECALL): menu choice 'Plateau', offered once the waypoint flag G[69:1] is set; usable from (almost) any map, some areas such as the Obsidian Fortress block it",
+   "condition": {
+    "all": [
+     {
+      "has_item": 833
+     },
+     {
+      "global": [
+       69,
+       1
+      ],
+      "eq": 1
+     }
+    ]
+   }
+  },
+  {
+   "from_map": -1,
+   "x": null,
+   "y": null,
+   "z": null,
+   "to_map": 50,
+   "to_x": 21311,
+   "to_y": 10527,
+   "to_z": 0,
+   "kind": "usecode",
+   "egg_id": 30,
+   "note": "Recall item (shape 833, class 833 RECALL): menu choice 'Upper Catacombs', offered once the waypoint flag G[70:1] is set; usable from (almost) any map, some areas such as the Obsidian Fortress block it",
+   "condition": {
+    "all": [
+     {
+      "has_item": 833
+     },
+     {
+      "global": [
+       70,
+       1
+      ],
+      "eq": 1
+     }
+    ]
+   }
+  },
+  {
+   "from_map": -1,
+   "x": null,
+   "y": null,
+   "z": null,
+   "to_map": 31,
+   "to_x": 2910,
+   "to_y": 9058,
+   "to_z": 80,
+   "kind": "usecode",
+   "egg_id": 30,
+   "note": "Recall item (shape 833, class 833 RECALL): menu choice 'Hall of the Mountain King', offered once the waypoint flag G[71:1] is set; usable from (almost) any map, some areas such as the Obsidian Fortress block it",
+   "condition": {
+    "all": [
+     {
+      "has_item": 833
+     },
+     {
+      "global": [
+       71,
+       1
+      ],
+      "eq": 1
+     }
+    ]
+   }
+  },
+  {
+   "from_map": -1,
+   "x": null,
+   "y": null,
+   "z": null,
+   "to_map": 37,
+   "to_x": 25055,
+   "to_y": 19903,
+   "to_z": 80,
+   "kind": "usecode",
+   "egg_id": 30,
+   "note": "Recall item (shape 833, class 833 RECALL): menu choice 'Argentrock Isle', offered once the waypoint flag G[72:1] is set; usable from (almost) any map, some areas such as the Obsidian Fortress block it",
+   "condition": {
+    "all": [
+     {
+      "has_item": 833
+     },
+     {
+      "global": [
+       72,
+       1
+      ],
+      "eq": 1
+     }
+    ]
+   }
+  },
+  {
+   "from_map": -1,
+   "x": null,
+   "y": null,
+   "z": null,
+   "to_map": 16,
+   "to_x": 19775,
+   "to_y": 9439,
+   "to_z": 112,
+   "kind": "usecode",
+   "egg_id": 30,
+   "note": "Recall item (shape 833, class 833 RECALL): menu choice 'Carthax Lake (before G[52:2])', offered once the waypoint flag G[73:1] is set; usable from (almost) any map, some areas such as the Obsidian Fortress block it",
+   "condition": {
+    "all": [
+     {
+      "has_item": 833
+     },
+     {
+      "global": [
+       73,
+       1
+      ],
+      "eq": 1
+     },
+     {
+      "global": [
+       52,
+       2
+      ],
+      "eq": 0
+     }
+    ]
+   }
+  },
+  {
+   "from_map": -1,
+   "x": null,
+   "y": null,
+   "z": null,
+   "to_map": 26,
+   "to_x": 19743,
+   "to_y": 9407,
+   "to_z": 104,
+   "kind": "usecode",
+   "egg_id": 30,
+   "note": "Recall item (shape 833, class 833 RECALL): menu choice 'Carthax Lake (after G[52:2])', offered once the waypoint flag G[73:1] is set; usable from (almost) any map, some areas such as the Obsidian Fortress block it",
+   "condition": {
+    "all": [
+     {
+      "has_item": 833
+     },
+     {
+      "global": [
+       73,
+       1
+      ],
+      "eq": 1
+     },
+     {
+      "global": [
+       52,
+       2
+      ],
+      "ne": 0
+     }
+    ]
+   }
+  },
+  {
+   "from_map": -1,
+   "x": null,
+   "y": null,
+   "z": null,
+   "to_map": 12,
+   "to_x": 21279,
+   "to_y": 15647,
+   "to_z": 72,
+   "kind": "usecode",
+   "egg_id": 30,
+   "note": "Recall item (shape 833, class 833 RECALL): menu choice 'Daemon's Crag', offered once the waypoint flag G[74:1] is set; usable from (almost) any map, some areas such as the Obsidian Fortress block it",
+   "condition": {
+    "all": [
+     {
+      "has_item": 833
+     },
+     {
+      "global": [
+       74,
+       1
+      ],
+      "eq": 1
+     }
+    ]
+   }
+  },
+  {
+   "from_map": -1,
+   "x": null,
+   "y": null,
+   "z": null,
+   "to_map": 43,
+   "to_x": 16767,
+   "to_y": 17279,
+   "to_z": 16,
+   "kind": "usecode",
+   "note": "Ethereal Travel spellbook (shape 288 quality 86, cast via BOOK1 -> ETHRSPEL class 1413): Actor teleport to the ethereal plane. The book's ENCHANT check wants the five blackrock fragments (shape 442) carried",
+   "condition": {
+    "all": [
+     {
+      "has_item": 288,
+      "quality": 86
+     }
+    ]
+   }
+  },
+  {
+   "from_map": 44,
+   "x": 23583,
+   "y": 14879,
+   "z": 24,
+   "to_map": 43,
+   "to_x": 16767,
+   "to_y": 17279,
+   "to_z": 16,
+   "kind": "usecode",
+   "note": "BROCK (class 442): using the matching blackrock fragment (shape 442 frame 4) on Pyros turns it into shape 793 and teleports the Avatar back to the central pentagram of map 43",
+   "condition": {
+    "has_item": 442,
+    "frame": 4
+   }
+  },
+  {
+   "from_map": 45,
+   "x": 7071,
+   "y": 12319,
+   "z": 0,
+   "to_map": 43,
+   "to_x": 16767,
+   "to_y": 17279,
+   "to_z": 16,
+   "kind": "usecode",
+   "note": "BROCK (class 442): using the matching blackrock fragment (shape 442 frame 2) on Hydros turns it into shape 793 and teleports the Avatar back to the central pentagram of map 43",
+   "condition": {
+    "has_item": 442,
+    "frame": 2
+   }
+  },
+  {
+   "from_map": 46,
+   "x": 14719,
+   "y": 3295,
+   "z": 216,
+   "to_map": 43,
+   "to_x": 16767,
+   "to_y": 17279,
+   "to_z": 16,
+   "kind": "usecode",
+   "note": "BROCK (class 442): using the matching blackrock fragment (shape 442 frame 3) on Stratos turns it into shape 793 and teleports the Avatar back to the central pentagram of map 43",
+   "condition": {
+    "has_item": 442,
+    "frame": 3
+   }
+  },
+  {
+   "from_map": 47,
+   "x": 2719,
+   "y": 14495,
+   "z": 56,
+   "to_map": 43,
+   "to_x": 16767,
+   "to_y": 17279,
+   "to_z": 16,
+   "kind": "usecode",
+   "note": "BROCK (class 442): using the matching blackrock fragment (shape 442 frame 1) on Lithos turns it into shape 793 and teleports the Avatar back to the central pentagram of map 43",
+   "condition": {
+    "has_item": 442,
+    "frame": 1
+   }
+  },
+  {
+   "from_map": 14,
+   "x": null,
+   "y": null,
+   "z": null,
+   "to_map": 12,
+   "to_x": 17382,
+   "to_y": 19549,
+   "to_z": 56,
+   "kind": "usecode",
+   "note": "MALCHIR (NPC 27, class 1051): after the third test the Avatar is moved to the Great Pentacle on Daemon's Crag for the Pyros ceremony",
+   "condition": {
+    "global": [
+     155,
+     1
+    ],
+    "eq": 1
+   }
+  }
+ ]
+}

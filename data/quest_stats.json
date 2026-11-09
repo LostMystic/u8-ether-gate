@@ -1,0 +1,20 @@
+{
+  "notes": [
+    "Leveling stage 4 (game/stat_growth.h): major story steps (data/critpath.json ids) that raise stats, next to quest_xp.json. Paid once per game when the step is first seen done: each companion walking with the Avatar then (Follow, alive, on his map) gets 'companions' points in their main stat; the Avatar gets 'avatar' points (0: nothing; he has the chosen point of every level).",
+    "main_stat: by companion id; one not listed goes by class (fighter STR, caster INT, hybrid: the highest of its level-1 stats).",
+    "Old games: steps already done when stage 4 first sees the game never pay."
+  ],
+  "main_stat": {
+    "brannoc": "str", "varn": "str", "corvin": "dex",
+    "morvain": "int", "kalvax": "int", "ilvaran": "int", "wynna": "int", "nerissa": "int"
+  },
+  "steps": [
+    {"step": "necromancer_6", "companions": 1, "avatar": 0},
+    {"step": "meet_lithos", "companions": 1, "avatar": 0},
+    {"step": "trial", "companions": 1, "avatar": 0},
+    {"step": "ancient_ones", "companions": 1, "avatar": 0},
+    {"step": "test_belief", "companions": 1, "avatar": 0},
+    {"step": "free_hydros", "companions": 1, "avatar": 0},
+    {"step": "kill_malchir", "companions": 1, "avatar": 0}
+  ]
+}

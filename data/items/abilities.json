@@ -1,0 +1,35 @@
+// Item powers: engine-side abilities of items (game/item_powers.h, NOTES.md "Item powers").
+// One entry per item; "effect" names the engine code that runs (only "quake" so far).
+//   shape, frame         the item (frame omitted = any frame)
+//   name, log_name       shown in the turn menu; "Avatar's <log_name> hits ..." in the combat log
+//   cooldown_minutes     minutes of play (paused time does not count); kept in the save
+//   radius, height       foes within this distance of the Avatar (world units) and height difference
+//   damage               [min, max], ignores armour, hostile creatures only
+//   quake_strength, quake_frames   the screen shake (intrinsic 0x0C6's strength; 30 frames = 1 s)
+//   sfx, sfx_priority    sound effects played when it fires
+//   original_use         the item's usecode still has a use: while the item's quality is "quality"
+//                        the usecode runs and shows its target cursor, picking "target_shape" is
+//                        the original use and anything else fires the power; at any other
+//                        quality the power fires at once. Omitted: it always fires at once.
+{
+  "abilities": [
+    {
+      "id": "skull_of_quakes",
+      "effect": "quake",
+      "shape": 814,
+      "name": "Skull of Quakes",
+      "log_name": "earthquake",
+      "log_text": "The earth heaves under the Skull of Quakes!",
+      "quiet_text": "The skull is still quiet.",
+      "cooldown_minutes": 30,
+      "radius": 512,
+      "height": 160,
+      "damage": [10, 25],
+      "quake_strength": 5,
+      "quake_frames": 60,
+      "sfx": [48, 49],
+      "sfx_priority": 100,
+      "original_use": { "quality": 0, "target_shape": 805 }
+    }
+  ]
+}

@@ -1,0 +1,227 @@
+{
+  "note": "The Avatar's virtues (game/virtues.h, PLAN-VIRTUES.md). max: each virtue's top score. deeds: paid once per game when 'when' (the critical-path condition language, data/critpath.json) holds; checked about once a second with the Virtues option on. Other deeds pay from code (Grant Peace: game/grant_peace.h; calming the Lurker's pet: game/creatures.cpp) or from dialogue topics with a 'virtue' field (data/dialog/*.json).",
+  "max": 50,
+  "deeds": [
+    {
+      "id": "rhian_truth",
+      "about": "PLAN-VIRTUES.md 3.15: telling Rhian that her son Torwin is dead (RHIAN sets G[505:1] when told; specs/world/leveling_facts.md 8.2).",
+      "when": {
+        "global": [
+          505,
+          1
+        ],
+        "eq": 1
+      },
+      "pay": {
+        "Honesty": 5
+      },
+      "say": "You told Rhian the hard truth about her son. Your Honesty grows."
+    },
+    {
+      "id": "rhian_ring",
+      "about": "PLAN-VIRTUES.md 3.15: bringing Torwin's ring home to his mother (G[138:1]; leveling_facts.md 8.2).",
+      "when": {
+        "global": [
+          138,
+          1
+        ],
+        "eq": 1
+      },
+      "pay": {
+        "Compassion": 3
+      },
+      "say": "Rhian holds her son's ring. Your Compassion grows."
+    },
+    {
+      "id": "devon_promise_kept",
+      "about": "PLAN-VIRTUES.md 3.6: the promise made to Devon in the dungeon (mark devon_promise, devon.json) is kept when the trial frees him (G[86:1]).",
+      "mark": "devon_promise",
+      "when": {
+        "global": [
+          86,
+          1
+        ],
+        "eq": 1
+      },
+      "pay": {
+        "Honor": 5
+      },
+      "say": "You kept your word to Devon. Your Honor grows."
+    },
+    {
+      "id": "khumash_gor",
+      "about": "PLAN-VIRTUES.md 3.13 (in part): facing Khumash-Gor's ghost in his tomb (map 54), an optional and dangerous side quest; done when the Avatar has the scimitar it drops (shape 821; leveling_facts.md 8.2).",
+      "when": {
+        "has_item": 821
+      },
+      "pay": {
+        "Valor": 5
+      },
+      "say": "You faced Khumash-Gor in his own tomb. Your Valor grows."
+    },
+    {
+      "id": "vividos_promise_kept",
+      "about": "Honor: the promise to Vividos (vividos.json) kept when the dagger is handed over (G[189:1]).",
+      "mark": "vividos_promise",
+      "when": {
+        "global": [
+          189,
+          1
+        ],
+        "eq": 1
+      },
+      "pay": {
+        "Honor": 4
+      },
+      "say": "You brought the dagger back as you swore. Your Honor grows."
+    },
+    {
+      "id": "xavier_promise_kept",
+      "about": "Honor: the promise to Xavier (xavier.json) kept when the focus is returned (G[111:1]).",
+      "mark": "xavier_promise",
+      "when": {
+        "global": [
+          111,
+          1
+        ],
+        "eq": 1
+      },
+      "pay": {
+        "Honor": 4
+      },
+      "say": "The Focus of healing is home, as you promised. Your Honor grows."
+    },
+    {
+      "id": "kilandra_promise_kept",
+      "about": "Honor: the promise to Kilandra (kilandra.json) kept when Elaina's grave is read (G[220:1]).",
+      "mark": "kilandra_promise",
+      "when": {
+        "global": [
+          220,
+          1
+        ],
+        "eq": 1
+      },
+      "pay": {
+        "Honor": 4
+      },
+      "say": "You kept your word to Kilandra. Your Honor grows."
+    }
+  ],
+  "endings_note": "First match wins, the last is the fallback. Liberator: total 45+ with little infamy. One More Tyrant: only for real cruelty (infamy 12+ and more infamy than virtue: murder, theft among townsfolk, cruel answers, broken promises). Anything else is the Pragmatist, however few deeds were done.",
+  "endings": [
+    {
+      "id": "liberator",
+      "title": "The Liberator",
+      "min_total": 45,
+      "text": [
+        "The Avatar stepped through the Black Gate, and Pagan woke to a sky without masters.",
+        "In Tenebrae they still speak of a stranger who came out of the sea and would not look away: who told hard truths gently, kept faith with the weak, and gave the dead their rest.",
+        "Pagan had never seen a light like that. It has not forgotten it."
+      ],
+      "max_infamy": 8
+    },
+    {
+      "id": "tyrant",
+      "title": "One More Tyrant",
+      "text": [
+        "The Avatar stepped through the Black Gate, and the Titans fell behind him.",
+        "Pagan is free of its gods, but in Tenebrae mothers still hush their children with the outlander's name. One more power came, took what it wanted, and left.",
+        "Freedom, they say, looks much like the old fear from the bottom of the hill."
+      ],
+      "min_infamy": 12,
+      "mostly_bad": true
+    },
+    {
+      "id": "pragmatist",
+      "title": "The Pragmatist",
+      "min_total": 0,
+      "text": [
+        "The Avatar stepped through the Black Gate, and the Titans were gone.",
+        "Pagan is free. It is not much changed. People say the stranger did what had to be done, no more and no less, and they are grateful, in the careful way of people who have learned not to expect too much."
+      ]
+    }
+  ],
+  "epilogue": [
+    {
+      "key": "mark/toran_cleared",
+      "text": "Toran the gem cutter's name was cleared before the whole city, the first of Mordea's sentences to be undone."
+    },
+    {
+      "key": "mark/rhian_helped",
+      "text": "Rhian's shop stayed open through the hard winter, and her door was never closed to a stranger again."
+    },
+    {
+      "key": "Honesty/deed/rhian_truth",
+      "text": "Rhian heard the truth about her son from the one who saw him last, and in time she was glad of it."
+    },
+    {
+      "key": "Honor/deed/devon_promise_kept",
+      "text": "Devon ruled Tenebrae as he had been freed: by a promise kept. His court learned to keep theirs."
+    },
+    {
+      "key": "Compassion/dialog/devon:lake_tell",
+      "text": "The fishermen's boats went back onto Carthax Lake, and the docks of Tenebrae smelled of fish and tar again."
+    },
+    {
+      "key": "Honesty/dialog/devon:tear_truth",
+      "text": "Devon never asked again what the Tear of the Seas had been for. He had been told, and that was enough."
+    },
+    {
+      "key": "mark/lothian_rite",
+      "text": "The Necromancers remembered the outlander who knelt by Lothian's tomb and learned their words."
+    },
+    {
+      "key": "Spirituality/peace/10",
+      "text": "The restless dead of Pagan lay quieter in their graves, for many had been granted peace."
+    },
+    {
+      "key": "Spirituality/banish/5",
+      "text": "The daemons of the Obsidian Fortress whispered of a sorcerer who sent them home instead of slaying them."
+    },
+    {
+      "key": "Valor/deed/khumash_gor",
+      "text": "Khumash-Gor's tomb is silent now. Children dare each other to go and look."
+    },
+    {
+      "key": "mark/kids_hero",
+      "text": "In the streets of Tenebrae the children still play Heroes and Monsters, and the hero is always called the Avatar. The troll always loses."
+    },
+    {
+      "key": "Honor/deed/kilandra_promise_kept",
+      "text": "Fresh flowers lay on Elaina's grave every spring after that."
+    },
+    {
+      "key": "Valor/invasion",
+      "text": "When the dead walked in Tenebrae, the Avatar stood in the streets with the guards, and the city has not forgotten it."
+    },
+    {
+      "key": "mark/known_avatar",
+      "text": "Devon had it cried from the palace steps: the one who came out of the sea was the Avatar. In Tenebrae nobody said \"stranger\" after that, and the word Avatar came to mean a friend."
+    },
+    {
+      "key": "mark/kids_comb",
+      "text": "A little girl of Tenebrae grew up telling everyone how she once showed the Avatar the way, and the Avatar followed. Her mother wore the shell comb to her wedding."
+    }
+  ],
+  "valor_note": "Valor from fights (game/virtues.cpp on_kill): beyond_level: the Avatar's own blow kills a foe at least `levels` above him (Leveling on), paying `points` up to `times` times; invasion: `kills` ghouls (shape 142) slain by the party in Tenebrae (maps 39, 40, 41) during the undead invasion (G[58:1]), paying `points` once.",
+  "valor": {
+    "beyond_level": {
+      "levels": 3,
+      "points": 3,
+      "times": 3
+    },
+    "invasion": {
+      "kills": 5,
+      "points": 5
+    }
+  },
+  "vice": {
+    "note": "Infamy points (game/virtues.h): murder of townsfolk who were no enemy, up to murder_times; theft among townsfolk (the Avatar's or a companion's), up to theft_times; each promise made and never kept, counted at the ending.",
+    "murder": 4,
+    "murder_times": 10,
+    "theft": 1,
+    "theft_times": 10,
+    "broken_promise": 3
+  }
+}

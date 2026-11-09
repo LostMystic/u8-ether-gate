@@ -1,0 +1,18 @@
+{
+ "_comment": "The fighting Aerial Servant (game/servant.h, NOTES.md 'The Aerial Servant'): Aerial Servant cast on a hostile creature, with 'Item powers' On. Frames are 1/30 s; damage is per blow (magic, armour does not stop it). 'fights': false keeps the original refusal.",
+ "fights": true,
+ "name": "Aerial Servant",
+ "shape": 481,
+ "hp": 2,
+ "dex": 20,
+ "strikes": 4,
+ "damage": [2, 4],
+ "first_strike": 15,
+ "strike_interval": 45,
+ "duration": 600,
+ "speed": 10,
+ "hover": 8,
+ "sfx_appear": 54,
+ "sfx_strike": 57,
+ "sfx_vanish": 116
+}

@@ -1,0 +1,72 @@
+{
+  "version": 1,
+  "notes": [
+    "Companion spells and reagents with Leveling on (PLAN-LEVELING.md 7; game/companion_magic.h; NOTES.md 'Companion spells and reagents'). The engine's own design. With Leveling off none of this applies.",
+    "unlock: by companion level ({\"level\": N}), by an Avatar spell learned ({\"avatar\": [ids]}, any one of them), or \"always\" (essential spells: never locked).",
+    "avatar_spells: how the engine tells that the Avatar has learned a spell, from real game state: a usecode global (\"global\": [pos, width, value]) or an item he carries anywhere in his inventory (\"items\": [[shape, frame]]). Once seen it stays learned (saved), even if the item is later dropped or used up.",
+    "uses: only the reagent schools (Necromancy, Sorcery, Thaumaturgy) count uses per spell; stock is the full count (a new game and an old save start full). Each cast needs a use and the mana.",
+    "price per use, in obsidian = round(reagents x reagent_price / doses), at least 1. reagents: how many a matching Avatar spell needs (magic.md 3.2, 4.3; leveling_facts.md 1.4); reagent_price: Mythran's price for that school (leveling_facts.md 5; Thaumaturgy's four reagents cost 25, 30, 25 and 40, so 30 on average); doses: one Avatar casting's reagents make this many companion uses (they mix small doses; hand-waved).",
+    "low: a spell is running low at this many uses or fewer (else a quarter of its stock, at least 2): the companion says so once in banter, and once more when one is out.",
+    "restock: when the Avatar's conversation with Mythran (NPC 33) ends, each reagent user in the party on his map buys uses with the obsidian in their own pack, the emptiest spell first, up to the full stock."
+  ],
+  "doses": 10,
+  "mythran_npc": 33,
+  "reagent_price": {"Necromancy": 10, "Sorcery": 15, "Thaumaturgy": 30},
+  "avatar_spells": {
+    "summon_dead": {"name": "Summon Dead", "global": [203, 1, 1], "items": [[746, 3]],
+      "why": "taught by the third Ancient Necromancer (G[203:1], bugfixes.md 2.2), or a Summon Dead token carried"},
+    "healing_touch": {"name": "Healing Touch", "items": [[396, 9]],
+      "why": "the Healing Touch focus (shape 396 frame 9, critical_path.md 7) carried"},
+    "restoration": {"name": "Restoration", "items": [[396, 11]],
+      "why": "the Restoration focus (shape 396 frame 11) carried"}
+  },
+  "companions": {
+    "morvain": {
+      "school": "Necromancy",
+      "spells": {
+        "grave_drain": {"unlock": {"level": 1}, "stock": 30, "model": "Death Speak", "reagents": 2},
+        "raise_bones": {"unlock": {"avatar": ["summon_dead"]}, "stock": 8, "model": "Summon Dead", "reagents": 3}
+      }
+    },
+    "kalvax": {
+      "school": "Sorcery",
+      "spells": {
+        "fire_bolt": {"unlock": {"level": 1}, "stock": 30, "model": "Flame Bolt", "reagents": 3},
+        "fire_field": {"unlock": {"level": 3}, "stock": 12, "model": "Fire Shield", "reagents": 4}
+      }
+    },
+    "wynna": {
+      "school": "Thaumaturgy",
+      "spells": {
+        "lightning": {"unlock": {"level": 1}, "stock": 20, "model": "Call Destruction", "reagents": 5},
+        "gust": {"unlock": {"level": 2}, "stock": 12, "model": "Confusion Blast", "reagents": 5}
+      }
+    },
+    "ilvaran": {
+      "school": "Theurgy",
+      "spells": {
+        "heal": {"unlock": {"avatar": ["healing_touch", "restoration"]}},
+        "cure": {"unlock": {"avatar": ["healing_touch", "restoration"]}},
+        "ancient_light": {"unlock": {"level": 1}},
+        "raise": {"unlock": "always"}
+      }
+    },
+    "varn": {
+      "school": "Tempest",
+      "spells": {
+        "wave": {"unlock": {"level": 1}},
+        "slowing_tide": {"unlock": {"level": 2}},
+        "healing_waters": {"unlock": {"level": 3}}
+      }
+    },
+    "nerissa": {
+      "school": "Tempest",
+      "spells": {
+        "tide_heal": {"unlock": {"level": 1}},
+        "ice_shards": {"unlock": {"level": 1}},
+        "calm": {"unlock": {"level": 3}},
+        "tide_rite": {"unlock": "always"}
+      }
+    }
+  }
+}

@@ -1,0 +1,24 @@
+{
+  "format": "pagan-area",
+  "version": 1,
+  "name": "Catacomb corridor",
+  "theme": "catacombs",
+  "seed": 11,
+  "rows": [
+    "##################",
+    "/................/",
+    "#................#",
+    "#######..#########",
+    "      #..#        ",
+    "      #..#        ",
+    "  #####..#####    ",
+    "  #..........#    ",
+    "  #..........#    ",
+    "  #..........#    ",
+    "  ############    "
+  ],
+  "pois": [
+    {"id": "graves", "x": 7, "y": 8, "note": "a row of old graves", "tags": ["grave"]},
+    {"id": "bones", "x": 12, "y": 1, "note": "bones of a fallen adventurer", "tags": ["remains"], "radius": 1}
+  ]
+}

@@ -1,0 +1,291 @@
+{
+ "id": "devon",
+ "name": "Devon",
+ "npc": 2,
+ "about": "Devon (class 1026), the fisherman who frees the Avatar on the beach and later rules Tenebrae after Mordea's trial. Virtue topics (PLAN-VIRTUES.md 3.18 and 3.27; feature 'virtues': shown while the Virtues option is on). Picking the answer that tells him pays the virtue once (game/virtues.h). Also 3.1 (Toran's name, Justice) and 3.6 (the promise in the dungeon, Honor: the mark devon_promise, paid by the deed devon_promise_kept in data/virtues.json when the trial frees him). The celebration (the user's request 2026-11-08; NOTES.md 'Known as the Avatar'): once he rules (the trial, G[86:1]) and the Avatar's virtues total at least 35 (virtue_total), he holds a feast and asks what the Avatar wants to be known as; 'The Avatar.' sets the mark known_avatar (data/avatar_title.json: from then on the people say 'Avatar', not 'stranger'). Any other answer leaves the offer open.",
+ "menu": {
+  "max_entries": 2,
+  "first_menu": true,
+  "exits_only_menu": true,
+  "back": "Back.",
+  "leave": "Something else."
+ },
+ "topics": [
+  {
+   "id": "lake",
+   "slot": "lake",
+   "feature": "virtues",
+   "label": "Carthax Lake",
+   "when": {
+    "step_done": [
+     "free_water"
+    ],
+    "cond": [
+     {
+      "global": [
+       86,
+       1
+      ],
+      "eq": 1
+     }
+    ]
+   },
+   "say": [
+    "Carthax Lake? Every fisherman in Tenebrae has cursed that dry bed for years. What of it?"
+   ],
+   "topics": [
+    {
+     "id": "lake_tell",
+     "label": "The water flows again. Tell the fishermen.",
+     "virtue": {
+      "Compassion": 4
+     },
+     "leave": true,
+     "say": [
+      "Flows again? You are certain? Then the old channels will fill, and the fish will follow the water as they always did.",
+      "I will send word down to the docks tonight. There are families who have eaten nothing but what the sea throws up for a long time.",
+      "You did not have to come and tell me. Thank you, my friend. Truly."
+     ]
+    },
+    {
+     "id": "lake_nothing",
+     "label": "Nothing. Never mind.",
+     "leave": true,
+     "say": [
+      "As you wish. The sea keeps me busy enough."
+     ]
+    }
+   ]
+  },
+  {
+   "id": "tear_why",
+   "slot": "tear",
+   "feature": "virtues",
+   "label": "Why I need the Tear of the Seas",
+   "when": {
+    "step_done": [
+     "show_tongue"
+    ],
+    "step_not_done": [
+     "tear_of_seas"
+    ]
+   },
+   "say": [
+    "You want to tell me something about the Tear? Go on. I have learned to listen when you are this serious."
+   ],
+   "topics": [
+    {
+     "id": "tear_truth",
+     "label": "I must gather the Titans' blackrock to open a way home, and to stop them.",
+     "virtue": {
+      "Honesty": 4
+     },
+     "leave": true,
+     "say": [
+      "To stop the Titans... You say it as calmly as a man talking of the weather.",
+      "I will not pretend that does not frighten me. Pagan has never lived without them, good or ill.",
+      "But you have never lied to me, and you freed this city when no one else would. Ask me for the fragment and it is yours. Go with my blessing."
+     ]
+    },
+    {
+     "id": "tear_trust",
+     "label": "It is better that you do not know.",
+     "leave": true,
+     "say": [
+      "Perhaps. Though a king who does not know what is done in his name sleeps badly."
+     ]
+    }
+   ]
+  },
+  {
+   "id": "promise",
+   "slot": "promise",
+   "feature": "virtues",
+   "label": "I will get you out of here.",
+   "when": {
+    "cond": [
+     {
+      "global": [
+       90,
+       1
+      ],
+      "eq": 1
+     },
+     {
+      "global": [
+       86,
+       1
+      ],
+      "eq": 0
+     }
+    ],
+    "not_mark": [
+     "devon_promise"
+    ]
+   },
+   "say": [
+    "Out? Friend, you are the only free man in Tenebrae who would even try. What are you saying?"
+   ],
+   "topics": [
+    {
+     "id": "promise_give",
+     "label": "You have my word. I will not leave you here.",
+     "mark": "devon_promise",
+     "leave": true,
+     "say": [
+      "Your word. In this city a man's word is worth what the Tempest says it is.",
+      "But I believe yours. Go, then. I will be here. I have nowhere else to be."
+     ]
+    },
+    {
+     "id": "promise_not",
+     "label": "I cannot promise anything.",
+     "leave": true,
+     "say": [
+      "Honest, at least. Do what you can."
+     ]
+    }
+   ]
+  },
+  {
+   "id": "toran",
+   "slot": "toran",
+   "feature": "virtues",
+   "label": "Toran",
+   "when": {
+    "step_done": [
+     "trial"
+    ]
+   },
+   "say": [
+    "Toran the gem cutter. I watched them take him to the dock the morning you came out of the sea.",
+    "Why do you bring him up now?"
+   ],
+   "topics": [
+    {
+     "id": "toran_clear",
+     "label": "He was condemned on the Tempest's word alone. Clear his name.",
+     "virtue": {
+      "Justice": 4
+     },
+     "mark": "toran_cleared",
+     "leave": true,
+     "say": [
+      "You are right, and I should have thought of it before you did.",
+      "Every sentence Mordea passed will be looked at again, in the open, beginning with his. If he did no wrong, the city will say so.",
+      "It will not bring him back. But Rhian and her family should not have to carry his shame as well as his loss."
+     ]
+    },
+    {
+     "id": "toran_leave",
+     "label": "Nothing. Let the dead rest.",
+     "leave": true,
+     "say": [
+      "Perhaps that is wiser. There are a great many dead in this city."
+     ]
+    }
+   ]
+  },
+  {
+   "id": "celebrate",
+   "slot": "celebrate",
+   "feature": "virtues",
+   "label": "You sent for me?",
+   "when": {
+    "step_done": [
+     "trial"
+    ],
+    "virtue_total": 35,
+    "not_mark": [
+     "known_avatar"
+    ]
+   },
+   "say": [
+    "There you are! I have had half the palace looking for you.",
+    "Do you know what they say of you down in the market? That you mended what Mordea broke, and asked nothing for it. The fishermen, the widows, the children... every one of them has a tale of the one who walked out of the sea.",
+    "Tenebrae has a new Tempest, and the new Tempest means to hold a feast. For you. Do not argue, the cooks are already at it.",
+    "But there is a difficulty. The heralds must cry your name, and no two tales agree on what it is. The stranger? The one from the sea? The fisherman's friend?",
+    "So tell me, my friend. When the whole city raises its cups tonight... what do you want to be known as?"
+   ],
+   "topics": [
+    {
+     "id": "known_avatar",
+     "label": "The Avatar.",
+     "virtue": {
+      "Honor": 2
+     },
+     "mark": "known_avatar",
+     "leave": true,
+     "say": [
+      "The Avatar. Avatar...",
+      "It sounds like a word out of one of Bentic's old books. A word for someone who is more than they look.",
+      "Yes. Yes, that is right. That is what you are.",
+      "Then the heralds will cry it from the palace steps tonight, and by morning there will not be a soul in Tenebrae who does not know it.",
+      "Nobody in this city will call you stranger again, Avatar. Not while I am Tempest."
+     ]
+    },
+    {
+     "id": "own_name",
+     "label": "Just {avatar}.",
+     "say": [
+      "{avatar}. That is a name, and a good one. But it is not what you are, is it?",
+      "I watched you on that beach, half drowned. The first thing you did was look up at the sky as if you expected it to be a different colour.",
+      "You are someone, somewhere. Someone with a title. Go on. Tell me."
+     ],
+     "topics": [
+      {
+       "id": "known_avatar_teased",
+       "label": "The Avatar.",
+       "virtue": {
+        "Honor": 2
+       },
+       "mark": "known_avatar",
+       "leave": true,
+       "say": [
+        "The Avatar. Avatar...",
+        "It sounds like a word out of one of Bentic's old books. A word for someone who is more than they look.",
+        "Yes. Yes, that is right. That is what you are.",
+        "Then the heralds will cry it from the palace steps tonight, and by morning there will not be a soul in Tenebrae who does not know it.",
+        "Nobody in this city will call you stranger again, Avatar. Not while I am Tempest."
+       ]
+      },
+      {
+       "id": "teased_no",
+       "label": "Another time, Devon.",
+       "leave": true,
+       "say": [
+        "Another time, then. The feast will keep. I will hold the heralds back until you are ready to tell me."
+       ]
+      }
+     ]
+    },
+    {
+     "id": "no_name",
+     "label": "I would rather not be known at all.",
+     "leave": true,
+     "say": [
+      "Humble, too! That will only make the tales worse, you know.",
+      "Well, I will not put a name on you that you have not chosen. Come back when you are ready. The cooks will be glad of the time."
+     ]
+    }
+   ]
+  },
+  {
+   "id": "feast",
+   "slot": "celebrate",
+   "feature": "virtues",
+   "label": "The feast",
+   "when": {
+    "mark": [
+     "known_avatar"
+    ]
+   },
+   "say": [
+    "They are still singing about it in Orlok's inn. Badly, but loudly.",
+    "You will find people look at you differently now, Avatar. Let them. You earned it.",
+    "And if anyone in Tenebrae still calls you stranger, send them to me."
+   ],
+   "leave": true
+  }
+ ]
+}

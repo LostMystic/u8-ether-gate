@@ -1,0 +1,2885 @@
+{
+ "version": 1,
+ "game": "Ultima 8 Pagan, English v2.10",
+ "notes": [
+  "Facts from FIXED.DAT/NONFIXED.DAT, NPCDATA and EUSECODE.FLX v2.10. See specs/world/leveling_facts.md section 3 for the rules behind every number.",
+  "eggs = placed monster eggs (shape 500) of that monster type. hatchable = eggs that have at least one MONEGG or MONFAST hatcher with a matching id within 3584 units. orphan = the rest; they never spawn.",
+  "links_monegg and links_monfast count (hatcher, egg) pairs. An egg with two hatchers spawns twice per cycle, so links can exceed eggs.",
+  "one_shot = eggs with frame != 0. MONEGG destroys such an egg after hatching it; MONFAST does not. one_shot_true = those reached only through MONEGG, which therefore spawn once per save.",
+  "Every hatch repeats whenever the hatcher re-arms (its chunk leaves the fast area); see the spec. Counts are per pass through the map, not lifetime limits.",
+  "Whether every hatcher is physically reachable by the Avatar was not checked.",
+  "category is a convenience: human = guards, townsfolk, sorcerers, theurgists; vermin = small spider, small lizard. Monster table values are copied from specs/world/combat.md 6."
+ ],
+ "monster_types": {
+  "76": {
+   "name": "kith",
+   "hp": "85-105",
+   "dex": "14-18",
+   "damage": "12-16",
+   "ac": 17,
+   "flags": "",
+   "category": "monster"
+  },
+  "83": {
+   "name": "troll",
+   "hp": "150-225",
+   "dex": "7-10",
+   "damage": "10-28",
+   "ac": 18,
+   "flags": "",
+   "category": "monster"
+  },
+  "96": {
+   "name": "demon",
+   "hp": "80-100",
+   "dex": "14-21",
+   "damage": "12-18",
+   "ac": 19,
+   "flags": "",
+   "category": "monster"
+  },
+  "119": {
+   "name": "skeleton",
+   "hp": "35-45",
+   "dex": "15-20",
+   "damage": "7-13",
+   "ac": 17,
+   "flags": "Res",
+   "category": "monster"
+  },
+  "120": {
+   "name": "torax",
+   "hp": "40-55",
+   "dex": "8-12",
+   "damage": "7-14",
+   "ac": 28,
+   "flags": "",
+   "category": "monster"
+  },
+  "142": {
+   "name": "ghoul",
+   "hp": "35-50",
+   "dex": "14-16",
+   "damage": "6-12",
+   "ac": 15,
+   "flags": "",
+   "category": "monster"
+  },
+  "187": {
+   "name": "Malchir",
+   "hp": "17-24",
+   "dex": "12-16",
+   "damage": "5-10",
+   "ac": 12,
+   "flags": "",
+   "category": "human"
+  },
+  "200": {
+   "name": "sorcerer",
+   "hp": "17-24",
+   "dex": "12-16",
+   "damage": "5-10",
+   "ac": 12,
+   "flags": "",
+   "category": "human"
+  },
+  "214": {
+   "name": "golem",
+   "hp": "150-175",
+   "dex": "7-8",
+   "damage": "15-25",
+   "ac": 18,
+   "flags": "",
+   "category": "monster"
+  },
+  "269": {
+   "name": "theurgist",
+   "hp": "17-24",
+   "dex": "12-16",
+   "damage": "5-10",
+   "ac": 12,
+   "flags": "",
+   "category": "human"
+  },
+  "357": {
+   "name": "changeling",
+   "hp": "30-45",
+   "dex": "12-16",
+   "damage": "7-10",
+   "ac": 11,
+   "flags": "Shift",
+   "category": "monster"
+  },
+  "377": {
+   "name": "air servant",
+   "hp": "40-60",
+   "dex": "15-22",
+   "damage": "6-12",
+   "ac": 5,
+   "flags": "",
+   "category": "monster"
+  },
+  "411": {
+   "name": "ghost",
+   "hp": "80-95",
+   "dex": "15-21",
+   "damage": "0-0",
+   "ac": 16,
+   "flags": "R",
+   "category": "monster"
+  },
+  "413": {
+   "name": "fireskull",
+   "hp": "2-5",
+   "dex": "12-15",
+   "damage": "1-3",
+   "ac": 0,
+   "flags": "",
+   "category": "monster"
+  },
+  "509": {
+   "name": "seeker",
+   "hp": "75-100",
+   "dex": "17-25",
+   "damage": "12-16",
+   "ac": 14,
+   "flags": "Exp 0x1CA (458)",
+   "category": "monster"
+  },
+  "574": {
+   "name": "guard",
+   "hp": "35-65",
+   "dex": "15-25",
+   "damage": "8-15",
+   "ac": 25,
+   "flags": "",
+   "category": "human"
+  },
+  "707": {
+   "name": "peasant 1",
+   "hp": "10-20",
+   "dex": "10-15",
+   "damage": "2-5",
+   "ac": 10,
+   "flags": "",
+   "category": "human"
+  },
+  "708": {
+   "name": "child",
+   "hp": "7-14",
+   "dex": "10-15",
+   "damage": "1-1",
+   "ac": 5,
+   "flags": "",
+   "category": "human"
+  },
+  "806": {
+   "name": "small lizard",
+   "hp": "2-7",
+   "dex": "8-12",
+   "damage": "1-2",
+   "ac": 0,
+   "flags": "",
+   "category": "vermin"
+  },
+  "807": {
+   "name": "small spider",
+   "hp": "2-6",
+   "dex": "8-12",
+   "damage": "1-1",
+   "ac": 0,
+   "flags": "",
+   "category": "vermin"
+  },
+  "808": {
+   "name": "invisible",
+   "hp": "15-25",
+   "dex": "8-12",
+   "damage": "4-6",
+   "ac": 5,
+   "flags": "",
+   "category": "monster"
+  },
+  "824": {
+   "name": "small insect",
+   "hp": "18-22",
+   "dex": "15-23",
+   "damage": "3-5",
+   "ac": 3,
+   "flags": "",
+   "category": "monster"
+  },
+  "835": {
+   "name": "peasant 2",
+   "hp": "15-25",
+   "dex": "10-15",
+   "damage": "2-5",
+   "ac": 10,
+   "flags": "",
+   "category": "human"
+  },
+  "836": {
+   "name": "peasant 3",
+   "hp": "15-25",
+   "dex": "10-15",
+   "damage": "2-5",
+   "ac": 10,
+   "flags": "",
+   "category": "human"
+  }
+ },
+ "stages": [
+  {
+   "id": "opening",
+   "title": "Opening: Tenebrae and the shore",
+   "maps": [
+    3,
+    39,
+    40,
+    41
+   ],
+   "optional_maps": [
+    4
+   ],
+   "hatchable_eggs": {
+    "83": 1,
+    "120": 4,
+    "411": 1,
+    "574": 1,
+    "707": 8,
+    "708": 8,
+    "806": 7,
+    "807": 2
+   },
+   "hatchable_eggs_optional": {
+    "76": 5,
+    "119": 1,
+    "120": 5,
+    "142": 1,
+    "357": 4,
+    "411": 1,
+    "707": 3,
+    "708": 2,
+    "806": 1,
+    "824": 3
+   },
+   "scripted_eggs": {
+    "574 GUARDMEG": 20,
+    "707,574 FIGHT": 14,
+    "835 PESANTSI": 5,
+    "836 PESANTLE": 6
+   },
+   "scripted_eggs_optional": {
+    "142 GHOULEGG": 1,
+    "574 GUARDMEG": 3,
+    "836 PESANTLE": 1
+   }
+  },
+  {
+   "id": "plateau",
+   "title": "Plateau: Herdsman's Valley and Mythran",
+   "maps": [
+    7,
+    8
+   ],
+   "optional_maps": [
+    63
+   ],
+   "hatchable_eggs": {
+    "76": 6,
+    "83": 2,
+    "120": 24,
+    "142": 8,
+    "357": 2,
+    "509": 3,
+    "708": 1,
+    "808": 2
+   },
+   "hatchable_eggs_optional": {
+    "411": 1,
+    "807": 2,
+    "824": 1
+   },
+   "scripted_eggs": {
+    "119 SKELEGG": 1,
+    "142 GHOULEGG": 2,
+    "411 GHOSTEGG": 1,
+    "574 GUARDMEG": 2
+   },
+   "scripted_eggs_optional": {}
+  },
+  {
+   "id": "necromancy",
+   "title": "Necromancy: East Road, Cemetery, Catacombs, Ancient Necromancers",
+   "maps": [
+    5,
+    6,
+    50,
+    62
+   ],
+   "optional_maps": [
+    15,
+    51
+   ],
+   "hatchable_eggs": {
+    "76": 6,
+    "83": 1,
+    "96": 1,
+    "119": 19,
+    "120": 5,
+    "142": 21,
+    "357": 7,
+    "411": 4,
+    "413": 2,
+    "509": 1,
+    "574": 1,
+    "707": 2,
+    "807": 5,
+    "808": 1,
+    "824": 2
+   },
+   "hatchable_eggs_optional": {
+    "76": 2,
+    "83": 3,
+    "119": 2,
+    "142": 1,
+    "357": 2,
+    "509": 2,
+    "574": 1,
+    "707": 1,
+    "806": 2,
+    "807": 5
+   },
+   "scripted_eggs": {
+    "119 SKELEGG": 4,
+    "142 GHOULEGG": 35,
+    "142 EGHOUL": 8,
+    "411 GHOSTEGG": 12,
+    "574 GUARDMEG": 2
+   },
+   "scripted_eggs_optional": {
+    "119 SKELEGG": 14,
+    "142 GHOULEGG": 11,
+    "142 EGHOUL": 1,
+    "411 GHOSTEGG": 6
+   }
+  },
+  {
+   "id": "mountain",
+   "title": "Mountain King: Catacombs 2, Stone Cove, the Hall",
+   "maps": [
+    49,
+    21,
+    31
+   ],
+   "optional_maps": [],
+   "hatchable_eggs": {
+    "76": 1,
+    "83": 2,
+    "119": 9,
+    "142": 6,
+    "214": 6,
+    "357": 2,
+    "411": 1,
+    "413": 2,
+    "509": 2,
+    "806": 1,
+    "807": 1
+   },
+   "hatchable_eggs_optional": {},
+   "scripted_eggs": {
+    "142 GHOULEGG": 9,
+    "411 GHOSTEGG": 2
+   },
+   "scripted_eggs_optional": {}
+  },
+  {
+   "id": "mordea",
+   "title": "Mordea plot: no new map (Central Tenebrae again)",
+   "maps": [],
+   "optional_maps": [],
+   "hatchable_eggs": {},
+   "hatchable_eggs_optional": {},
+   "scripted_eggs": {},
+   "scripted_eggs_optional": {}
+  },
+  {
+   "id": "scion",
+   "title": "Scion: Shrine of the Ancient Ones",
+   "maps": [
+    54
+   ],
+   "optional_maps": [],
+   "hatchable_eggs": {},
+   "hatchable_eggs_optional": {},
+   "scripted_eggs": {
+    "411 TOMB": 1
+   },
+   "scripted_eggs_optional": {}
+  },
+  {
+   "id": "theurgy",
+   "title": "Theurgy: Argentrock Isle",
+   "maps": [
+    37
+   ],
+   "optional_maps": [],
+   "hatchable_eggs": {
+    "76": 3,
+    "357": 2,
+    "806": 3,
+    "807": 4,
+    "824": 12
+   },
+   "hatchable_eggs_optional": {},
+   "scripted_eggs": {
+    "269 THURGEGG": 5,
+    "411 GHOSTEGG": 1
+   },
+   "scripted_eggs_optional": {}
+  },
+  {
+   "id": "hydros",
+   "title": "Hydros: Carthax Lake",
+   "maps": [
+    16,
+    26,
+    28
+   ],
+   "optional_maps": [],
+   "hatchable_eggs": {
+    "76": 2,
+    "83": 6,
+    "269": 1,
+    "357": 7,
+    "411": 1,
+    "806": 4,
+    "807": 2
+   },
+   "hatchable_eggs_optional": {},
+   "scripted_eggs": {
+    "142 GHOULEGG": 2,
+    "411 GHOSTEGG": 1
+   },
+   "scripted_eggs_optional": {}
+  },
+  {
+   "id": "sorcery",
+   "title": "Sorcery: Lava Tunnel, Daemon's Crag, Obsidian Fortress",
+   "maps": [
+    24,
+    25,
+    12,
+    14
+   ],
+   "optional_maps": [],
+   "hatchable_eggs": {
+    "76": 12,
+    "83": 1,
+    "96": 3,
+    "119": 2,
+    "142": 2,
+    "357": 1,
+    "411": 1,
+    "509": 4,
+    "708": 1
+   },
+   "hatchable_eggs_optional": {},
+   "scripted_eggs": {
+    "96 TRIALHAT": 2,
+    "142 GHOULEGG": 12
+   },
+   "scripted_eggs_optional": {}
+  },
+  {
+   "id": "blackrock",
+   "title": "Blackrock: Pit of the Dead",
+   "maps": [
+    57
+   ],
+   "optional_maps": [],
+   "hatchable_eggs": {
+    "83": 3,
+    "119": 7,
+    "142": 3,
+    "411": 3,
+    "413": 1,
+    "806": 1,
+    "807": 3,
+    "808": 4,
+    "824": 3
+   },
+   "hatchable_eggs_optional": {},
+   "scripted_eggs": {
+    "119 SKELEGG": 2,
+    "142 GHOULEGG": 5,
+    "142 EGHOUL": 1,
+    "411 GHOSTEGG": 2
+   },
+   "scripted_eggs_optional": {}
+  },
+  {
+   "id": "ether",
+   "title": "Ether: pentagram and the four planes",
+   "maps": [
+    43,
+    44,
+    45,
+    46,
+    47
+   ],
+   "optional_maps": [],
+   "hatchable_eggs": {
+    "76": 1,
+    "83": 1,
+    "96": 12,
+    "119": 9,
+    "142": 7,
+    "357": 6,
+    "411": 3,
+    "413": 7,
+    "509": 7
+   },
+   "hatchable_eggs_optional": {},
+   "scripted_eggs": {
+    "96 ENDPYRO": 1,
+    "214 ENDLITH": 1,
+    "377 ENDSTRAT": 1,
+    "411 GHOSTEGG": 1
+   },
+   "scripted_eggs_optional": {}
+  }
+ ],
+ "maps": {
+  "3": {
+   "stage": "opening",
+   "optional": false,
+   "eggs": {
+    "806": {
+     "eggs": 6,
+     "hatchable": 6,
+     "orphan": 0,
+     "links_monegg": 0,
+     "links_monfast": 6,
+     "one_shot": 1,
+     "one_shot_true": 0
+    },
+    "120": {
+     "eggs": 4,
+     "hatchable": 4,
+     "orphan": 0,
+     "links_monegg": 3,
+     "links_monfast": 1,
+     "one_shot": 0,
+     "one_shot_true": 0
+    },
+    "708": {
+     "eggs": 2,
+     "hatchable": 2,
+     "orphan": 0,
+     "links_monegg": 1,
+     "links_monfast": 1,
+     "one_shot": 0,
+     "one_shot_true": 0
+    },
+    "807": {
+     "eggs": 1,
+     "hatchable": 1,
+     "orphan": 0,
+     "links_monegg": 0,
+     "links_monfast": 1,
+     "one_shot": 0,
+     "one_shot_true": 0
+    }
+   },
+   "scripted_eggs": [],
+   "skeleton_items": 0,
+   "skeleton_items_near_skelegg": 0,
+   "npc_list_actors": [
+    {
+     "npc": 4,
+     "cls": 1028,
+     "name": "GUARD1",
+     "shape": 574
+    }
+   ]
+  },
+  "4": {
+   "stage": "opening",
+   "optional": true,
+   "eggs": {
+    "119": {
+     "eggs": 1,
+     "hatchable": 1,
+     "orphan": 0,
+     "links_monegg": 0,
+     "links_monfast": 1,
+     "one_shot": 0,
+     "one_shot_true": 0
+    },
+    "142": {
+     "eggs": 1,
+     "hatchable": 1,
+     "orphan": 0,
+     "links_monegg": 0,
+     "links_monfast": 1,
+     "one_shot": 0,
+     "one_shot_true": 0
+    },
+    "824": {
+     "eggs": 3,
+     "hatchable": 3,
+     "orphan": 0,
+     "links_monegg": 0,
+     "links_monfast": 3,
+     "one_shot": 0,
+     "one_shot_true": 0
+    },
+    "76": {
+     "eggs": 5,
+     "hatchable": 5,
+     "orphan": 0,
+     "links_monegg": 4,
+     "links_monfast": 1,
+     "one_shot": 0,
+     "one_shot_true": 0
+    },
+    "806": {
+     "eggs": 1,
+     "hatchable": 1,
+     "orphan": 0,
+     "links_monegg": 0,
+     "links_monfast": 1,
+     "one_shot": 0,
+     "one_shot_true": 0
+    },
+    "707": {
+     "eggs": 3,
+     "hatchable": 3,
+     "orphan": 0,
+     "links_monegg": 0,
+     "links_monfast": 3,
+     "one_shot": 0,
+     "one_shot_true": 0
+    },
+    "120": {
+     "eggs": 5,
+     "hatchable": 5,
+     "orphan": 0,
+     "links_monegg": 0,
+     "links_monfast": 5,
+     "one_shot": 0,
+     "one_shot_true": 0
+    },
+    "357": {
+     "eggs": 4,
+     "hatchable": 4,
+     "orphan": 0,
+     "links_monegg": 1,
+     "links_monfast": 4,
+     "one_shot": 0,
+     "one_shot_true": 0
+    },
+    "708": {
+     "eggs": 2,
+     "hatchable": 2,
+     "orphan": 0,
+     "links_monegg": 0,
+     "links_monfast": 2,
+     "one_shot": 0,
+     "one_shot_true": 0
+    },
+    "411": {
+     "eggs": 1,
+     "hatchable": 1,
+     "orphan": 0,
+     "links_monegg": 0,
+     "links_monfast": 1,
+     "one_shot": 0,
+     "one_shot_true": 0
+    }
+   },
+   "scripted_eggs": [
+    {
+     "cls": 1196,
+     "name": "GHOULEGG",
+     "count": 1,
+     "egg_id_1": 1,
+     "spawns": [
+      142
+     ],
+     "how": "hatch: if egg id 1 always, otherwise 10%; once per re-arm"
+    },
+    {
+     "cls": 1203,
+     "name": "GUARDMEG",
+     "count": 3,
+     "egg_id_1": 0,
+     "spawns": [
+      574
+     ],
+     "how": "enterFastArea: guard if none within 160. The ghoul branch needs G[58:1], which nothing sets in v2.10"
+    },
+    {
+     "cls": 1207,
+     "name": "PESANTLE",
+     "count": 1,
+     "egg_id_1": 0,
+     "spawns": [
+      836
+     ],
+     "how": "enterFastArea: 61% chance if none within 160"
+    }
+   ],
+   "skeleton_items": 0,
+   "skeleton_items_near_skelegg": 0,
+   "npc_list_actors": []
+  },
+  "5": {
+   "stage": "necromancy",
+   "optional": false,
+   "eggs": {
+    "76": {
+     "eggs": 3,
+     "hatchable": 1,
+     "orphan": 2,
+     "links_monegg": 0,
+     "links_monfast": 1,
+     "one_shot": 0,
+     "one_shot_true": 0
+    },
+    "142": {
+     "eggs": 6,
+     "hatchable": 6,
+     "orphan": 0,
+     "links_monegg": 0,
+     "links_monfast": 6,
+     "one_shot": 1,
+     "one_shot_true": 0
+    },
+    "119": {
+     "eggs": 4,
+     "hatchable": 4,
+     "orphan": 0,
+     "links_monegg": 0,
+     "links_monfast": 4,
+     "one_shot": 0,
+     "one_shot_true": 0
+    },
+    "357": {
+     "eggs": 5,
+     "hatchable": 5,
+     "orphan": 0,
+     "links_monegg": 3,
+     "links_monfast": 5,
+     "one_shot": 0,
+     "one_shot_true": 0
+    },
+    "807": {
+     "eggs": 4,
+     "hatchable": 4,
+     "orphan": 0,
+     "links_monegg": 0,
+     "links_monfast": 4,
+     "one_shot": 1,
+     "one_shot_true": 0
+    },
+    "120": {
+     "eggs": 5,
+     "hatchable": 5,
+     "orphan": 0,
+     "links_monegg": 0,
+     "links_monfast": 5,
+     "one_shot": 0,
+     "one_shot_true": 0
+    },
+    "574": {
+     "eggs": 1,
+     "hatchable": 1,
+     "orphan": 0,
+     "links_monegg": 0,
+     "links_monfast": 1,
+     "one_shot": 1,
+     "one_shot_true": 0
+    },
+    "707": {
+     "eggs": 2,
+     "hatchable": 2,
+     "orphan": 0,
+     "links_monegg": 0,
+     "links_monfast": 2,
+     "one_shot": 0,
+     "one_shot_true": 0
+    },
+    "824": {
+     "eggs": 2,
+     "hatchable": 2,
+     "orphan": 0,
+     "links_monegg": 0,
+     "links_monfast": 3,
+     "one_shot": 0,
+     "one_shot_true": 0
+    }
+   },
+   "scripted_eggs": [
+    {
+     "cls": 1196,
+     "name": "GHOULEGG",
+     "count": 3,
+     "egg_id_1": 1,
+     "spawns": [
+      142
+     ],
+     "how": "hatch: if egg id 1 always, otherwise 10%; once per re-arm"
+    },
+    {
+     "cls": 1203,
+     "name": "GUARDMEG",
+     "count": 2,
+     "egg_id_1": 0,
+     "spawns": [
+      574
+     ],
+     "how": "enterFastArea: guard if none within 160. The ghoul branch needs G[58:1], which nothing sets in v2.10"
+    }
+   ],
+   "skeleton_items": 0,
+   "skeleton_items_near_skelegg": 0,
+   "npc_list_actors": [
+    {
+     "npc": 59,
+     "cls": 1083,
+     "name": "GUARD_EW",
+     "shape": 574
+    }
+   ]
+  },
+  "6": {
+   "stage": "necromancy",
+   "optional": false,
+   "eggs": {
+    "142": {
+     "eggs": 7,
+     "hatchable": 7,
+     "orphan": 0,
+     "links_monegg": 0,
+     "links_monfast": 7,
+     "one_shot": 0,
+     "one_shot_true": 0
+    },
+    "119": {
+     "eggs": 2,
+     "hatchable": 2,
+     "orphan": 0,
+     "links_monegg": 0,
+     "links_monfast": 2,
+     "one_shot": 0,
+     "one_shot_true": 0
+    }
+   },
+   "scripted_eggs": [
+    {
+     "cls": 1195,
+     "name": "GHOSTEGG",
+     "count": 3,
+     "egg_id_1": 3,
+     "spawns": [
+      411
+     ],
+     "how": "hatch: if egg id 1 always, otherwise 10%; once per re-arm"
+    },
+    {
+     "cls": 1196,
+     "name": "GHOULEGG",
+     "count": 9,
+     "egg_id_1": 3,
+     "spawns": [
+      142
+     ],
+     "how": "hatch: if egg id 1 always, otherwise 10%; once per re-arm"
+    },
+    {
+     "cls": 1220,
+     "name": "EGHOUL",
+     "count": 2,
+     "egg_id_1": 0,
+     "spawns": [
+      142
+     ],
+     "how": "hatch: every shape-581 item within 640 becomes a ghoul; the item is destroyed, so finite"
+    }
+   ],
+   "skeleton_items": 0,
+   "skeleton_items_near_skelegg": 0,
+   "npc_list_actors": []
+  },
+  "7": {
+   "stage": "plateau",
+   "optional": false,
+   "eggs": {
+    "120": {
+     "eggs": 22,
+     "hatchable": 21,
+     "orphan": 1,
+     "links_monegg": 1,
+     "links_monfast": 25,
+     "one_shot": 0,
+     "one_shot_true": 0
+    },
+    "83": {
+     "eggs": 1,
+     "hatchable": 1,
+     "orphan": 0,
+     "links_monegg": 0,
+     "links_monfast": 2,
+     "one_shot": 0,
+     "one_shot_true": 0
+    },
+    "76": {
+     "eggs": 6,
+     "hatchable": 6,
+     "orphan": 0,
+     "links_monegg": 1,
+     "links_monfast": 6,
+     "one_shot": 0,
+     "one_shot_true": 0
+    },
+    "708": {
+     "eggs": 1,
+     "hatchable": 1,
+     "orphan": 0,
+     "links_monegg": 0,
+     "links_monfast": 1,
+     "one_shot": 0,
+     "one_shot_true": 0
+    }
+   },
+   "scripted_eggs": [
+    {
+     "cls": 1203,
+     "name": "GUARDMEG",
+     "count": 2,
+     "egg_id_1": 0,
+     "spawns": [
+      574
+     ],
+     "how": "enterFastArea: guard if none within 160. The ghoul branch needs G[58:1], which nothing sets in v2.10"
+    }
+   ],
+   "skeleton_items": 0,
+   "skeleton_items_near_skelegg": 0,
+   "npc_list_actors": []
+  },
+  "8": {
+   "stage": "plateau",
+   "optional": false,
+   "eggs": {
+    "808": {
+     "eggs": 2,
+     "hatchable": 2,
+     "orphan": 0,
+     "links_monegg": 0,
+     "links_monfast": 2,
+     "one_shot": 0,
+     "one_shot_true": 0
+    },
+    "83": {
+     "eggs": 1,
+     "hatchable": 1,
+     "orphan": 0,
+     "links_monegg": 0,
+     "links_monfast": 1,
+     "one_shot": 0,
+     "one_shot_true": 0
+    },
+    "120": {
+     "eggs": 3,
+     "hatchable": 3,
+     "orphan": 0,
+     "links_monegg": 3,
+     "links_monfast": 0,
+     "one_shot": 0,
+     "one_shot_true": 0
+    },
+    "357": {
+     "eggs": 2,
+     "hatchable": 2,
+     "orphan": 0,
+     "links_monegg": 0,
+     "links_monfast": 2,
+     "one_shot": 1,
+     "one_shot_true": 0
+    },
+    "509": {
+     "eggs": 3,
+     "hatchable": 3,
+     "orphan": 0,
+     "links_monegg": 1,
+     "links_monfast": 3,
+     "one_shot": 0,
+     "one_shot_true": 0
+    },
+    "142": {
+     "eggs": 8,
+     "hatchable": 8,
+     "orphan": 0,
+     "links_monegg": 3,
+     "links_monfast": 5,
+     "one_shot": 0,
+     "one_shot_true": 0
+    }
+   },
+   "scripted_eggs": [
+    {
+     "cls": 1195,
+     "name": "GHOSTEGG",
+     "count": 1,
+     "egg_id_1": 1,
+     "spawns": [
+      411
+     ],
+     "how": "hatch: if egg id 1 always, otherwise 10%; once per re-arm"
+    },
+    {
+     "cls": 1196,
+     "name": "GHOULEGG",
+     "count": 2,
+     "egg_id_1": 2,
+     "spawns": [
+      142
+     ],
+     "how": "hatch: if egg id 1 always, otherwise 10%; once per re-arm"
+    },
+    {
+     "cls": 1197,
+     "name": "SKELEGG",
+     "count": 1,
+     "egg_id_1": 1,
+     "spawns": [
+      119
+     ],
+     "how": "hatch: if egg id 1 always, otherwise 10%; turns at most 2 non-actor shape-119 items within 640 into live skeletons and destroys those items, so the supply is finite"
+    }
+   ],
+   "skeleton_items": 1,
+   "skeleton_items_near_skelegg": 1,
+   "npc_list_actors": []
+  },
+  "12": {
+   "stage": "sorcery",
+   "optional": false,
+   "eggs": {},
+   "scripted_eggs": [
+    {
+     "cls": 1204,
+     "name": "TRIALHAT",
+     "count": 1,
+     "egg_id_1": 0,
+     "spawns": [
+      96
+     ],
+     "how": "hatch: story scene (trial)"
+    }
+   ],
+   "skeleton_items": 0,
+   "skeleton_items_near_skelegg": 0,
+   "npc_list_actors": [
+    {
+     "npc": 52,
+     "cls": 1076,
+     "name": "CARDAS",
+     "shape": 200
+    },
+    {
+     "npc": 53,
+     "cls": 1077,
+     "name": "MENTAR",
+     "shape": 200
+    },
+    {
+     "npc": 54,
+     "cls": 1078,
+     "name": "DAEMOS",
+     "shape": 200
+    },
+    {
+     "npc": 55,
+     "cls": 1079,
+     "name": "TALLON",
+     "shape": 200
+    },
+    {
+     "npc": 56,
+     "cls": 1080,
+     "name": "KOTHIUS",
+     "shape": 200
+    },
+    {
+     "npc": 60,
+     "cls": 1084,
+     "name": "EMRICHOL",
+     "shape": 200
+    }
+   ]
+  },
+  "14": {
+   "stage": "sorcery",
+   "optional": false,
+   "eggs": {
+    "509": {
+     "eggs": 5,
+     "hatchable": 4,
+     "orphan": 1,
+     "links_monegg": 2,
+     "links_monfast": 2,
+     "one_shot": 0,
+     "one_shot_true": 0
+    },
+    "96": {
+     "eggs": 3,
+     "hatchable": 3,
+     "orphan": 0,
+     "links_monegg": 1,
+     "links_monfast": 2,
+     "one_shot": 0,
+     "one_shot_true": 0
+    },
+    "357": {
+     "eggs": 1,
+     "hatchable": 1,
+     "orphan": 0,
+     "links_monegg": 0,
+     "links_monfast": 1,
+     "one_shot": 0,
+     "one_shot_true": 0
+    },
+    "142": {
+     "eggs": 2,
+     "hatchable": 2,
+     "orphan": 0,
+     "links_monegg": 0,
+     "links_monfast": 2,
+     "one_shot": 0,
+     "one_shot_true": 0
+    },
+    "119": {
+     "eggs": 2,
+     "hatchable": 2,
+     "orphan": 0,
+     "links_monegg": 0,
+     "links_monfast": 2,
+     "one_shot": 0,
+     "one_shot_true": 0
+    },
+    "76": {
+     "eggs": 12,
+     "hatchable": 12,
+     "orphan": 0,
+     "links_monegg": 0,
+     "links_monfast": 12,
+     "one_shot": 0,
+     "one_shot_true": 0
+    },
+    "411": {
+     "eggs": 1,
+     "hatchable": 1,
+     "orphan": 0,
+     "links_monegg": 0,
+     "links_monfast": 1,
+     "one_shot": 0,
+     "one_shot_true": 0
+    },
+    "708": {
+     "eggs": 1,
+     "hatchable": 1,
+     "orphan": 0,
+     "links_monegg": 1,
+     "links_monfast": 0,
+     "one_shot": 0,
+     "one_shot_true": 0
+    },
+    "83": {
+     "eggs": 1,
+     "hatchable": 1,
+     "orphan": 0,
+     "links_monegg": 0,
+     "links_monfast": 1,
+     "one_shot": 0,
+     "one_shot_true": 0
+    }
+   },
+   "scripted_eggs": [
+    {
+     "cls": 1196,
+     "name": "GHOULEGG",
+     "count": 12,
+     "egg_id_1": 3,
+     "spawns": [
+      142
+     ],
+     "how": "hatch: if egg id 1 always, otherwise 10%; once per re-arm"
+    },
+    {
+     "cls": 1204,
+     "name": "TRIALHAT",
+     "count": 1,
+     "egg_id_1": 0,
+     "spawns": [
+      96
+     ],
+     "how": "hatch: story scene (trial)"
+    }
+   ],
+   "skeleton_items": 0,
+   "skeleton_items_near_skelegg": 0,
+   "npc_list_actors": [
+    {
+     "npc": 27,
+     "cls": 1051,
+     "name": "MALCHIR",
+     "shape": 187
+    },
+    {
+     "npc": 57,
+     "cls": 1081,
+     "name": "ARCADION",
+     "shape": 96
+    },
+    {
+     "npc": 58,
+     "cls": 1082,
+     "name": "EVILSORC",
+     "shape": 200
+    }
+   ]
+  },
+  "15": {
+   "stage": "necromancy",
+   "optional": true,
+   "eggs": {
+    "509": {
+     "eggs": 2,
+     "hatchable": 2,
+     "orphan": 0,
+     "links_monegg": 2,
+     "links_monfast": 0,
+     "one_shot": 1,
+     "one_shot_true": 1
+    },
+    "357": {
+     "eggs": 1,
+     "hatchable": 1,
+     "orphan": 0,
+     "links_monegg": 1,
+     "links_monfast": 0,
+     "one_shot": 0,
+     "one_shot_true": 0
+    },
+    "807": {
+     "eggs": 5,
+     "hatchable": 5,
+     "orphan": 0,
+     "links_monegg": 5,
+     "links_monfast": 1,
+     "one_shot": 0,
+     "one_shot_true": 0
+    },
+    "142": {
+     "eggs": 1,
+     "hatchable": 1,
+     "orphan": 0,
+     "links_monegg": 1,
+     "links_monfast": 0,
+     "one_shot": 1,
+     "one_shot_true": 1
+    },
+    "574": {
+     "eggs": 1,
+     "hatchable": 1,
+     "orphan": 0,
+     "links_monegg": 1,
+     "links_monfast": 0,
+     "one_shot": 1,
+     "one_shot_true": 1
+    },
+    "119": {
+     "eggs": 2,
+     "hatchable": 2,
+     "orphan": 0,
+     "links_monegg": 4,
+     "links_monfast": 0,
+     "one_shot": 0,
+     "one_shot_true": 0
+    },
+    "83": {
+     "eggs": 2,
+     "hatchable": 2,
+     "orphan": 0,
+     "links_monegg": 1,
+     "links_monfast": 1,
+     "one_shot": 1,
+     "one_shot_true": 0
+    },
+    "806": {
+     "eggs": 4,
+     "hatchable": 2,
+     "orphan": 2,
+     "links_monegg": 3,
+     "links_monfast": 0,
+     "one_shot": 0,
+     "one_shot_true": 0
+    },
+    "707": {
+     "eggs": 1,
+     "hatchable": 1,
+     "orphan": 0,
+     "links_monegg": 1,
+     "links_monfast": 0,
+     "one_shot": 0,
+     "one_shot_true": 0
+    }
+   },
+   "scripted_eggs": [
+    {
+     "cls": 1196,
+     "name": "GHOULEGG",
+     "count": 1,
+     "egg_id_1": 1,
+     "spawns": [
+      142
+     ],
+     "how": "hatch: if egg id 1 always, otherwise 10%; once per re-arm"
+    },
+    {
+     "cls": 1197,
+     "name": "SKELEGG",
+     "count": 2,
+     "egg_id_1": 2,
+     "spawns": [
+      119
+     ],
+     "how": "hatch: if egg id 1 always, otherwise 10%; turns at most 2 non-actor shape-119 items within 640 into live skeletons and destroys those items, so the supply is finite"
+    }
+   ],
+   "skeleton_items": 6,
+   "skeleton_items_near_skelegg": 3,
+   "npc_list_actors": []
+  },
+  "16": {
+   "stage": "hydros",
+   "optional": false,
+   "eggs": {},
+   "scripted_eggs": [],
+   "skeleton_items": 0,
+   "skeleton_items_near_skelegg": 0,
+   "npc_list_actors": []
+  },
+  "21": {
+   "stage": "mountain",
+   "optional": false,
+   "eggs": {
+    "509": {
+     "eggs": 2,
+     "hatchable": 2,
+     "orphan": 0,
+     "links_monegg": 2,
+     "links_monfast": 0,
+     "one_shot": 0,
+     "one_shot_true": 0
+    },
+    "119": {
+     "eggs": 4,
+     "hatchable": 4,
+     "orphan": 0,
+     "links_monegg": 4,
+     "links_monfast": 0,
+     "one_shot": 0,
+     "one_shot_true": 0
+    },
+    "142": {
+     "eggs": 1,
+     "hatchable": 1,
+     "orphan": 0,
+     "links_monegg": 1,
+     "links_monfast": 0,
+     "one_shot": 0,
+     "one_shot_true": 0
+    }
+   },
+   "scripted_eggs": [
+    {
+     "cls": 1195,
+     "name": "GHOSTEGG",
+     "count": 1,
+     "egg_id_1": 0,
+     "spawns": [
+      411
+     ],
+     "how": "hatch: if egg id 1 always, otherwise 10%; once per re-arm"
+    },
+    {
+     "cls": 1196,
+     "name": "GHOULEGG",
+     "count": 5,
+     "egg_id_1": 1,
+     "spawns": [
+      142
+     ],
+     "how": "hatch: if egg id 1 always, otherwise 10%; once per re-arm"
+    }
+   ],
+   "skeleton_items": 0,
+   "skeleton_items_near_skelegg": 0,
+   "npc_list_actors": []
+  },
+  "24": {
+   "stage": "sorcery",
+   "optional": false,
+   "eggs": {},
+   "scripted_eggs": [],
+   "skeleton_items": 0,
+   "skeleton_items_near_skelegg": 0,
+   "npc_list_actors": []
+  },
+  "25": {
+   "stage": "sorcery",
+   "optional": false,
+   "eggs": {},
+   "scripted_eggs": [],
+   "skeleton_items": 0,
+   "skeleton_items_near_skelegg": 0,
+   "npc_list_actors": []
+  },
+  "26": {
+   "stage": "hydros",
+   "optional": false,
+   "eggs": {
+    "357": {
+     "eggs": 7,
+     "hatchable": 7,
+     "orphan": 0,
+     "links_monegg": 0,
+     "links_monfast": 7,
+     "one_shot": 0,
+     "one_shot_true": 0
+    },
+    "83": {
+     "eggs": 1,
+     "hatchable": 1,
+     "orphan": 0,
+     "links_monegg": 0,
+     "links_monfast": 1,
+     "one_shot": 0,
+     "one_shot_true": 0
+    },
+    "806": {
+     "eggs": 3,
+     "hatchable": 3,
+     "orphan": 0,
+     "links_monegg": 0,
+     "links_monfast": 3,
+     "one_shot": 0,
+     "one_shot_true": 0
+    },
+    "269": {
+     "eggs": 1,
+     "hatchable": 1,
+     "orphan": 0,
+     "links_monegg": 0,
+     "links_monfast": 1,
+     "one_shot": 0,
+     "one_shot_true": 0
+    },
+    "76": {
+     "eggs": 2,
+     "hatchable": 2,
+     "orphan": 0,
+     "links_monegg": 0,
+     "links_monfast": 2,
+     "one_shot": 1,
+     "one_shot_true": 0
+    },
+    "807": {
+     "eggs": 2,
+     "hatchable": 2,
+     "orphan": 0,
+     "links_monegg": 0,
+     "links_monfast": 2,
+     "one_shot": 1,
+     "one_shot_true": 0
+    }
+   },
+   "scripted_eggs": [],
+   "skeleton_items": 0,
+   "skeleton_items_near_skelegg": 0,
+   "npc_list_actors": []
+  },
+  "28": {
+   "stage": "hydros",
+   "optional": false,
+   "eggs": {
+    "806": {
+     "eggs": 1,
+     "hatchable": 1,
+     "orphan": 0,
+     "links_monegg": 1,
+     "links_monfast": 0,
+     "one_shot": 0,
+     "one_shot_true": 0
+    },
+    "83": {
+     "eggs": 5,
+     "hatchable": 5,
+     "orphan": 0,
+     "links_monegg": 2,
+     "links_monfast": 4,
+     "one_shot": 3,
+     "one_shot_true": 0
+    },
+    "411": {
+     "eggs": 1,
+     "hatchable": 1,
+     "orphan": 0,
+     "links_monegg": 1,
+     "links_monfast": 1,
+     "one_shot": 0,
+     "one_shot_true": 0
+    }
+   },
+   "scripted_eggs": [
+    {
+     "cls": 1195,
+     "name": "GHOSTEGG",
+     "count": 1,
+     "egg_id_1": 1,
+     "spawns": [
+      411
+     ],
+     "how": "hatch: if egg id 1 always, otherwise 10%; once per re-arm"
+    },
+    {
+     "cls": 1196,
+     "name": "GHOULEGG",
+     "count": 2,
+     "egg_id_1": 2,
+     "spawns": [
+      142
+     ],
+     "how": "hatch: if egg id 1 always, otherwise 10%; once per re-arm"
+    }
+   ],
+   "skeleton_items": 0,
+   "skeleton_items_near_skelegg": 0,
+   "npc_list_actors": []
+  },
+  "31": {
+   "stage": "mountain",
+   "optional": false,
+   "eggs": {
+    "83": {
+     "eggs": 1,
+     "hatchable": 1,
+     "orphan": 0,
+     "links_monegg": 0,
+     "links_monfast": 1,
+     "one_shot": 0,
+     "one_shot_true": 0
+    },
+    "214": {
+     "eggs": 7,
+     "hatchable": 6,
+     "orphan": 1,
+     "links_monegg": 6,
+     "links_monfast": 0,
+     "one_shot": 0,
+     "one_shot_true": 0
+    },
+    "357": {
+     "eggs": 1,
+     "hatchable": 1,
+     "orphan": 0,
+     "links_monegg": 0,
+     "links_monfast": 1,
+     "one_shot": 0,
+     "one_shot_true": 0
+    },
+    "807": {
+     "eggs": 1,
+     "hatchable": 1,
+     "orphan": 0,
+     "links_monegg": 0,
+     "links_monfast": 1,
+     "one_shot": 0,
+     "one_shot_true": 0
+    },
+    "806": {
+     "eggs": 1,
+     "hatchable": 1,
+     "orphan": 0,
+     "links_monegg": 0,
+     "links_monfast": 1,
+     "one_shot": 1,
+     "one_shot_true": 0
+    },
+    "76": {
+     "eggs": 1,
+     "hatchable": 1,
+     "orphan": 0,
+     "links_monegg": 1,
+     "links_monfast": 0,
+     "one_shot": 0,
+     "one_shot_true": 0
+    }
+   },
+   "scripted_eggs": [
+    {
+     "cls": 1196,
+     "name": "GHOULEGG",
+     "count": 1,
+     "egg_id_1": 1,
+     "spawns": [
+      142
+     ],
+     "how": "hatch: if egg id 1 always, otherwise 10%; once per re-arm"
+    }
+   ],
+   "skeleton_items": 0,
+   "skeleton_items_near_skelegg": 0,
+   "npc_list_actors": [
+    {
+     "npc": 6,
+     "cls": 1030,
+     "name": null,
+     "shape": 119
+    },
+    {
+     "npc": 30,
+     "cls": 1054,
+     "name": null,
+     "shape": 119
+    },
+    {
+     "npc": 34,
+     "cls": 1058,
+     "name": null,
+     "shape": 119
+    },
+    {
+     "npc": 35,
+     "cls": 1059,
+     "name": null,
+     "shape": 119
+    },
+    {
+     "npc": 36,
+     "cls": 1060,
+     "name": null,
+     "shape": 119
+    },
+    {
+     "npc": 37,
+     "cls": 1061,
+     "name": null,
+     "shape": 119
+    },
+    {
+     "npc": 38,
+     "cls": 1062,
+     "name": null,
+     "shape": 119
+    },
+    {
+     "npc": 39,
+     "cls": 1063,
+     "name": null,
+     "shape": 119
+    },
+    {
+     "npc": 41,
+     "cls": 1065,
+     "name": null,
+     "shape": 142
+    },
+    {
+     "npc": 42,
+     "cls": 1066,
+     "name": null,
+     "shape": 142
+    },
+    {
+     "npc": 43,
+     "cls": 1067,
+     "name": null,
+     "shape": 142
+    },
+    {
+     "npc": 44,
+     "cls": 1068,
+     "name": null,
+     "shape": 142
+    }
+   ]
+  },
+  "37": {
+   "stage": "theurgy",
+   "optional": false,
+   "eggs": {
+    "807": {
+     "eggs": 4,
+     "hatchable": 4,
+     "orphan": 0,
+     "links_monegg": 0,
+     "links_monfast": 4,
+     "one_shot": 0,
+     "one_shot_true": 0
+    },
+    "357": {
+     "eggs": 2,
+     "hatchable": 2,
+     "orphan": 0,
+     "links_monegg": 0,
+     "links_monfast": 2,
+     "one_shot": 0,
+     "one_shot_true": 0
+    },
+    "76": {
+     "eggs": 3,
+     "hatchable": 3,
+     "orphan": 0,
+     "links_monegg": 2,
+     "links_monfast": 1,
+     "one_shot": 0,
+     "one_shot_true": 0
+    },
+    "806": {
+     "eggs": 3,
+     "hatchable": 3,
+     "orphan": 0,
+     "links_monegg": 0,
+     "links_monfast": 3,
+     "one_shot": 0,
+     "one_shot_true": 0
+    },
+    "824": {
+     "eggs": 12,
+     "hatchable": 12,
+     "orphan": 0,
+     "links_monegg": 0,
+     "links_monfast": 14,
+     "one_shot": 2,
+     "one_shot_true": 0
+    }
+   },
+   "scripted_eggs": [
+    {
+     "cls": 1195,
+     "name": "GHOSTEGG",
+     "count": 1,
+     "egg_id_1": 1,
+     "spawns": [
+      411
+     ],
+     "how": "hatch: if egg id 1 always, otherwise 10%; once per re-arm"
+    },
+    {
+     "cls": 1212,
+     "name": "THURGEGG",
+     "count": 5,
+     "egg_id_1": 0,
+     "spawns": [
+      269
+     ],
+     "how": "enterFastArea: 51% chance if no theurgist within 960"
+    }
+   ],
+   "skeleton_items": 0,
+   "skeleton_items_near_skelegg": 0,
+   "npc_list_actors": []
+  },
+  "39": {
+   "stage": "opening",
+   "optional": false,
+   "eggs": {
+    "707": {
+     "eggs": 1,
+     "hatchable": 1,
+     "orphan": 0,
+     "links_monegg": 0,
+     "links_monfast": 1,
+     "one_shot": 0,
+     "one_shot_true": 0
+    },
+    "411": {
+     "eggs": 1,
+     "hatchable": 1,
+     "orphan": 0,
+     "links_monegg": 0,
+     "links_monfast": 1,
+     "one_shot": 0,
+     "one_shot_true": 0
+    },
+    "83": {
+     "eggs": 1,
+     "hatchable": 1,
+     "orphan": 0,
+     "links_monegg": 0,
+     "links_monfast": 1,
+     "one_shot": 0,
+     "one_shot_true": 0
+    }
+   },
+   "scripted_eggs": [
+    {
+     "cls": 1203,
+     "name": "GUARDMEG",
+     "count": 9,
+     "egg_id_1": 1,
+     "spawns": [
+      574
+     ],
+     "how": "enterFastArea: guard if none within 160. The ghoul branch needs G[58:1], which nothing sets in v2.10"
+    },
+    {
+     "cls": 1206,
+     "name": "PESANTSI",
+     "count": 2,
+     "egg_id_1": 1,
+     "spawns": [
+      835
+     ],
+     "how": "enterFastArea: if none within 160"
+    },
+    {
+     "cls": 1219,
+     "name": "FIGHT",
+     "count": 6,
+     "egg_id_1": 0,
+     "spawns": [
+      707,
+      574
+     ],
+     "how": "enterFastArea: 16% chance, once (egg id set to 1), never after G[86:1]; a peasant and a guard at shape-174 marker items in a fight scene"
+    }
+   ],
+   "skeleton_items": 0,
+   "skeleton_items_near_skelegg": 0,
+   "npc_list_actors": []
+  },
+  "40": {
+   "stage": "opening",
+   "optional": false,
+   "eggs": {
+    "707": {
+     "eggs": 2,
+     "hatchable": 2,
+     "orphan": 0,
+     "links_monegg": 0,
+     "links_monfast": 2,
+     "one_shot": 0,
+     "one_shot_true": 0
+    },
+    "806": {
+     "eggs": 1,
+     "hatchable": 1,
+     "orphan": 0,
+     "links_monegg": 0,
+     "links_monfast": 1,
+     "one_shot": 0,
+     "one_shot_true": 0
+    },
+    "574": {
+     "eggs": 1,
+     "hatchable": 1,
+     "orphan": 0,
+     "links_monegg": 0,
+     "links_monfast": 1,
+     "one_shot": 0,
+     "one_shot_true": 0
+    }
+   },
+   "scripted_eggs": [
+    {
+     "cls": 1203,
+     "name": "GUARDMEG",
+     "count": 4,
+     "egg_id_1": 0,
+     "spawns": [
+      574
+     ],
+     "how": "enterFastArea: guard if none within 160. The ghoul branch needs G[58:1], which nothing sets in v2.10"
+    },
+    {
+     "cls": 1219,
+     "name": "FIGHT",
+     "count": 2,
+     "egg_id_1": 0,
+     "spawns": [
+      707,
+      574
+     ],
+     "how": "enterFastArea: 16% chance, once (egg id set to 1), never after G[86:1]; a peasant and a guard at shape-174 marker items in a fight scene"
+    }
+   ],
+   "skeleton_items": 0,
+   "skeleton_items_near_skelegg": 0,
+   "npc_list_actors": [
+    {
+     "npc": 11,
+     "cls": 1035,
+     "name": "GUARD3",
+     "shape": 574
+    },
+    {
+     "npc": 45,
+     "cls": 1069,
+     "name": "GUARD2",
+     "shape": 574
+    },
+    {
+     "npc": 46,
+     "cls": 1070,
+     "name": "GUARD4",
+     "shape": 574
+    },
+    {
+     "npc": 47,
+     "cls": 1071,
+     "name": "GUARD5",
+     "shape": 574
+    },
+    {
+     "npc": 48,
+     "cls": 1072,
+     "name": "GUARD6",
+     "shape": 574
+    },
+    {
+     "npc": 49,
+     "cls": 1073,
+     "name": "GUARD7",
+     "shape": 574
+    },
+    {
+     "npc": 50,
+     "cls": 1074,
+     "name": "GUARD8",
+     "shape": 574
+    },
+    {
+     "npc": 51,
+     "cls": 1075,
+     "name": "GUARD9",
+     "shape": 574
+    },
+    {
+     "npc": 61,
+     "cls": 1085,
+     "name": "GUARD10",
+     "shape": 574
+    }
+   ]
+  },
+  "41": {
+   "stage": "opening",
+   "optional": false,
+   "eggs": {
+    "707": {
+     "eggs": 5,
+     "hatchable": 5,
+     "orphan": 0,
+     "links_monegg": 0,
+     "links_monfast": 5,
+     "one_shot": 0,
+     "one_shot_true": 0
+    },
+    "708": {
+     "eggs": 6,
+     "hatchable": 6,
+     "orphan": 0,
+     "links_monegg": 2,
+     "links_monfast": 6,
+     "one_shot": 0,
+     "one_shot_true": 0
+    },
+    "807": {
+     "eggs": 1,
+     "hatchable": 1,
+     "orphan": 0,
+     "links_monegg": 0,
+     "links_monfast": 1,
+     "one_shot": 0,
+     "one_shot_true": 0
+    }
+   },
+   "scripted_eggs": [
+    {
+     "cls": 1203,
+     "name": "GUARDMEG",
+     "count": 7,
+     "egg_id_1": 3,
+     "spawns": [
+      574
+     ],
+     "how": "enterFastArea: guard if none within 160. The ghoul branch needs G[58:1], which nothing sets in v2.10"
+    },
+    {
+     "cls": 1206,
+     "name": "PESANTSI",
+     "count": 3,
+     "egg_id_1": 0,
+     "spawns": [
+      835
+     ],
+     "how": "enterFastArea: if none within 160"
+    },
+    {
+     "cls": 1207,
+     "name": "PESANTLE",
+     "count": 6,
+     "egg_id_1": 0,
+     "spawns": [
+      836
+     ],
+     "how": "enterFastArea: 61% chance if none within 160"
+    },
+    {
+     "cls": 1219,
+     "name": "FIGHT",
+     "count": 6,
+     "egg_id_1": 0,
+     "spawns": [
+      707,
+      574
+     ],
+     "how": "enterFastArea: 16% chance, once (egg id set to 1), never after G[86:1]; a peasant and a guard at shape-174 marker items in a fight scene"
+    }
+   ],
+   "skeleton_items": 0,
+   "skeleton_items_near_skelegg": 0,
+   "npc_list_actors": []
+  },
+  "43": {
+   "stage": "ether",
+   "optional": false,
+   "eggs": {
+    "357": {
+     "eggs": 3,
+     "hatchable": 3,
+     "orphan": 0,
+     "links_monegg": 0,
+     "links_monfast": 3,
+     "one_shot": 0,
+     "one_shot_true": 0
+    }
+   },
+   "scripted_eggs": [],
+   "skeleton_items": 0,
+   "skeleton_items_near_skelegg": 0,
+   "npc_list_actors": []
+  },
+  "44": {
+   "stage": "ether",
+   "optional": false,
+   "eggs": {
+    "96": {
+     "eggs": 12,
+     "hatchable": 12,
+     "orphan": 0,
+     "links_monegg": 11,
+     "links_monfast": 1,
+     "one_shot": 0,
+     "one_shot_true": 0
+    },
+    "413": {
+     "eggs": 7,
+     "hatchable": 7,
+     "orphan": 0,
+     "links_monegg": 7,
+     "links_monfast": 0,
+     "one_shot": 0,
+     "one_shot_true": 0
+    },
+    "509": {
+     "eggs": 7,
+     "hatchable": 7,
+     "orphan": 0,
+     "links_monegg": 7,
+     "links_monfast": 0,
+     "one_shot": 0,
+     "one_shot_true": 0
+    },
+    "76": {
+     "eggs": 1,
+     "hatchable": 1,
+     "orphan": 0,
+     "links_monegg": 1,
+     "links_monfast": 0,
+     "one_shot": 0,
+     "one_shot_true": 0
+    }
+   },
+   "scripted_eggs": [
+    {
+     "cls": 1195,
+     "name": "GHOSTEGG",
+     "count": 1,
+     "egg_id_1": 1,
+     "spawns": [
+      411
+     ],
+     "how": "hatch: if egg id 1 always, otherwise 10%; once per re-arm"
+    },
+    {
+     "cls": 1169,
+     "name": "ENDPYRO",
+     "count": 1,
+     "egg_id_1": 0,
+     "spawns": [
+      96
+     ],
+     "how": "hatch: Plane of Fire Pyros scene. One per shape-684 marker within 640, with STR 25, INT 20, DEX 25, HP 220"
+    }
+   ],
+   "skeleton_items": 0,
+   "skeleton_items_near_skelegg": 0,
+   "npc_list_actors": []
+  },
+  "45": {
+   "stage": "ether",
+   "optional": false,
+   "eggs": {
+    "142": {
+     "eggs": 3,
+     "hatchable": 3,
+     "orphan": 0,
+     "links_monegg": 3,
+     "links_monfast": 0,
+     "one_shot": 0,
+     "one_shot_true": 0
+    },
+    "357": {
+     "eggs": 4,
+     "hatchable": 3,
+     "orphan": 1,
+     "links_monegg": 3,
+     "links_monfast": 0,
+     "one_shot": 0,
+     "one_shot_true": 0
+    }
+   },
+   "scripted_eggs": [],
+   "skeleton_items": 0,
+   "skeleton_items_near_skelegg": 0,
+   "npc_list_actors": []
+  },
+  "46": {
+   "stage": "ether",
+   "optional": false,
+   "eggs": {},
+   "scripted_eggs": [
+    {
+     "cls": 1189,
+     "name": "ENDSTRAT",
+     "count": 1,
+     "egg_id_1": 0,
+     "spawns": [
+      377
+     ],
+     "how": "hatch: Plane of Air Stratos scene. Keeps up to 4 air servants within 1600, spawning every 0 to 9 x 30 ticks"
+    }
+   ],
+   "skeleton_items": 0,
+   "skeleton_items_near_skelegg": 0,
+   "npc_list_actors": []
+  },
+  "47": {
+   "stage": "ether",
+   "optional": false,
+   "eggs": {
+    "119": {
+     "eggs": 11,
+     "hatchable": 9,
+     "orphan": 2,
+     "links_monegg": 10,
+     "links_monfast": 0,
+     "one_shot": 0,
+     "one_shot_true": 0
+    },
+    "142": {
+     "eggs": 6,
+     "hatchable": 4,
+     "orphan": 2,
+     "links_monegg": 4,
+     "links_monfast": 0,
+     "one_shot": 0,
+     "one_shot_true": 0
+    },
+    "411": {
+     "eggs": 3,
+     "hatchable": 3,
+     "orphan": 0,
+     "links_monegg": 3,
+     "links_monfast": 0,
+     "one_shot": 0,
+     "one_shot_true": 0
+    },
+    "83": {
+     "eggs": 1,
+     "hatchable": 1,
+     "orphan": 0,
+     "links_monegg": 1,
+     "links_monfast": 0,
+     "one_shot": 0,
+     "one_shot_true": 0
+    },
+    "76": {
+     "eggs": 1,
+     "hatchable": 0,
+     "orphan": 1,
+     "links_monegg": 0,
+     "links_monfast": 0,
+     "one_shot": 0,
+     "one_shot_true": 0
+    }
+   },
+   "scripted_eggs": [
+    {
+     "cls": 1183,
+     "name": "ENDLITH",
+     "count": 1,
+     "egg_id_1": 0,
+     "spawns": [
+      214
+     ],
+     "how": "hatch: Plane of Earth Lithos scene. One golem per shape-174 marker within 3200, attacking the Avatar"
+    }
+   ],
+   "skeleton_items": 0,
+   "skeleton_items_near_skelegg": 0,
+   "npc_list_actors": []
+  },
+  "49": {
+   "stage": "mountain",
+   "optional": false,
+   "eggs": {
+    "413": {
+     "eggs": 2,
+     "hatchable": 2,
+     "orphan": 0,
+     "links_monegg": 2,
+     "links_monfast": 0,
+     "one_shot": 0,
+     "one_shot_true": 0
+    },
+    "119": {
+     "eggs": 5,
+     "hatchable": 5,
+     "orphan": 0,
+     "links_monegg": 5,
+     "links_monfast": 0,
+     "one_shot": 0,
+     "one_shot_true": 0
+    },
+    "83": {
+     "eggs": 1,
+     "hatchable": 1,
+     "orphan": 0,
+     "links_monegg": 0,
+     "links_monfast": 1,
+     "one_shot": 0,
+     "one_shot_true": 0
+    },
+    "357": {
+     "eggs": 2,
+     "hatchable": 1,
+     "orphan": 1,
+     "links_monegg": 1,
+     "links_monfast": 0,
+     "one_shot": 0,
+     "one_shot_true": 0
+    },
+    "411": {
+     "eggs": 1,
+     "hatchable": 1,
+     "orphan": 0,
+     "links_monegg": 1,
+     "links_monfast": 1,
+     "one_shot": 0,
+     "one_shot_true": 0
+    },
+    "142": {
+     "eggs": 5,
+     "hatchable": 5,
+     "orphan": 0,
+     "links_monegg": 2,
+     "links_monfast": 3,
+     "one_shot": 0,
+     "one_shot_true": 0
+    }
+   },
+   "scripted_eggs": [
+    {
+     "cls": 1195,
+     "name": "GHOSTEGG",
+     "count": 1,
+     "egg_id_1": 0,
+     "spawns": [
+      411
+     ],
+     "how": "hatch: if egg id 1 always, otherwise 10%; once per re-arm"
+    },
+    {
+     "cls": 1196,
+     "name": "GHOULEGG",
+     "count": 3,
+     "egg_id_1": 2,
+     "spawns": [
+      142
+     ],
+     "how": "hatch: if egg id 1 always, otherwise 10%; once per re-arm"
+    }
+   ],
+   "skeleton_items": 0,
+   "skeleton_items_near_skelegg": 0,
+   "npc_list_actors": []
+  },
+  "50": {
+   "stage": "necromancy",
+   "optional": false,
+   "eggs": {
+    "413": {
+     "eggs": 2,
+     "hatchable": 2,
+     "orphan": 0,
+     "links_monegg": 2,
+     "links_monfast": 1,
+     "one_shot": 0,
+     "one_shot_true": 0
+    },
+    "142": {
+     "eggs": 6,
+     "hatchable": 6,
+     "orphan": 0,
+     "links_monegg": 6,
+     "links_monfast": 1,
+     "one_shot": 0,
+     "one_shot_true": 0
+    },
+    "808": {
+     "eggs": 1,
+     "hatchable": 1,
+     "orphan": 0,
+     "links_monegg": 0,
+     "links_monfast": 1,
+     "one_shot": 0,
+     "one_shot_true": 0
+    },
+    "411": {
+     "eggs": 1,
+     "hatchable": 1,
+     "orphan": 0,
+     "links_monegg": 1,
+     "links_monfast": 0,
+     "one_shot": 0,
+     "one_shot_true": 0
+    },
+    "119": {
+     "eggs": 5,
+     "hatchable": 5,
+     "orphan": 0,
+     "links_monegg": 4,
+     "links_monfast": 1,
+     "one_shot": 0,
+     "one_shot_true": 0
+    }
+   },
+   "scripted_eggs": [
+    {
+     "cls": 1195,
+     "name": "GHOSTEGG",
+     "count": 7,
+     "egg_id_1": 5,
+     "spawns": [
+      411
+     ],
+     "how": "hatch: if egg id 1 always, otherwise 10%; once per re-arm"
+    },
+    {
+     "cls": 1196,
+     "name": "GHOULEGG",
+     "count": 19,
+     "egg_id_1": 13,
+     "spawns": [
+      142
+     ],
+     "how": "hatch: if egg id 1 always, otherwise 10%; once per re-arm"
+    },
+    {
+     "cls": 1197,
+     "name": "SKELEGG",
+     "count": 4,
+     "egg_id_1": 3,
+     "spawns": [
+      119
+     ],
+     "how": "hatch: if egg id 1 always, otherwise 10%; turns at most 2 non-actor shape-119 items within 640 into live skeletons and destroys those items, so the supply is finite"
+    },
+    {
+     "cls": 1220,
+     "name": "EGHOUL",
+     "count": 4,
+     "egg_id_1": 2,
+     "spawns": [
+      142
+     ],
+     "how": "hatch: every shape-581 item within 640 becomes a ghoul; the item is destroyed, so finite"
+    }
+   ],
+   "skeleton_items": 18,
+   "skeleton_items_near_skelegg": 8,
+   "npc_list_actors": []
+  },
+  "51": {
+   "stage": "necromancy",
+   "optional": true,
+   "eggs": {
+    "76": {
+     "eggs": 2,
+     "hatchable": 2,
+     "orphan": 0,
+     "links_monegg": 2,
+     "links_monfast": 0,
+     "one_shot": 0,
+     "one_shot_true": 0
+    },
+    "357": {
+     "eggs": 1,
+     "hatchable": 1,
+     "orphan": 0,
+     "links_monegg": 1,
+     "links_monfast": 0,
+     "one_shot": 0,
+     "one_shot_true": 0
+    },
+    "83": {
+     "eggs": 1,
+     "hatchable": 1,
+     "orphan": 0,
+     "links_monegg": 1,
+     "links_monfast": 0,
+     "one_shot": 0,
+     "one_shot_true": 0
+    }
+   },
+   "scripted_eggs": [
+    {
+     "cls": 1195,
+     "name": "GHOSTEGG",
+     "count": 6,
+     "egg_id_1": 3,
+     "spawns": [
+      411
+     ],
+     "how": "hatch: if egg id 1 always, otherwise 10%; once per re-arm"
+    },
+    {
+     "cls": 1196,
+     "name": "GHOULEGG",
+     "count": 10,
+     "egg_id_1": 2,
+     "spawns": [
+      142
+     ],
+     "how": "hatch: if egg id 1 always, otherwise 10%; once per re-arm"
+    },
+    {
+     "cls": 1197,
+     "name": "SKELEGG",
+     "count": 12,
+     "egg_id_1": 3,
+     "spawns": [
+      119
+     ],
+     "how": "hatch: if egg id 1 always, otherwise 10%; turns at most 2 non-actor shape-119 items within 640 into live skeletons and destroys those items, so the supply is finite"
+    },
+    {
+     "cls": 1220,
+     "name": "EGHOUL",
+     "count": 1,
+     "egg_id_1": 0,
+     "spawns": [
+      142
+     ],
+     "how": "hatch: every shape-581 item within 640 becomes a ghoul; the item is destroyed, so finite"
+    }
+   ],
+   "skeleton_items": 96,
+   "skeleton_items_near_skelegg": 28,
+   "npc_list_actors": []
+  },
+  "54": {
+   "stage": "scion",
+   "optional": false,
+   "eggs": {},
+   "scripted_eggs": [
+    {
+     "cls": 1157,
+     "name": "TOMB",
+     "count": 1,
+     "egg_id_1": 0,
+     "spawns": [
+      411
+     ],
+     "how": "hatch: once (G[77:1]); Khumash-Gor"
+    }
+   ],
+   "skeleton_items": 0,
+   "skeleton_items_near_skelegg": 0,
+   "npc_list_actors": []
+  },
+  "57": {
+   "stage": "blackrock",
+   "optional": false,
+   "eggs": {
+    "808": {
+     "eggs": 4,
+     "hatchable": 4,
+     "orphan": 0,
+     "links_monegg": 2,
+     "links_monfast": 2,
+     "one_shot": 1,
+     "one_shot_true": 1
+    },
+    "806": {
+     "eggs": 1,
+     "hatchable": 1,
+     "orphan": 0,
+     "links_monegg": 2,
+     "links_monfast": 0,
+     "one_shot": 0,
+     "one_shot_true": 0
+    },
+    "807": {
+     "eggs": 3,
+     "hatchable": 3,
+     "orphan": 0,
+     "links_monegg": 4,
+     "links_monfast": 0,
+     "one_shot": 0,
+     "one_shot_true": 0
+    },
+    "119": {
+     "eggs": 7,
+     "hatchable": 7,
+     "orphan": 0,
+     "links_monegg": 4,
+     "links_monfast": 3,
+     "one_shot": 1,
+     "one_shot_true": 1
+    },
+    "142": {
+     "eggs": 3,
+     "hatchable": 3,
+     "orphan": 0,
+     "links_monegg": 4,
+     "links_monfast": 0,
+     "one_shot": 0,
+     "one_shot_true": 0
+    },
+    "83": {
+     "eggs": 3,
+     "hatchable": 3,
+     "orphan": 0,
+     "links_monegg": 2,
+     "links_monfast": 1,
+     "one_shot": 0,
+     "one_shot_true": 0
+    },
+    "413": {
+     "eggs": 1,
+     "hatchable": 1,
+     "orphan": 0,
+     "links_monegg": 1,
+     "links_monfast": 0,
+     "one_shot": 0,
+     "one_shot_true": 0
+    },
+    "411": {
+     "eggs": 3,
+     "hatchable": 3,
+     "orphan": 0,
+     "links_monegg": 2,
+     "links_monfast": 1,
+     "one_shot": 0,
+     "one_shot_true": 0
+    },
+    "824": {
+     "eggs": 3,
+     "hatchable": 3,
+     "orphan": 0,
+     "links_monegg": 0,
+     "links_monfast": 3,
+     "one_shot": 0,
+     "one_shot_true": 0
+    }
+   },
+   "scripted_eggs": [
+    {
+     "cls": 1195,
+     "name": "GHOSTEGG",
+     "count": 2,
+     "egg_id_1": 1,
+     "spawns": [
+      411
+     ],
+     "how": "hatch: if egg id 1 always, otherwise 10%; once per re-arm"
+    },
+    {
+     "cls": 1196,
+     "name": "GHOULEGG",
+     "count": 5,
+     "egg_id_1": 2,
+     "spawns": [
+      142
+     ],
+     "how": "hatch: if egg id 1 always, otherwise 10%; once per re-arm"
+    },
+    {
+     "cls": 1197,
+     "name": "SKELEGG",
+     "count": 2,
+     "egg_id_1": 2,
+     "spawns": [
+      119
+     ],
+     "how": "hatch: if egg id 1 always, otherwise 10%; turns at most 2 non-actor shape-119 items within 640 into live skeletons and destroys those items, so the supply is finite"
+    },
+    {
+     "cls": 1220,
+     "name": "EGHOUL",
+     "count": 1,
+     "egg_id_1": 0,
+     "spawns": [
+      142
+     ],
+     "how": "hatch: every shape-581 item within 640 becomes a ghoul; the item is destroyed, so finite"
+    }
+   ],
+   "skeleton_items": 4,
+   "skeleton_items_near_skelegg": 4,
+   "npc_list_actors": []
+  },
+  "62": {
+   "stage": "necromancy",
+   "optional": false,
+   "eggs": {
+    "142": {
+     "eggs": 2,
+     "hatchable": 2,
+     "orphan": 0,
+     "links_monegg": 2,
+     "links_monfast": 0,
+     "one_shot": 0,
+     "one_shot_true": 0
+    },
+    "119": {
+     "eggs": 8,
+     "hatchable": 8,
+     "orphan": 0,
+     "links_monegg": 8,
+     "links_monfast": 0,
+     "one_shot": 1,
+     "one_shot_true": 1
+    },
+    "357": {
+     "eggs": 2,
+     "hatchable": 2,
+     "orphan": 0,
+     "links_monegg": 1,
+     "links_monfast": 1,
+     "one_shot": 1,
+     "one_shot_true": 0
+    },
+    "76": {
+     "eggs": 6,
+     "hatchable": 5,
+     "orphan": 1,
+     "links_monegg": 5,
+     "links_monfast": 0,
+     "one_shot": 1,
+     "one_shot_true": 1
+    },
+    "411": {
+     "eggs": 3,
+     "hatchable": 3,
+     "orphan": 0,
+     "links_monegg": 3,
+     "links_monfast": 0,
+     "one_shot": 0,
+     "one_shot_true": 0
+    },
+    "509": {
+     "eggs": 1,
+     "hatchable": 1,
+     "orphan": 0,
+     "links_monegg": 1,
+     "links_monfast": 0,
+     "one_shot": 0,
+     "one_shot_true": 0
+    },
+    "83": {
+     "eggs": 1,
+     "hatchable": 1,
+     "orphan": 0,
+     "links_monegg": 1,
+     "links_monfast": 0,
+     "one_shot": 1,
+     "one_shot_true": 1
+    },
+    "96": {
+     "eggs": 1,
+     "hatchable": 1,
+     "orphan": 0,
+     "links_monegg": 1,
+     "links_monfast": 0,
+     "one_shot": 0,
+     "one_shot_true": 0
+    },
+    "807": {
+     "eggs": 1,
+     "hatchable": 1,
+     "orphan": 0,
+     "links_monegg": 1,
+     "links_monfast": 0,
+     "one_shot": 0,
+     "one_shot_true": 0
+    }
+   },
+   "scripted_eggs": [
+    {
+     "cls": 1195,
+     "name": "GHOSTEGG",
+     "count": 2,
+     "egg_id_1": 1,
+     "spawns": [
+      411
+     ],
+     "how": "hatch: if egg id 1 always, otherwise 10%; once per re-arm"
+    },
+    {
+     "cls": 1196,
+     "name": "GHOULEGG",
+     "count": 4,
+     "egg_id_1": 4,
+     "spawns": [
+      142
+     ],
+     "how": "hatch: if egg id 1 always, otherwise 10%; once per re-arm"
+    },
+    {
+     "cls": 1220,
+     "name": "EGHOUL",
+     "count": 2,
+     "egg_id_1": 0,
+     "spawns": [
+      142
+     ],
+     "how": "hatch: every shape-581 item within 640 becomes a ghoul; the item is destroyed, so finite"
+    }
+   ],
+   "skeleton_items": 0,
+   "skeleton_items_near_skelegg": 0,
+   "npc_list_actors": []
+  },
+  "63": {
+   "stage": "plateau",
+   "optional": true,
+   "eggs": {
+    "411": {
+     "eggs": 1,
+     "hatchable": 1,
+     "orphan": 0,
+     "links_monegg": 0,
+     "links_monfast": 2,
+     "one_shot": 0,
+     "one_shot_true": 0
+    },
+    "824": {
+     "eggs": 1,
+     "hatchable": 1,
+     "orphan": 0,
+     "links_monegg": 0,
+     "links_monfast": 2,
+     "one_shot": 0,
+     "one_shot_true": 0
+    },
+    "807": {
+     "eggs": 2,
+     "hatchable": 2,
+     "orphan": 0,
+     "links_monegg": 0,
+     "links_monfast": 2,
+     "one_shot": 0,
+     "one_shot_true": 0
+    }
+   },
+   "scripted_eggs": [],
+   "skeleton_items": 0,
+   "skeleton_items_near_skelegg": 0,
+   "npc_list_actors": []
+  }
+ },
+ "other_spawn_sources": [
+  {
+   "class": "0197 GRAVE_NS",
+   "spawns": [
+    411
+   ],
+   "how": "Elaina grave (shape 350, quality 51, map 6 at 3392,27768,8), once: needs G[264:1], sets G[220:1]"
+  },
+  {
+   "class": "0525 COLLAPSE",
+   "spawns": [
+    142
+   ],
+   "how": "gotHit with weight on it or from a quake: the shape 521 item linked to it collapses, and a ghoul can result; 42 items placed (map 50 has 21)"
+  },
+  {
+   "class": "0672 LEVER",
+   "spawns": [
+    142,
+    411
+   ],
+   "how": "lever puzzles: one ghoul or ghost per shape-174 marker within 960, guarded by flags such as G[576:1]"
+  },
+  {
+   "class": "1045 VIVIDOS",
+   "spawns": [
+    142
+   ],
+   "how": "3 ghouls in the Lothian ritual scene, map 6"
+  },
+  {
+   "class": "0607 LOGBOOK, 1408 LOGBOOK2",
+   "spawns": [
+    574
+   ],
+   "how": "guards in the Mordea plot scenes"
+  },
+  {
+   "class": "engine: ghost 411",
+   "spawns": [
+    142,
+    413
+   ],
+   "how": "a living ghost keeps making fire skulls and (off map 54) ghouls, see combat.md 10. Unbounded while it lives"
+  },
+  {
+   "class": "engine: skeleton 119",
+   "spawns": [
+    119
+   ],
+   "how": "rises U[5,30] s after death unless the killing blow had fire; same actor, see combat.md 8"
+  }
+ ]
+}

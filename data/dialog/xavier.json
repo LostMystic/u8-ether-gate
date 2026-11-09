@@ -1,0 +1,64 @@
+{
+ "id": "xavier",
+ "name": "Xavier",
+ "npc": 25,
+ "about": "Xavier (class 1049), Theurgist on Argentrock, who receives the stolen Focus of healing (return_focus, G[111:1]). Virtues topic (Honor, 2026-11-08): the promise to bring it back (mark xavier_promise; deed xavier_promise_kept).",
+ "menu": {
+  "max_entries": 1,
+  "first_menu": true,
+  "exits_only_menu": true,
+  "back": "Back.",
+  "leave": "Something else."
+ },
+ "topics": [
+  {
+   "id": "promise",
+   "slot": "promise",
+   "feature": "virtues",
+   "label": "The stolen focus",
+   "when": {
+    "step_done": [
+     "test_skills"
+    ],
+    "step_not_done": [
+     "return_focus"
+    ],
+    "not_mark": [
+     "xavier_promise"
+    ]
+   },
+   "say": [
+    "The Focus of healing was taken from this monastery. It is not a thing we speak of to strangers. Yet here you are."
+   ],
+   "topics": [
+    {
+     "id": "promise_give",
+     "label": "I will find it and bring it back to you. I promise.",
+     "mark": "xavier_promise",
+     "leave": true,
+     "say": [
+      "Then I will hold you to that, and pray to Stratos that you can keep it."
+     ]
+    },
+    {
+     "id": "promise_not",
+     "label": "I am sorry to hear it.",
+     "leave": true,
+     "say": [
+      "So are we all."
+     ]
+    },
+    {
+     "id": "promise_cruel",
+     "label": "Your monks lost it. Why should I care?",
+     "vice": 2,
+     "leave": true,
+     "say": [
+      "Xavier's calm does not break, but something behind it closes.",
+      "Then we have nothing more to say to one another today."
+     ]
+    }
+   ]
+  }
+ ]
+}

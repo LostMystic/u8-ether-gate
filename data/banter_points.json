@@ -1,0 +1,307 @@
+{
+ "version": 1,
+ "notes": [
+  "Banter points (game/banter.h): quiet places on the critical path's roads where two companions may talk. map, x, y, z (the Avatar's foot centre on a walking route), r: the radius that fires it.",
+  "Chosen from the walking routes of the travel maps (pagan_banter_tests ... cands): at least 768 from any monster egg and 512 from any hatcher, 1000 apart on one map; tests/test_banter.cpp checks this.",
+  "Map 16 also counts on 26 (Carthax Lake in its two states)."
+ ],
+ "points": [
+  {
+   "id": "shore_road",
+   "map": 3,
+   "x": 12624,
+   "y": 5392,
+   "z": 8,
+   "r": 192,
+   "place": "Tenebrae shore, the beach road west of Devon's camp"
+  },
+  {
+   "id": "gate_road",
+   "map": 3,
+   "x": 11952,
+   "y": 3856,
+   "z": 48,
+   "r": 192,
+   "place": "Tenebrae shore, the road up to the city gate"
+  },
+  {
+   "id": "central_north",
+   "map": 40,
+   "x": 12752,
+   "y": 4944,
+   "z": 48,
+   "r": 192,
+   "place": "Central Tenebrae, the street south of the north gate"
+  },
+  {
+   "id": "central_market",
+   "map": 40,
+   "x": 12112,
+   "y": 6896,
+   "z": 48,
+   "r": 192,
+   "place": "Central Tenebrae, halfway along the main street"
+  },
+  {
+   "id": "central_south",
+   "map": 40,
+   "x": 12848,
+   "y": 11120,
+   "z": 48,
+   "r": 192,
+   "place": "Central Tenebrae, the street up from the shore gate"
+  },
+  {
+   "id": "west_lane",
+   "map": 39,
+   "x": 18064,
+   "y": 13008,
+   "z": 48,
+   "r": 192,
+   "place": "West Tenebrae, the lane from the central gate"
+  },
+  {
+   "id": "west_houses",
+   "map": 39,
+   "x": 16368,
+   "y": 12528,
+   "z": 48,
+   "r": 192,
+   "place": "West Tenebrae, the main lane"
+  },
+  {
+   "id": "west_reef_road",
+   "map": 39,
+   "x": 14576,
+   "y": 12720,
+   "z": 48,
+   "r": 192,
+   "place": "West Tenebrae, the way toward the reef gate"
+  },
+  {
+   "id": "reef_path",
+   "map": 4,
+   "x": 18896,
+   "y": 17008,
+   "z": 48,
+   "r": 192,
+   "place": "Fisherman's Reef, the shore path"
+  },
+  {
+   "id": "reef_middle",
+   "map": 4,
+   "x": 20048,
+   "y": 18320,
+   "z": 48,
+   "r": 192,
+   "place": "Fisherman's Reef, the long walk along the water"
+  },
+  {
+   "id": "reef_far",
+   "map": 4,
+   "x": 20848,
+   "y": 20368,
+   "z": 48,
+   "r": 192,
+   "place": "Fisherman's Reef, short of the far shore"
+  },
+  {
+   "id": "east_north",
+   "map": 41,
+   "x": 14384,
+   "y": 4560,
+   "z": 48,
+   "r": 192,
+   "place": "East Tenebrae, the north street"
+  },
+  {
+   "id": "east_square",
+   "map": 41,
+   "x": 18704,
+   "y": 6192,
+   "z": 48,
+   "r": 192,
+   "place": "East Tenebrae, the street east toward the city wall"
+  },
+  {
+   "id": "east_road_gate",
+   "map": 41,
+   "x": 17200,
+   "y": 11984,
+   "z": 48,
+   "r": 192,
+   "place": "East Tenebrae, the street to the East Road gate"
+  },
+  {
+   "id": "east_road_south",
+   "map": 5,
+   "x": 5520,
+   "y": 22352,
+   "z": 48,
+   "r": 192,
+   "place": "East Road, leaving the city"
+  },
+  {
+   "id": "east_road_middle",
+   "map": 5,
+   "x": 6768,
+   "y": 14768,
+   "z": 48,
+   "r": 192,
+   "place": "East Road, the middle of the long road north"
+  },
+  {
+   "id": "east_road_north",
+   "map": 5,
+   "x": 7152,
+   "y": 12464,
+   "z": 48,
+   "r": 192,
+   "place": "East Road, near the cemetery"
+  },
+  {
+   "id": "cemetery_gate",
+   "map": 6,
+   "x": 6896,
+   "y": 28816,
+   "z": 8,
+   "r": 192,
+   "place": "Cemetery, inside the gate"
+  },
+  {
+   "id": "cemetery_rows",
+   "map": 6,
+   "x": 7600,
+   "y": 26736,
+   "z": 8,
+   "r": 192,
+   "place": "Cemetery, between the old rows"
+  },
+  {
+   "id": "valley_south",
+   "map": 7,
+   "x": 14000,
+   "y": 25584,
+   "z": 8,
+   "r": 192,
+   "place": "Herdsman's Valley, the road north out of town"
+  },
+  {
+   "id": "valley_middle",
+   "map": 7,
+   "x": 11824,
+   "y": 22032,
+   "z": 8,
+   "r": 192,
+   "place": "Herdsman's Valley, the path to the plateau cave"
+  },
+  {
+   "id": "valley_west",
+   "map": 7,
+   "x": 8112,
+   "y": 23632,
+   "z": 8,
+   "r": 192,
+   "place": "Herdsman's Valley, the open ground to the west"
+  },
+  {
+   "id": "plateau_pond",
+   "map": 8,
+   "x": 12496,
+   "y": 14704,
+   "z": 48,
+   "r": 192,
+   "place": "The Plateau, the walk from the pond"
+  },
+  {
+   "id": "plateau_house",
+   "map": 8,
+   "x": 14128,
+   "y": 15088,
+   "z": 48,
+   "r": 192,
+   "place": "The Plateau, the path to Mythran's house"
+  },
+  {
+   "id": "argentrock_shore",
+   "map": 37,
+   "x": 28368,
+   "y": 25008,
+   "z": 56,
+   "r": 192,
+   "place": "Argentrock Isle, the path up from the shore"
+  },
+  {
+   "id": "argentrock_road",
+   "map": 37,
+   "x": 26288,
+   "y": 20176,
+   "z": 56,
+   "r": 192,
+   "place": "Argentrock Isle, the road inland"
+  },
+  {
+   "id": "argentrock_stones",
+   "map": 37,
+   "x": 22416,
+   "y": 18288,
+   "z": 56,
+   "r": 192,
+   "place": "Argentrock Isle, west of the standing stones"
+  },
+  {
+   "id": "argentrock_west",
+   "map": 37,
+   "x": 18672,
+   "y": 18416,
+   "z": 56,
+   "r": 192,
+   "place": "Argentrock Isle, the long walk west to the altar"
+  },
+  {
+   "id": "carthax_north",
+   "map": 16,
+   "x": 19120,
+   "y": 9968,
+   "z": 104,
+   "r": 192,
+   "place": "Carthax Lake, the north rim"
+  },
+  {
+   "id": "carthax_rim",
+   "map": 16,
+   "x": 17040,
+   "y": 10992,
+   "z": 104,
+   "r": 192,
+   "place": "Carthax Lake, the west rim"
+  },
+  {
+   "id": "carthax_south",
+   "map": 16,
+   "x": 16240,
+   "y": 12656,
+   "z": 104,
+   "r": 192,
+   "place": "Carthax Lake, the long rim walk south"
+  },
+  {
+   "id": "crag_bluff",
+   "map": 12,
+   "x": 21247,
+   "y": 16079,
+   "z": 56,
+   "r": 192,
+   "place": "Daemon's Crag, the path to the east bluff"
+  },
+  {
+   "id": "crag_ravine",
+   "map": 12,
+   "x": 17904,
+   "y": 18928,
+   "z": 56,
+   "r": 192,
+   "place": "Daemon's Crag, the path from the waypoint toward the ceremony ground"
+  }
+ ]
+}

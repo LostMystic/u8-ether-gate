@@ -1,0 +1,3590 @@
+{
+ "version": 1,
+ "notes": [
+  "Companions (PLAN-COMPANIONS.md): the engine's own content, not from the original game. Edit freely.",
+  "talk: answer-menu topics. when: conditions (in_party, party_full, waiting, combat, joined_before, dead_ally, map, present, absent, flag, not_flag, step_done, step_not_done, asked, not_asked, leveling (Leveling active), reagents / not_reagents (\"out\", \"low\", \"ok\": data/companion_magic.json)).",
+  "say: lines barked in order; alt: [{when, say}] variants (the first that holds); action: join wait follow leave trade bye picklock steal cast:<spell>; set: flags; topics: a sub-menu.",
+  "found_again (a bark, game/party.h): the line of someone back home after dying, when found. leveling: level 1 stats with the Leveling option on, and the class whose gains in level_classes they take; stats stays for Leveling off (a floor of mana can be given, for a spell that must stay castable).",
+  "barks: lines by trigger (greet, greet_party, greet_again, join, refuse_full, wait, follow, leave, bye, home, idle, waiting, combat, low_hp, ally_down, kill, revived, theft, innocent, no_mana, cast_ok, cast_nobody, reagents_low, reagents_out, restock, restock_poor, spell_locked, picklock_<result>, steal_<result>); area_barks: on arriving on a map.",
+  "spawn: the beach spot (debug mode, and the fallback). home: where they wait to be found: {map, x, y, z, dir, place}; checked by tests/test_homes.cpp and test_route.cpp.",
+    "{avatar} in a line is the Avatar's name. art.recolour: hue rules (degrees) for the world shape; paperdoll_recolour: for the paperdoll picture.",
+  "spells: kind bolt / lightning / drain / field / knock / slow / calm / summon / heal / cure / raise; type: damage type bits (combat.md: 0x08 fire, 0x10 undead, 0x20 magic, 0x80 pierce = always hits).",
+  "Lore checked against the game's texts: Theurgy is the air school (Stratos, the theurgists of Argentrock), Thaumaturgy the ether (Mythran), Tempestry Hydros' power held by the Tempest."
+ ],
+ "level_classes": {
+  "fighter": {"str": 2, "dex": 1, "int": 0},
+  "caster": {"str": 0, "dex": 1, "int": 2},
+  "hybrid": {"str": 1, "dex": 1, "int": 1}
+ },
+ "spells": [
+  {
+   "id": "grave_drain",
+   "name": "Grave Drain",
+   "kind": "drain",
+   "mana": 4,
+   "damage": [
+    4,
+    9
+   ],
+   "type": 160,
+   "missile": {
+    "shape": 260,
+    "frame": 2
+   },
+   "effect": {
+    "shape": 578,
+    "first": 66,
+    "last": 78
+   },
+   "range": 448
+  },
+  {
+   "id": "raise_bones",
+   "name": "Raise Bones",
+   "kind": "summon",
+   "mana": 12,
+   "damage": [
+    0,
+    45
+   ],
+   "effect": {
+    "shape": 578,
+    "first": 66,
+    "last": 78
+   },
+   "range": 448
+  },
+  {
+   "id": "fire_bolt",
+   "name": "Fire Bolt",
+   "kind": "bolt",
+   "mana": 3,
+   "damage": [
+    6,
+    12
+   ],
+   "type": 168,
+   "missile": {
+    "shape": 260,
+    "frame": 4
+   },
+   "effect": {
+    "shape": 480,
+    "first": 3,
+    "last": 10
+   },
+   "sound": 31,
+   "range": 480
+  },
+  {
+   "id": "fire_field",
+   "name": "Fire Field",
+   "kind": "field",
+   "mana": 8,
+   "damage": [
+    5,
+    10
+   ],
+   "type": 168,
+   "radius": 96,
+   "effect": {
+    "shape": 400,
+    "first": 0,
+    "last": 9
+   },
+   "sound": 158,
+   "range": 384
+  },
+  {
+   "id": "healing_waters",
+   "name": "Healing Waters",
+   "kind": "heal",
+   "mana": 5,
+   "damage": [
+    8,
+    14
+   ],
+   "effect": {
+    "shape": 703,
+    "first": 0,
+    "last": 9
+   },
+   "outside": true,
+   "range": 384
+  },
+  {
+   "id": "slowing_tide",
+   "name": "Slowing Tide",
+   "kind": "slow",
+   "mana": 4,
+   "damage": [
+    1,
+    3
+   ],
+   "type": 160,
+   "missile": {
+    "shape": 260,
+    "frame": 3
+   },
+   "effect": {
+    "shape": 400,
+    "first": 10,
+    "last": 19
+   },
+   "range": 384
+  },
+  {
+   "id": "wave",
+   "name": "Wave",
+   "kind": "knock",
+   "mana": 5,
+   "damage": [
+    3,
+    6
+   ],
+   "type": 160,
+   "effect": {
+    "shape": 400,
+    "first": 10,
+    "last": 19
+   },
+   "range": 256
+  },
+  {
+   "id": "heal",
+   "name": "Heal",
+   "kind": "heal",
+   "mana": 5,
+   "damage": [
+    10,
+    18
+   ],
+   "effect": {
+    "shape": 703,
+    "first": 0,
+    "last": 9
+   },
+   "outside": true,
+   "range": 384
+  },
+  {
+   "id": "cure",
+   "name": "Cleanse",
+   "kind": "cure",
+   "mana": 3,
+   "damage": [
+    2,
+    5
+   ],
+   "effect": {
+    "shape": 703,
+    "first": 0,
+    "last": 9
+   },
+   "outside": true,
+   "range": 384
+  },
+  {
+   "id": "ancient_light",
+   "name": "Light of the Ancients",
+   "kind": "bolt",
+   "mana": 4,
+   "damage": [
+    4,
+    9
+   ],
+   "type": 176,
+   "missile": {
+    "shape": 260,
+    "frame": 0
+   },
+   "effect": {
+    "shape": 480,
+    "first": 0,
+    "last": 4
+   },
+   "range": 448
+  },
+  {
+   "id": "raise",
+   "name": "Raise the Fallen",
+   "kind": "raise",
+   "mana": 30,
+   "combat": false,
+   "outside": true,
+   "effect": {
+    "shape": 703,
+    "first": 0,
+    "last": 9
+   },
+   "range": 640
+  },
+  {
+   "id": "lightning",
+   "name": "Lightning",
+   "kind": "lightning",
+   "mana": 4,
+   "damage": [
+    5,
+    12
+   ],
+   "type": 160,
+   "flash": true,
+   "effect": {
+    "shape": 578,
+    "first": 20,
+    "last": 34
+   },
+   "sound": 94,
+   "range": 480
+  },
+  {
+   "id": "gust",
+   "name": "Gust",
+   "kind": "knock",
+   "mana": 3,
+   "damage": [
+    2,
+    4
+   ],
+   "type": 160,
+   "missile": {
+    "shape": 260,
+    "frame": 0
+   },
+   "effect": {
+    "shape": 480,
+    "first": 0,
+    "last": 3
+   },
+   "range": 384
+  },
+  {
+   "id": "ice_shards",
+   "name": "Ice Shards",
+   "kind": "bolt",
+   "mana": 3,
+   "damage": [
+    5,
+    10
+   ],
+   "type": 160,
+   "missile": {
+    "shape": 260,
+    "frame": 3
+   },
+   "effect": {
+    "shape": 400,
+    "first": 10,
+    "last": 19
+   },
+   "range": 448
+  },
+  {
+   "id": "calm",
+   "name": "Calm",
+   "kind": "calm",
+   "mana": 6,
+   "damage": [
+    0,
+    0
+   ],
+   "effect": {
+    "shape": 703,
+    "first": 0,
+    "last": 9
+   },
+   "range": 384
+  },
+  {
+   "id": "tide_heal",
+   "name": "Tide's Mending",
+   "kind": "heal",
+   "mana": 5,
+   "damage": [
+    8,
+    14
+   ],
+   "effect": {
+    "shape": 703,
+    "first": 0,
+    "last": 9
+   },
+   "outside": true,
+   "range": 384
+  },
+  {
+   "id": "tide_rite",
+   "name": "Rite of the Tide",
+   "kind": "raise",
+   "mana": 30,
+   "combat": false,
+   "outside": true,
+   "only": "ilvaran",
+   "effect": {
+    "shape": 400,
+    "first": 10,
+    "last": 19
+   },
+   "range": 640
+  }
+ ],
+ "companions": [
+  {
+   "id": "morvain",
+   "name": "Morvain",
+   "title": "gravekeeper",
+   "sex": "M",
+   "element": "Earth",
+   "school": "Necromancy",
+   "role": "caster: grave magic (drains life, raises a skeleton for a while)",
+   "stats": {
+    "str": 14,
+    "dex": 13,
+    "int": 22,
+    "hp": 32,
+    "mana": 40
+   },
+   "leveling": {"class": "caster", "str": 10, "dex": 10, "int": 14},
+   "art": {
+    "shape": 187,
+    "note": "Malchir's hooded robe (full walk/run/attack/hit/die/cast 27-31); red trim turned moss green",
+    "recolour": [
+     {
+      "hues": [
+       330,
+       30
+      ],
+      "min_sat": 0.3,
+      "to_hue": 105,
+      "sat": 0.8,
+      "val": 0.9
+     }
+    ],
+    "paperdoll_recolour": [
+     {
+      "hues": [
+       345,
+       15
+      ],
+      "min_sat": 0.35,
+      "to_hue": 110,
+      "sat": 0.7,
+      "val": 0.6
+     },
+     {
+      "hues": [
+       35,
+       60
+      ],
+      "min_sat": 0.25,
+      "to_hue": 30,
+      "sat": 0.25,
+      "val": 0.35
+     }
+    ]
+   },
+   "equipment": [
+    {
+     "shape": 418
+    }
+   ],
+   "backpack": [
+    {
+     "shape": 395,
+     "frame": 0,
+     "qty": 4
+    },
+    {
+     "shape": 766,
+     "frame": 1
+    }
+   ],
+   "spells": [
+    "grave_drain",
+    "raise_bones"
+   ],
+   "caster": true,
+   "spawn": {
+    "x": 15620,
+    "y": 5770,
+    "z": 8,
+    "dir": 6
+   },
+   "home": {
+    "map": 6,
+    "x": 7360,
+    "y": 27120,
+    "z": 8,
+    "dir": 2,
+    "place": "Cemetery, the old plot"
+   },
+   "talk": [
+    {
+     "id": "name",
+     "label": "name",
+     "say": [
+      "Morvain. My mother named me for the morning mist over the graves. She had a gravedigger's idea of poetry."
+     ]
+    },
+    {
+     "id": "job",
+     "label": "job",
+     "say": [
+      "I kept the cemetery north of Tenebrae, beside the necromancers. I dug, I washed the dead, I sang them into the earth.",
+      "Then a new keeper came and I was not needed. So I mind the old plots he is not paid to. The dead are good listeners."
+     ]
+    },
+    {
+     "id": "lithos",
+     "label": "Lithos",
+     "say": [
+      "Lithos is the Titan of Earth, the Mountain King. Long ago our people made a pact with him: still the shaking ground, and we give him our dead.",
+      "Every grave in Tenebrae is a promise kept. Break it, and the earth remembers."
+     ],
+     "topics": [
+      {
+       "id": "necro",
+       "label": "necromancy",
+       "say": [
+        "Necromancy is not cruelty, whatever the townsfolk whisper. It is the patience of the earth: bone, blood and dirt, and words the ground can hear.",
+        "I know a little. Enough to draw strength from the dying and to wake old bones for a short while. Not enough to frighten Vividos."
+       ]
+      },
+      {
+       "id": "dead",
+       "label": "the dead",
+       "say": [
+        "The dead are not gone, only quiet. Lithos keeps them, and they work for him in the dark.",
+        "I would not have them disturbed for a handful of rings. If thou robbest a grave while I walk with thee, I will say nothing. But I will remember."
+       ]
+      },
+      {
+       "id": "digging",
+       "label": "gravedigging",
+       "say": [
+        "First rule of gravedigging: make the hole a little longer than the man. They stretch."
+       ]
+      }
+     ]
+    },
+    {
+     "id": "titans",
+     "label": "Titans",
+     "say": [
+      "Four Titans rule this land: Lithos below us, Hydros in the deep, Pyros in the fire mountains, Stratos in the high winds. Each takes its due."
+     ],
+     "alt": [
+      {
+       "when": {
+        "present": [
+         "kalvax"
+        ]
+       },
+       "say": [
+        "Four Titans rule this land: Lithos below, Hydros in the deep, Pyros in the fire, Stratos in the wind.",
+        "Kalvax will tell thee Pyros is the greatest. Fire burns bright. Earth is still here when it goes out."
+       ]
+      }
+     ]
+    },
+    {
+     "id": "tenebrae",
+     "label": "Tenebrae",
+     "say": [
+      "A city of the Tempest's people. Mordea rules, the guards bark, the merchants weigh their coin twice. I bury them all the same, in the end."
+     ]
+    },
+    {
+     "id": "quest",
+     "label": "my quest",
+     "say": [
+      "Thou seekest a way home? Then thou must go where the living seldom go. The necromancers under the cemetery know more than they say."
+     ],
+     "alt": [
+      {
+       "when": {
+        "step_done": [
+         "meet_lithos"
+        ]
+       },
+       "say": [
+        "Thou hast stood before the Mountain King himself. I have buried kings. I have never met one who was a mountain."
+       ]
+      },
+      {
+       "when": {
+        "step_done": [
+         "enter_catacombs"
+        ]
+       },
+       "say": [
+        "Thou hast been below, among the old ones of the catacombs. Thou smellest of old dust. Good. They will have marked thee."
+       ]
+      },
+      {
+       "when": {
+        "step_done": [
+         "to_cemetery"
+        ]
+       },
+       "say": [
+        "Thou hast walked among my old headstones. Did Vividos speak to thee? He speaks to few of the living."
+       ]
+      }
+     ]
+    },
+    {
+     "id": "corvin",
+     "label": "Corvin",
+     "when": {
+      "present": [
+       "corvin"
+      ]
+     },
+     "say": [
+      "The thief? He has quick hands and a good heart, and he would deny both. Keep him away from the tombs."
+     ]
+    },
+    {
+     "id": "join",
+     "label": "join me",
+     "when": {
+      "in_party": false
+     },
+     "action": "join"
+    },
+    {
+     "id": "orders",
+     "label": "orders",
+     "when": {
+      "in_party": true
+     },
+     "topics": [
+      {
+       "id": "wait",
+       "label": "wait here",
+       "when": {
+        "waiting": false
+       },
+       "action": "wait"
+      },
+      {
+       "id": "follow",
+       "label": "follow me",
+       "when": {
+        "waiting": true
+       },
+       "action": "follow"
+      },
+      {
+       "id": "trade",
+       "label": "trade",
+       "action": "trade"
+      },
+      {
+       "id": "part",
+       "label": "part ways",
+       "action": "leave"
+      }
+     ]
+    },
+    {
+     "id": "reagents_out",
+     "label": "What do you mean you're out of spells?",
+     "when": {
+      "in_party": true,
+      "leveling": true,
+      "reagents": "out"
+     },
+     "say": [
+      "My spells are bone, blood and grave-earth, {avatar}, not prayers. When the pouch is empty, so am I.",
+      "Next time thou goest to Mythran, I will buy at the same time. But I need money on me: put some obsidian in my pack."
+     ]
+    },
+    {
+     "id": "reagents",
+     "label": "your reagents",
+     "when": {
+      "in_party": true,
+      "leveling": true,
+      "not_reagents": "out"
+     },
+     "say": [
+      "Every spell I cast eats a little bone dust and blackmoor. I count my doses; I will tell thee when they run low.",
+      "When thou talkest with Mythran I buy what I need from him, if I have obsidian on me. Put coins in my pack if thou wantest me casting."
+     ]
+    },
+    {
+     "id": "bye",
+     "label": "bye",
+     "action": "bye"
+    }
+   ],
+   "barks": {
+    "found_again": [
+     "I woke in my own old plot, with earth in my mouth and no grave dug. It seems Lithos does not want me yet. Well. Shall we go on?"
+    ],
+    "greet": [
+     "Thou walkest softly for one so lately drowned. I am Morvain. The dead and I keep this plot.",
+     "Ah. The one Devon pulled from his nets. Lithos has not claimed thee yet, it seems."
+    ],
+    "greet_again": [
+     "Back again. The earth brings everything back, given time."
+    ],
+    "greet_party": [
+     "Speak. I am listening, as the dead listen.",
+     "Yes?"
+    ],
+    "join": [
+     "Very well. Someone should be on hand to bury thee properly.",
+     "I will walk with thee. This plot is quiet, but so is a tomb."
+    ],
+    "refuse_full": [
+     "Thou hast company enough. Too many feet trample the graves."
+    ],
+    "wait": [
+     "I will wait. Waiting is most of my trade."
+    ],
+    "follow": [
+     "Lead on."
+    ],
+    "leave": [
+     "Then I stop here. The ground asks no questions."
+    ],
+    "bye": [
+     "Walk carefully.",
+     "Until the earth calls one of us."
+    ],
+    "home": [
+     "A sandal came up with the frost this morning. Only one. I buried it again, out of habit.",
+     "Listen... the ground is murmuring tonight.",
+     "The new keeper digs too shallow. I have told him. They stretch."
+    ],
+    "idle": [
+     "Mind the soft ground.",
+     "There is a grave under every step of this land, if thou digst deep enough.",
+     "Lithos is patient. I try to be."
+    ],
+    "waiting": [
+     "Still here. Still waiting."
+    ],
+    "combat": [
+     "Back to the earth with thee!",
+     "Lithos, take this one!"
+    ],
+    "low_hp": [
+     "I am not ready for my own hole yet.",
+     "Too much blood. Mine."
+    ],
+    "ally_down": [
+     "Rest now. I will see thee buried properly.",
+     "No. Not like this."
+    ],
+    "kill": [
+     "Earth to earth.",
+     "Another for Lithos."
+    ],
+    "revived": [
+     "The ground let me go. It does not do that often."
+    ],
+    "theft": [
+     "Thou takest what is not thine. The dead see that too."
+    ],
+    "innocent": [
+     "That one had done thee no harm. I will dig for them, since thou wilt not."
+    ],
+    "no_mana": [
+     "My strength is spent. Let me rest."
+    ],
+    "reagents_low": [
+     "My bone dust is running thin. We should stop at Mythran's before long."
+    ],
+    "reagents_out": [
+     "That is the last of my grave-earth. No more spells from me until we see Mythran."
+    ],
+    "restock": [
+     "Fresh bone and blackmoor. The dead will hear me again."
+    ],
+    "restock_poor": [
+     "I have not a coin on me. Put some obsidian in my pack, and next time I will buy."
+    ]
+   },
+   "area_barks": [
+    {
+     "maps": [
+      50,
+      49,
+      51,
+      62
+     ],
+     "say": [
+      "The catacombs. Lower thy voice, they are sleeping.",
+      "I know these halls by smell. Do not touch the urns."
+     ]
+    },
+    {
+     "maps": [
+      6
+     ],
+     "say": [
+      "My old cemetery. The headstones still lean the way I left them."
+     ]
+    },
+    {
+     "maps": [
+      31
+     ],
+     "say": [
+      "The Mountain King's hall. My knees are shaking, and not from the climb."
+     ]
+    },
+    {
+     "maps": [
+      47
+     ],
+     "say": [
+      "Earth itself. I can hear it breathing."
+     ]
+    },
+    {
+     "maps": [
+      40,
+      39,
+      41
+     ],
+     "say": [
+      "Tenebrae. Too many living people in one place."
+     ]
+    }
+   ]
+  },
+  {
+   "id": "kalvax",
+   "name": "Kalvax",
+   "title": "exiled sorcerer",
+   "sex": "M",
+   "element": "Fire",
+   "school": "Sorcery",
+   "role": "caster: fire bolts and fire fields",
+   "stats": {
+    "str": 13,
+    "dex": 15,
+    "int": 22,
+    "hp": 30,
+    "mana": 44
+   },
+   "leveling": {"class": "caster", "str": 10, "dex": 11, "int": 14},
+   "art": {
+    "shape": 191,
+    "note": "Vardion's sorcerer coat (cast 27-31); the red coat burned to amber",
+    "recolour": [
+     {
+      "hues": [
+       335,
+       25
+      ],
+      "min_sat": 0.35,
+      "to_hue": 32,
+      "sat": 1.0,
+      "val": 1.15
+     }
+    ],
+    "paperdoll_recolour": [
+     {
+      "hues": [
+       345,
+       15
+      ],
+      "min_sat": 0.35,
+      "to_hue": 28,
+      "sat": 1.0,
+      "val": 1.1
+     },
+     {
+      "hues": [
+       35,
+       60
+      ],
+      "min_sat": 0.25,
+      "to_hue": 5,
+      "sat": 0.8,
+      "val": 0.45
+     }
+    ]
+   },
+   "equipment": [
+    {
+     "shape": 418
+    }
+   ],
+   "backpack": [
+    {
+     "shape": 398,
+     "frame": 0,
+     "qty": 3
+    },
+    {
+     "shape": 143,
+     "frame": 0,
+     "qty": 12
+    }
+   ],
+   "spells": [
+    "fire_bolt",
+    "fire_field"
+   ],
+   "caster": true,
+   "spawn": {
+    "x": 15725,
+    "y": 5796,
+    "z": 8,
+    "dir": 6
+   },
+   "home": {
+    "map": 12,
+    "x": 21340,
+    "y": 17000,
+    "z": 56,
+    "dir": 6,
+    "place": "Daemon's Crag, the east bluff"
+   },
+   "talk": [
+    {
+     "id": "name",
+     "label": "name",
+     "say": [
+      "Kalvax. Remember it. The sorcerers of the Crag will be saying it soon enough, through their teeth."
+     ]
+    },
+    {
+     "id": "job",
+     "label": "job",
+     "say": [
+      "I was a disciple at Daemon's Crag, until I questioned my master's work in front of his apprentices. Loudly. With flames.",
+      "Now I am a sorcerer without a pentagram, at the far edge of my own Crag, where my betters need not look at me. It is very humbling. I hate it."
+     ]
+    },
+    {
+     "id": "pyros",
+     "label": "Pyros",
+     "say": [
+      "Pyros, Lord of Flame. The other Titans keep the world. Pyros changes it. Fire takes, and gives back ash, and new things grow from ash.",
+      "The sorcerers call daemons in his name and drink a little of his power. A little. I want more than a little."
+     ],
+     "topics": [
+      {
+       "id": "sorcery",
+       "label": "sorcery",
+       "say": [
+        "Sorcery is ritual: a pentagram, the right candles, reagents laid just so, and the will to command whatever answers.",
+        "Out here I make do with smaller fires. A bolt, a burning field. Enough to make a troll think twice."
+       ]
+      },
+      {
+       "id": "power",
+       "label": "power",
+       "say": [
+        "Power is the only honest thing on this isle. The Titans have it, so they are worshipped. I intend to have some.",
+        "Do not frown at me. Thou hast more power than any man here, and thou art spending it on going home. What a waste."
+       ]
+      }
+     ]
+    },
+    {
+     "id": "titans",
+     "label": "Titans",
+     "say": [
+      "Lithos sulks under the ground, Hydros drowns whoever she likes, Stratos hides above the clouds. Only Pyros is honest. He burns."
+     ],
+     "alt": [
+      {
+       "when": {
+        "present": [
+         "morvain"
+        ]
+       },
+       "say": [
+        "Lithos sulks under the ground, Hydros drowns whoever she likes, Stratos hides in the clouds. Only Pyros is honest.",
+        "Morvain disagrees, I am sure. Morvain disagrees with everything that is not already dead."
+       ]
+      }
+     ]
+    },
+    {
+     "id": "tenebrae",
+     "label": "Tenebrae",
+     "say": [
+      "A wet little city that bows to a wet little queen. The Tempest holds a sliver of Hydros' power and thinks herself a goddess."
+     ]
+    },
+    {
+     "id": "quest",
+     "label": "my quest",
+     "say": [
+      "Thou wantest to leave this world? Odd. I want to rule a piece of it. Perhaps we can help each other on the way."
+     ],
+     "alt": [
+      {
+       "when": {
+        "step_done": [
+         "tongue_of_flame"
+        ]
+       },
+       "say": [
+        "The Tongue of Flame. Thou carriest a piece of Pyros himself. Do not look at me like that. I am only admiring it."
+       ]
+      },
+      {
+       "when": {
+        "step_done": [
+         "choose_mentor"
+        ]
+       },
+       "say": [
+        "Thou hast taken a mentor at the Crag! Bane or Vardion, it matters not. Both will try to use thee. Use them first."
+       ]
+      }
+     ]
+    },
+    {
+     "id": "ilvaran",
+     "label": "Ilvaran",
+     "when": {
+      "flag": [
+       "clashed"
+      ]
+     },
+     "say": [
+      "The pilgrim? He prays to gods who left. I pray to one who is still burning. We do not agree on much."
+     ]
+    },
+    {
+     "id": "join",
+     "label": "join me",
+     "when": {
+      "in_party": false,
+      "absent": [
+       "ilvaran"
+      ]
+     },
+     "action": "join"
+    },
+    {
+     "id": "join_clash",
+     "label": "join me",
+     "when": {
+      "in_party": false,
+      "present": [
+       "ilvaran"
+      ],
+      "not_flag": [
+       "persuaded"
+      ]
+     },
+     "say": [
+      "Travel with that ghost-worshipper? He would spend every night praying for my soul.",
+      "No. Choose, stranger: him or me."
+     ],
+     "set": [
+      "clashed"
+     ]
+    },
+    {
+     "id": "persuade",
+     "label": "he means no harm",
+     "when": {
+      "in_party": false,
+      "present": [
+       "ilvaran"
+      ],
+      "flag": [
+       "clashed"
+      ],
+      "not_flag": [
+       "persuaded"
+      ]
+     },
+     "say": [
+      "Hmph. He did mend that fisherman's hand without asking a coin for it. Fine.",
+      "But if he prays at me, I set his robe alight. A small fire. Mostly."
+     ],
+     "set": [
+      "persuaded"
+     ]
+    },
+    {
+     "id": "join_ok",
+     "label": "join me",
+     "when": {
+      "in_party": false,
+      "present": [
+       "ilvaran"
+      ],
+      "flag": [
+       "persuaded"
+      ]
+     },
+     "action": "join"
+    },
+    {
+     "id": "orders",
+     "label": "orders",
+     "when": {
+      "in_party": true
+     },
+     "topics": [
+      {
+       "id": "wait",
+       "label": "wait here",
+       "when": {
+        "waiting": false
+       },
+       "action": "wait"
+      },
+      {
+       "id": "follow",
+       "label": "follow me",
+       "when": {
+        "waiting": true
+       },
+       "action": "follow"
+      },
+      {
+       "id": "trade",
+       "label": "trade",
+       "action": "trade"
+      },
+      {
+       "id": "part",
+       "label": "part ways",
+       "action": "leave"
+      }
+     ]
+    },
+    {
+     "id": "reagents_out",
+     "label": "What do you mean you're out of spells?",
+     "when": {
+      "in_party": true,
+      "leveling": true,
+      "reagents": "out"
+     },
+     "say": [
+      "Fire needs fuel, {avatar}. Ash, pumice, pig iron. I have none left, so I have no fire.",
+      "Next time thou goest to Mythran, I will buy at the same time. But I need money on me. Obsidian, in my pack. I am not a beggar."
+     ]
+    },
+    {
+     "id": "reagents",
+     "label": "your reagents",
+     "when": {
+      "in_party": true,
+      "leveling": true,
+      "not_reagents": "out"
+     },
+     "say": [
+      "Each bolt burns a measure of reagents. I keep count. Thou wilt hear about it when I run low.",
+      "Mythran sells them. When thou visitest him, I buy my own, with my own obsidian. So see that I have some."
+     ]
+    },
+    {
+     "id": "bye",
+     "label": "bye",
+     "action": "bye"
+    }
+   ],
+   "barks": {
+    "found_again": [
+     "Dead? Me? The ash spat me back out on this bluff, and I remember none of it. Whoever did that owes me blood. Lead on, then."
+    ],
+    "greet": [
+     "Thou! Yes, thou, the stranger. Thou hast the look of someone with ambition. Or a fever.",
+     "Kalvax, sorcerer of Pyros. Exiled, for now. Thou mayest bow."
+    ],
+    "greet_again": [
+     "Back to ask for my help? Wise."
+    ],
+    "greet_party": [
+     "Speak quickly. Fire does not wait."
+    ],
+    "join": [
+     "At last, someone with sense. Lead on, and stand back when I cast.",
+     "Excellent. Try to keep up."
+    ],
+    "refuse_full": [
+     "Thy little band is full. Dismiss someone dull and ask me again."
+    ],
+    "wait": [
+     "Wait? Kalvax does not wait. ...Very well. Briefly."
+    ],
+    "follow": [
+     "Finally."
+    ],
+    "leave": [
+     "Thy loss. I will be right here, being magnificent."
+    ],
+    "bye": [
+     "Go, then.",
+     "Do not take long. I grow bored."
+    ],
+    "home": [
+     "Ash. Hot ash. Everywhere. I used to love this place.",
+     "Look at that lava. Imagine it in the Tempest's harbour.",
+     "Disciples. They smell of candle wax. Why must they smell of candle wax?"
+    ],
+    "idle": [
+     "Is there nothing to burn around here?",
+     "My talents are wasted on walking.",
+     "Ha! Didst thou see that bird? Neither did I. Boredom makes me see things."
+    ],
+    "waiting": [
+     "I am counting cracks in the ground. Hurry."
+    ],
+    "combat": [
+     "Burn!",
+     "Pyros, give me fire!",
+     "Ha! Come and be ashes!"
+    ],
+    "low_hp": [
+     "I am NOT dying here!",
+     "Cover me, curse thee!"
+    ],
+    "ally_down": [
+     "They fell! Someone will pay for that in fire.",
+     "No. Get up. Get up!"
+    ],
+    "kill": [
+     "Ashes!",
+     "Ha! Next!"
+    ],
+    "revived": [
+     "I... was dead? How undignified."
+    ],
+    "theft": [
+     "Ha! Take it all. The world belongs to the bold."
+    ],
+    "innocent": [
+     "Hm. Even I choose my fires better than that."
+    ],
+    "no_mana": [
+     "My fire is out. Give me a moment!"
+    ],
+    "reagents_low": [
+     "My ash pouch is getting light. A visit to Mythran would not go amiss."
+    ],
+    "reagents_out": [
+     "Out. Not a pinch of brimstone left. Find me a reagent shop, or find me a sword."
+    ],
+    "restock": [
+     "Pumice, ash, pig iron. Now I am dangerous again."
+    ],
+    "restock_poor": [
+     "He wants coin and I have none. Thou couldst have mentioned that. Some obsidian in my pack, next time."
+    ]
+   },
+   "area_barks": [
+    {
+     "maps": [
+      12
+     ],
+     "say": [
+      "The Crag. My old masters are here. Let them see me now.",
+      "Smell that: sulphur and ambition. Home."
+     ]
+    },
+    {
+     "maps": [
+      14
+     ],
+     "say": [
+      "Malchir's fortress. Walk softly and burn loudly."
+     ]
+    },
+    {
+     "maps": [
+      44
+     ],
+     "say": [
+      "The heart of Pyros! I could weep. The tears would boil."
+     ]
+    },
+    {
+     "maps": [
+      24,
+      25
+     ],
+     "say": [
+      "Lava! At last, a road with some warmth to it."
+     ]
+    },
+    {
+     "maps": [
+      16,
+      26,
+      28,
+      45
+     ],
+     "say": [
+      "Water. Far too much water."
+     ]
+    }
+   ]
+  },
+  {
+   "id": "brannoc",
+   "name": "Brannoc",
+   "title": "sellsword",
+   "sex": "M",
+   "element": "Air",
+   "school": "",
+   "role": "fighter: fast, high DEX, a two-handed axe, the best runner",
+   "stats": {
+    "str": 24,
+    "dex": 22,
+    "int": 10,
+    "hp": 52,
+    "mana": 0
+   },
+   "leveling": {"class": "fighter", "str": 14, "dex": 13, "int": 9},
+   "art": {
+    "shape": 401,
+    "note": "Darion's plate armour (walk/run/attack with a hit frame/hit/die; Korick 431's attack never reaches); the plate tinted storm blue, the leather dark",
+    "recolour": [
+     {
+      "hues": [
+       0,
+       360
+      ],
+      "min_sat": 0.0,
+      "max_sat": 0.14,
+      "min_val": 0.25,
+      "to_hue": 212,
+      "add_sat": 0.18,
+      "val": 1.0
+     },
+     {
+      "hues": [
+       12,
+       45
+      ],
+      "min_sat": 0.35,
+      "to_hue": 205,
+      "sat": 0.6,
+      "val": 0.8
+     }
+    ],
+    "paperdoll_recolour": [
+     {
+      "hues": [
+       345,
+       15
+      ],
+      "min_sat": 0.35,
+      "to_hue": 215,
+      "sat": 0.45,
+      "val": 0.75
+     },
+     {
+      "hues": [
+       35,
+       60
+      ],
+      "min_sat": 0.25,
+      "to_hue": 25,
+      "sat": 0.7,
+      "val": 0.5
+     }
+    ]
+   },
+   "equipment": [
+    {
+     "shape": 419
+    },
+    {
+     "shape": 531,
+     "frame": 0
+    },
+    {
+     "shape": 532,
+     "frame": 0
+    }
+   ],
+   "backpack": [
+    {
+     "shape": 766,
+     "frame": 1
+    }
+   ],
+   "spells": [],
+   "caster": false,
+   "spawn": {
+    "x": 15830,
+    "y": 5742,
+    "z": 8,
+    "dir": 6
+   },
+   "home": {
+    "map": 7,
+    "x": 6918,
+    "y": 23418,
+    "z": 8,
+    "dir": 2,
+    "place": "Herdsman's Valley, open ground"
+   },
+   "talk": [
+    {
+     "id": "name",
+     "label": "name",
+     "say": [
+      "Brannoc. On the plateau they say it means raven. They say a lot of things on the plateau."
+     ]
+    },
+    {
+     "id": "job",
+     "label": "job",
+     "say": [
+      "I watched the storms from the high plateau. Read the clouds, rang the bell when Stratos was angry.",
+      "The bell cracked, the pay stopped, and I found I liked swinging an axe better than swinging a bell rope."
+     ]
+    },
+    {
+     "id": "stratos",
+     "label": "Stratos",
+     "say": [
+      "Stratos is the air. She breathes, and the grass bows. Giver of Life, the theurgists call her. I just call her weather.",
+      "Out on the plateau thou learnest to hear her coming. A hush first, then the grass lies flat, then she arrives."
+     ],
+     "topics": [
+      {
+       "id": "theurgy",
+       "label": "theurgy",
+       "say": [
+        "The theurgists on Argentrock talk to Stratos with their foci and their tests. I never had the patience. I have an axe."
+       ]
+      },
+      {
+       "id": "weather",
+       "label": "the weather",
+       "say": [
+        "Rain by evening. Maybe sooner. My knee says so, and my knee has never lied to me."
+       ]
+      }
+     ]
+    },
+    {
+     "id": "titans",
+     "label": "Titans",
+     "say": [
+      "Four of them, older than anything. They quarrel, and we get quakes and floods and fire. Best stay out of their way."
+     ]
+    },
+    {
+     "id": "tenebrae",
+     "label": "Tenebrae",
+     "say": [
+      "Walls. Guards. Rules. I can't breathe in there. The wind can't get in."
+     ]
+    },
+    {
+     "id": "quest",
+     "label": "my quest",
+     "say": [
+      "Thou wantest out of this world? I understand that. I only want out of this valley."
+     ],
+     "alt": [
+      {
+       "when": {
+        "step_done": [
+         "test_belief"
+        ]
+       },
+       "say": [
+        "Thou hast stood before Stratos herself, and thou art still standing. I'm impressed. Don't tell anyone."
+       ]
+      },
+      {
+       "when": {
+        "step_done": [
+         "to_argentrock"
+        ]
+       },
+       "say": [
+        "Thou hast been to Argentrock. Did the wind there talk to thee? It talks to everyone. They just don't listen."
+       ]
+      }
+     ]
+    },
+    {
+     "id": "axe",
+     "label": "fighting",
+     "say": [
+      "Two hands, one axe, no tricks. Hit first, hit hard and keep moving. The wind never stands still. Neither should thou."
+     ]
+    },
+    {
+     "id": "why",
+     "label": "why follow me?",
+     "when": {
+      "in_party": true
+     },
+     "say": [
+      "Thou payest in trouble, not coin. That's all right. Trouble is honest."
+     ]
+    },
+    {
+     "id": "join",
+     "label": "join me",
+     "when": {
+      "in_party": false
+     },
+     "action": "join"
+    },
+    {
+     "id": "orders",
+     "label": "orders",
+     "when": {
+      "in_party": true
+     },
+     "topics": [
+      {
+       "id": "wait",
+       "label": "wait here",
+       "when": {
+        "waiting": false
+       },
+       "action": "wait"
+      },
+      {
+       "id": "follow",
+       "label": "follow me",
+       "when": {
+        "waiting": true
+       },
+       "action": "follow"
+      },
+      {
+       "id": "trade",
+       "label": "trade",
+       "action": "trade"
+      },
+      {
+       "id": "part",
+       "label": "part ways",
+       "action": "leave"
+      }
+     ]
+    },
+    {
+     "id": "bye",
+     "label": "bye",
+     "action": "bye"
+    }
+   ],
+   "barks": {
+    "found_again": [
+     "Woke up here with the wind in my face. Don't know how I got back. Thought thou hadst gone on without me. Good to swing beside thee again."
+    ],
+    "greet": [
+     "Wind's turning. Thou art the drowned man? Brannoc. I sell my axe.",
+     "Brannoc. Stormwatcher once, sellsword now. What dost thou want?"
+    ],
+    "greet_again": [
+     "Thou again. Good. I was getting restless."
+    ],
+    "greet_party": [
+     "Aye?"
+    ],
+    "join": [
+     "Right. Point me at something.",
+     "I'm with thee. Don't make me regret it."
+    ],
+    "refuse_full": [
+     "Too many already. Crowds make me twitchy."
+    ],
+    "wait": [
+     "Fine. I'll stand here and watch the clouds."
+    ],
+    "follow": [
+     "About time."
+    ],
+    "leave": [
+     "Suit thyself. I'll be about here if thou needest an axe."
+    ],
+    "bye": [
+     "Aye.",
+     "Watch the sky."
+    ],
+    "home": [
+     "Storm coming in from the west. Always is.",
+     "Good ground for running, this. Nobody to run with.",
+     "The plateau's just up there. The wind comes off it cold and clean."
+    ],
+    "idle": [
+     "Wind's shifting.",
+     "Smell that? Rain.",
+     "My legs want to run. Let's go faster."
+    ],
+    "waiting": [
+     "Still standing here. Still bored."
+    ],
+    "combat": [
+     "Come on, then!",
+     "Here's the storm!",
+     "Hah!"
+    ],
+    "low_hp": [
+     "That one stung.",
+     "I need a breather!"
+    ],
+    "ally_down": [
+     "They're down! Cover them!",
+     "Curse it, no!"
+    ],
+    "kill": [
+     "Next.",
+     "That's one."
+    ],
+    "revived": [
+     "Hah. Not yet, then."
+    ],
+    "theft": [
+     "Huh. Didn't see that. Didn't see anything."
+    ],
+    "innocent": [
+     "That wasn't a fight. That was butchery."
+    ]
+   },
+   "area_barks": [
+    {
+     "maps": [
+      8
+     ],
+     "say": [
+      "The plateau! Feel that wind!",
+      "Home. Or near enough."
+     ]
+    },
+    {
+     "maps": [
+      37
+     ],
+     "say": [
+      "Argentrock. Up here even the stones hum."
+     ]
+    },
+    {
+     "maps": [
+      46
+     ],
+     "say": [
+      "The sky itself. I could fly, if I had the nerve."
+     ]
+    },
+    {
+     "maps": [
+      7
+     ],
+     "say": [
+      "Good open ground. Good running ground."
+     ]
+    }
+   ]
+  },
+  {
+   "id": "varn",
+   "name": "Varn of the Tide",
+   "title": "warden of Hydros",
+   "sex": "M",
+   "element": "Water",
+   "school": "Tempestry",
+   "role": "magic warrior: strong melee, healing waters, a slowing tide, a wave that knocks foes back",
+   "stats": {
+    "str": 22,
+    "dex": 16,
+    "int": 15,
+    "hp": 50,
+    "mana": 20
+   },
+   "leveling": {"class": "hybrid", "str": 14, "dex": 10, "int": 11},
+   "art": {
+    "shape": 574,
+    "note": "the Tempest's guard in armour (walk/run/attack/hit/die, cast 27-29); the blue tabard turned sea green",
+    "recolour": [
+     {
+      "hues": [
+       195,
+       265
+      ],
+      "min_sat": 0.25,
+      "to_hue": 172,
+      "sat": 1.0,
+      "val": 0.95
+     },
+     {
+      "hues": [
+       40,
+       65
+      ],
+      "min_sat": 0.4,
+      "to_hue": 190,
+      "sat": 0.3,
+      "val": 1.2
+     }
+    ]
+   },
+   "equipment": [
+    {
+     "shape": 420
+    },
+    {
+     "shape": 539,
+     "frame": 0
+    },
+    {
+     "shape": 523,
+     "frame": 2
+    },
+    {
+     "shape": 531,
+     "frame": 2
+    }
+   ],
+   "backpack": [
+    {
+     "shape": 766,
+     "frame": 1
+    }
+   ],
+   "spells": [
+    "healing_waters",
+    "slowing_tide",
+    "wave"
+   ],
+   "caster": true,
+   "spawn": {
+    "x": 15935,
+    "y": 5768,
+    "z": 8,
+    "dir": 6
+   },
+   "home": {
+    "map": 16,
+    "x": 20398,
+    "y": 9978,
+    "z": 104,
+    "dir": 4,
+    "place": "Carthax Lake, the north rim"
+   },
+   "talk": [
+    {
+     "id": "name",
+     "label": "name",
+     "say": [
+      "Varn. Varn of the Tide, they call me, for the oath I swore at the water's edge."
+     ]
+    },
+    {
+     "id": "job",
+     "label": "job",
+     "say": [
+      "I am a warden of Hydros, one of the last. We guarded the springs and the temple shores long before the Tempest built her palace.",
+      "Now the wardens are scattered, and I keep my oath alone."
+     ]
+    },
+    {
+     "id": "hydros",
+     "label": "Hydros",
+     "say": [
+      "Hydros. The townsfolk call her the Lurker and fear her. She is the deep water, cold and patient and older than grief.",
+      "She takes much. She has also fed this land for a thousand years. Both are true."
+     ],
+     "topics": [
+      {
+       "id": "tempestry",
+       "label": "Tempestry",
+       "say": [
+        "Tempestry is Hydros' gift: to call water, to heal with it, to turn it on a foe. Mordea the Tempest holds most of it now.",
+        "The wardens kept a few pieces of the old rite. Enough to mend a wound or slow an enemy. Not enough to stop the rains."
+       ]
+      },
+      {
+       "id": "mordea",
+       "label": "the Tempest",
+       "say": [
+        "Mordea holds a portion of Hydros' power and wields it like a sceptre. A warden serves the water, not the throne."
+       ],
+       "alt": [
+        {
+         "when": {
+          "step_done": [
+           "trial"
+          ]
+         },
+         "say": [
+          "Thou hast proclaimed Devon the rightful heir. The water has a true Tempest again. I owe thee more than I can say."
+         ]
+        }
+       ]
+      }
+     ]
+    },
+    {
+     "id": "titans",
+     "label": "Titans",
+     "say": [
+      "The Titans were meant to keep the world. Instead they quarrel, and the land pays for it: quakes, floods, fire. I mourn what they have done.",
+      "Still I keep my oath. An oath kept to a flawed god is still an oath kept."
+     ]
+    },
+    {
+     "id": "tenebrae",
+     "label": "Tenebrae",
+     "say": [
+      "The city of the Tempest. Its people are not wicked, only frightened. Fear makes cruel laws."
+     ]
+    },
+    {
+     "id": "quest",
+     "label": "my quest",
+     "say": [
+      "Thou seekest a way out of this world. I will not stand in thy way. But do not leave Pagan worse than thou found it."
+     ],
+     "alt": [
+      {
+       "when": {
+        "step_done": [
+         "free_hydros"
+        ]
+       },
+       "say": [
+        "Thou hast set Hydros free. The springs run strong again. I felt it here, like a breath held far too long."
+       ]
+      }
+     ]
+    },
+    {
+     "id": "honour",
+     "label": "honour",
+     "say": [
+      "A warden does not lie, does not steal, and does not strike a man who has yielded. I ask the same of those I walk with."
+     ],
+     "alt": [
+      {
+       "when": {
+        "present": [
+         "corvin"
+        ]
+       },
+       "say": [
+        "A warden does not lie, does not steal, and does not strike a man who has yielded.",
+        "I ask the same of those I walk with. I am looking at thee, Corvin."
+       ]
+      }
+     ]
+    },
+    {
+     "id": "join",
+     "label": "join me",
+     "when": {
+      "in_party": false
+     },
+     "action": "join"
+    },
+    {
+     "id": "orders",
+     "label": "orders",
+     "when": {
+      "in_party": true
+     },
+     "topics": [
+      {
+       "id": "wait",
+       "label": "wait here",
+       "when": {
+        "waiting": false
+       },
+       "action": "wait"
+      },
+      {
+       "id": "follow",
+       "label": "follow me",
+       "when": {
+        "waiting": true
+       },
+       "action": "follow"
+      },
+      {
+       "id": "trade",
+       "label": "trade",
+       "action": "trade"
+      },
+      {
+       "id": "heal",
+       "label": "healing waters",
+       "action": "cast:healing_waters"
+      },
+      {
+       "id": "part",
+       "label": "part ways",
+       "action": "leave"
+      }
+     ]
+    },
+    {
+     "id": "bye",
+     "label": "bye",
+     "action": "bye"
+    }
+   ],
+   "barks": {
+    "found_again": [
+     "The waters carried me back to this shore; I know not how. I feared I had failed thee, and my oath. I am glad to stand with thee again."
+    ],
+    "greet": [
+     "Peace upon thee, stranger from the sea. Hydros spared thee. I would know why.",
+     "I am Varn, warden of the Tide. Speak, and be truthful."
+    ],
+    "greet_again": [
+     "The tide returns, and so dost thou."
+    ],
+    "greet_party": [
+     "I am here."
+    ],
+    "join": [
+     "I will stand with thee, as I stood at the water's edge.",
+     "By the Tide, I am thy shield."
+    ],
+    "refuse_full": [
+     "Thy company is large enough. Too many swords and nobody guards the rear."
+    ],
+    "wait": [
+     "I hold this ground."
+    ],
+    "follow": [
+     "Lead, and I follow."
+    ],
+    "leave": [
+     "Go with the current, then. I keep my watch here."
+    ],
+    "bye": [
+     "Peace upon thee.",
+     "May the water keep thee."
+    ],
+    "home": [
+     "Hear the water in the stone? Every drop is a word, if thou art patient.",
+     "The lake is restless tonight. Hydros dreams badly.",
+     "I wash my blade at the lake's edge each dawn. An old warden's habit."
+    ],
+    "idle": [
+     "Keep near the water when thou canst. It remembers its friends.",
+     "I pray as we walk. Pay it no mind.",
+     "The rains have been heavy. Too heavy."
+    ],
+    "waiting": [
+     "I keep my post."
+    ],
+    "combat": [
+     "For the Tide!",
+     "Stand fast!",
+     "Hydros, guide my arm!"
+    ],
+    "low_hp": [
+     "The tide is going out...",
+     "I must fall back. Only a little."
+    ],
+    "ally_down": [
+     "A companion has fallen! Guard them!",
+     "Rest, friend. The water will carry thee."
+    ],
+    "kill": [
+     "It is done.",
+     "Go back to the dark."
+    ],
+    "revived": [
+     "I felt the cold water close over me. And then light."
+    ],
+    "theft": [
+     "That is theft. I saw it. Do not do it again."
+    ],
+    "innocent": [
+     "That was no enemy. Thou hast stained us both."
+    ],
+    "no_mana": [
+     "The water in me is spent."
+    ],
+    "cast_ok": [
+     "Let the water mend thee."
+    ],
+    "cast_nobody": [
+     "None here needs healing."
+    ],
+    "spell_locked": [
+     "The tide will not answer that call from me yet. Give me time."
+    ]
+   },
+   "area_barks": [
+    {
+     "maps": [
+      45
+     ],
+     "say": [
+      "The deep itself. Speak softly. She is listening."
+     ]
+    },
+    {
+     "maps": [
+      16,
+      26,
+      28
+     ],
+     "say": [
+      "Carthax Lake, where the waters begin. I have kept watch here longer than I can say."
+     ]
+    },
+    {
+     "maps": [
+      40
+     ],
+     "say": [
+      "The Tempest's towers loom over us. Keep thy head down."
+     ]
+    },
+    {
+     "maps": [
+      4
+     ],
+     "say": [
+      "The reef. Good fishing, bad currents."
+     ]
+    }
+   ]
+  },
+  {
+   "id": "ilvaran",
+   "name": "Ilvaran",
+   "title": "Zealan pilgrim",
+   "sex": "M",
+   "element": "Air (the Zealan faith)",
+   "school": "Theurgy",
+   "role": "caster and healer: heals, cleanses, a light that sears the undead, raises a fallen companion",
+   "stats": {
+    "str": 12,
+    "dex": 13,
+    "int": 24,
+    "hp": 30,
+    "mana": 50
+   },
+   "leveling": {"class": "caster", "str": 9, "dex": 10, "int": 14, "mana": 30},
+   "art": {
+    "shape": 188,
+    "note": "Stellos' theurgist robe (cast 27-31); the blue robe turned to Zealan gold",
+    "recolour": [
+     {
+      "hues": [
+       195,
+       270
+      ],
+      "min_sat": 0.2,
+      "to_hue": 44,
+      "sat": 0.85,
+      "val": 1.05
+     }
+    ],
+    "paperdoll_recolour": [
+     {
+      "hues": [
+       345,
+       15
+      ],
+      "min_sat": 0.35,
+      "to_hue": 46,
+      "sat": 0.85,
+      "val": 1.15
+     },
+     {
+      "hues": [
+       35,
+       60
+      ],
+      "min_sat": 0.25,
+      "to_hue": 40,
+      "sat": 0.1,
+      "val": 1.25
+     }
+    ]
+   },
+   "equipment": [
+    {
+     "shape": 417
+    }
+   ],
+   "backpack": [
+    {
+     "shape": 766,
+     "frame": 1
+    },
+    {
+     "shape": 766,
+     "frame": 1
+    }
+   ],
+   "spells": [
+    "heal",
+    "cure",
+    "ancient_light",
+    "raise"
+   ],
+   "caster": true,
+   "healer": true,
+   "spawn": {
+    "x": 16040,
+    "y": 5714,
+    "z": 8,
+    "dir": 6
+   },
+   "home": {
+    "map": 37,
+    "x": 23900,
+    "y": 19950,
+    "z": 56,
+    "dir": 2,
+    "place": "Argentrock, the standing stones"
+   },
+   "talk": [
+    {
+     "id": "name",
+     "label": "name",
+     "say": [
+      "Ilvaran. In the old Zealan tongue it meant one who listens. I try to deserve it."
+     ]
+    },
+    {
+     "id": "job",
+     "label": "job",
+     "say": [
+      "I am a pilgrim. I walk the roads the Zealans walked, I pray at their broken shrines, and I heal whoever I meet on the way.",
+      "The theurgists of Argentrock taught me what little magic I have. The rest is only listening."
+     ]
+    },
+    {
+     "id": "zealans",
+     "label": "the Zealans",
+     "say": [
+      "Long ago the Zealans lived here. They honoured the Titans and the Ancient Ones both, and their shrines still stand in the wild places.",
+      "Then they were gone. Destroyed or departed, the books do not agree. I hope departed. I like to think they are listening still."
+     ],
+     "topics": [
+      {
+       "id": "ancients",
+       "label": "Ancient Ones",
+       "say": [
+        "The Ancient Ones were the Zealans' gods, older than the Titans' quarrels. Their shrine lies hidden in the hills. Few go there now."
+       ],
+       "alt": [
+        {
+         "when": {
+          "step_done": [
+           "ancient_ones"
+          ]
+         },
+         "say": [
+          "Thou hast laid the shield on the Zealan altar. I felt it, like a bell rung very far away. Thank thee."
+         ]
+        }
+       ]
+      },
+      {
+       "id": "theurgy",
+       "label": "theurgy",
+       "say": [
+        "Theurgy is the magic of Stratos, the air. The theurgists carve each spell into a focus and test the heart of whoever would carry it.",
+        "My foci are few and worn: healing, cleansing, a little light against the dark. And once in a long while, calling back a soul that has not gone far."
+       ]
+      },
+      {
+       "id": "raising",
+       "label": "raising the dead",
+       "say": [
+        "If a companion falls, bring me to the body soon, before the spirit wanders. It costs me dearly, but I can call them back.",
+        "If I fall myself, Nerissa knows a rite of the tide that can call me back. Ask her."
+       ]
+      }
+     ]
+    },
+    {
+     "id": "titans",
+     "label": "Titans",
+     "say": [
+      "Stratos gives breath, Hydros water, Lithos holds the ground and Pyros gives warmth. When they forget their purpose, people suffer. I pray they remember."
+     ],
+     "alt": [
+      {
+       "when": {
+        "present": [
+         "kalvax"
+        ]
+       },
+       "say": [
+        "Stratos gives breath, Hydros water, Lithos holds the ground and Pyros gives warmth. I pray they remember their purpose.",
+        "Kalvax thinks me a fool for praying. Perhaps I am. I pray for him too."
+       ]
+      }
+     ]
+    },
+    {
+     "id": "tenebrae",
+     "label": "Tenebrae",
+     "say": [
+      "Tenebrae has forgotten its old prayers. It has guards instead. Perhaps it needs both."
+     ]
+    },
+    {
+     "id": "sign",
+     "label": "a sign?",
+     "say": [
+      "Thou camest out of the sea with a name this land does not know. In the Zealan books, such strangers come when a world is about to change.",
+      "Whether that is a blessing or a warning, I cannot tell. Let us find out together."
+     ]
+    },
+    {
+     "id": "quest",
+     "label": "my quest",
+     "say": [
+      "Thou seekest thy way home. I will help thee look. Home is a holy thing."
+     ],
+     "alt": [
+      {
+       "when": {
+        "step_done": [
+         "ethereal_travel"
+        ]
+       },
+       "say": [
+        "Thou walkest between the planes now. Be careful there. Even prayers echo strangely."
+       ]
+      },
+      {
+       "when": {
+        "step_done": [
+         "to_argentrock"
+        ]
+       },
+       "say": [
+        "Thou hast walked on Argentrock, where I made my foci. Did the monks test thee with riddles? They do love their riddles."
+       ]
+      }
+     ]
+    },
+    {
+     "id": "join",
+     "label": "join me",
+     "when": {
+      "in_party": false
+     },
+     "action": "join"
+    },
+    {
+     "id": "orders",
+     "label": "orders",
+     "when": {
+      "in_party": true
+     },
+     "topics": [
+      {
+       "id": "wait",
+       "label": "wait here",
+       "when": {
+        "waiting": false
+       },
+       "action": "wait"
+      },
+      {
+       "id": "follow",
+       "label": "follow me",
+       "when": {
+        "waiting": true
+       },
+       "action": "follow"
+      },
+      {
+       "id": "trade",
+       "label": "trade",
+       "action": "trade"
+      },
+      {
+       "id": "heal",
+       "label": "heal us",
+       "action": "cast:heal"
+      },
+      {
+       "id": "cure",
+       "label": "cleanse",
+       "action": "cast:cure"
+      },
+      {
+       "id": "raise",
+       "label": "raise the fallen",
+       "when": {
+        "dead_ally": true
+       },
+       "action": "cast:raise"
+      },
+      {
+       "id": "part",
+       "label": "part ways",
+       "action": "leave"
+      }
+     ]
+    },
+    {
+     "id": "bye",
+     "label": "bye",
+     "action": "bye"
+    }
+   ],
+   "barks": {
+    "found_again": [
+     "I remember a great stillness, and then these stones. Perhaps the Ancient Ones are not done with me. It is good to see thee, friend."
+    ],
+    "greet": [
+     "Be welcome, child of another sky. I am Ilvaran. I have been waiting for thee, I think.",
+     "Thou art the one from the sea. A stranger was foretold. Or perhaps it was only the wind."
+    ],
+    "greet_again": [
+     "Thou hast returned. That is a good sign."
+    ],
+    "greet_party": [
+     "Yes, my friend?"
+    ],
+    "join": [
+     "I will walk with thee. May the Ancient Ones light our road.",
+     "Gladly. Every road is a pilgrimage, if it is walked rightly."
+    ],
+    "refuse_full": [
+     "Thou hast many friends already. Come back for me when the road is less crowded."
+    ],
+    "wait": [
+     "I will wait, and pray."
+    ],
+    "follow": [
+     "Of course."
+    ],
+    "leave": [
+     "Go in peace. I will be here, listening to the wind."
+    ],
+    "bye": [
+     "Peace go with thee.",
+     "Be gentle with thyself."
+    ],
+    "home": [
+     "The wind in these stones sounds like breathing. Stratos, talking to herself.",
+     "A gull landed on my hand this morning. I took it for a blessing.",
+     "There is a Zealan glyph scratched on a stone here. The wind has nearly worn it away."
+    ],
+    "idle": [
+     "Breathe slowly. The air is a gift.",
+     "Every step we take, someone once took before us.",
+     "I sense something old nearby."
+    ],
+    "waiting": [
+     "I am here, and I am praying."
+    ],
+    "combat": [
+     "Ancient Ones, protect us!",
+     "Forgive me, creature!"
+    ],
+    "low_hp": [
+     "My strength fades... help me!",
+     "I must step back."
+    ],
+    "ally_down": [
+     "Hold on! Do not go far. I will call thee back!",
+     "No! Bring me to them, quickly!"
+    ],
+    "kill": [
+     "May it find peace.",
+     "Go gently."
+    ],
+    "revived": [
+     "I saw a light. And then thy face. Thank thee."
+    ],
+    "theft": [
+     "Oh, my friend. That was not thine to take."
+    ],
+    "innocent": [
+     "Why? They meant us no harm. I will pray for them."
+    ],
+    "no_mana": [
+     "My foci are dim. I must rest before I can heal again."
+    ],
+    "cast_ok": [
+     "Breathe. Be whole.",
+     "There. The air mends what it can."
+    ],
+    "cast_nobody": [
+     "No one here needs my help just now. A good thing."
+    ],
+    "spell_locked": [
+     "I know the shape of that prayer, but not its words. Learn it thyself first, and I will follow."
+    ]
+   },
+   "area_barks": [
+    {
+     "maps": [
+      54
+     ],
+     "say": [
+      "The shrine of the Ancient Ones. Kneel with me a moment."
+     ]
+    },
+    {
+     "maps": [
+      37
+     ],
+     "say": [
+      "Argentrock. I learned my foci on this stone."
+     ]
+    },
+    {
+     "maps": [
+      46
+     ],
+     "say": [
+      "Stratos' own plane. Every breath here is a prayer."
+     ]
+    },
+    {
+     "maps": [
+      43
+     ],
+     "say": [
+      "The ether. So close to the Ancient Ones..."
+     ]
+    }
+   ]
+  },
+  {
+   "id": "corvin",
+   "name": "Corvin",
+   "title": "the Crow",
+   "sex": "M",
+   "element": "",
+   "school": "",
+   "role": "rogue: sword fighter, picks locks, steals from NPCs",
+   "stats": {
+    "str": 16,
+    "dex": 25,
+    "int": 14,
+    "hp": 38,
+    "mana": 0
+   },
+   "leveling": {"class": "hybrid", "str": 11, "dex": 14, "int": 10},
+   "art": {
+    "shape": 403,
+    "note": "Orlok's dockside coat (walk/run/attack/hit/die); the blue coat dyed crow black-green, the vest rust; its attack animation has no hit frame, so the companion AI resolves his blows (half way through the swing when adjacent)",
+    "recolour": [
+     {
+      "hues": [
+       195,
+       265
+      ],
+      "min_sat": 0.2,
+      "to_hue": 150,
+      "sat": 0.55,
+      "val": 0.6
+     },
+     {
+      "hues": [
+       340,
+       20
+      ],
+      "min_sat": 0.35,
+      "to_hue": 22,
+      "sat": 0.9,
+      "val": 0.9
+     }
+    ],
+    "paperdoll_recolour": [
+     {
+      "hues": [
+       345,
+       15
+      ],
+      "min_sat": 0.35,
+      "to_hue": 150,
+      "sat": 0.5,
+      "val": 0.5
+     },
+     {
+      "hues": [
+       35,
+       60
+      ],
+      "min_sat": 0.25,
+      "to_hue": 30,
+      "sat": 0.2,
+      "val": 0.25
+     }
+    ]
+   },
+   "equipment": [
+    {
+     "shape": 420
+    }
+   ],
+   "backpack": [
+    {
+     "shape": 143,
+     "frame": 0,
+     "qty": 23
+    },
+    {
+     "shape": 418
+    }
+   ],
+   "spells": [],
+   "caster": false,
+   "rogue": true,
+   "spawn": {
+    "x": 16145,
+    "y": 5740,
+    "z": 8,
+    "dir": 6
+   },
+   "home": {
+    "map": 3,
+    "x": 13400,
+    "y": 6360,
+    "z": 8,
+    "dir": 6,
+    "place": "The rocks below the dock"
+   },
+   "talk": [
+    {
+     "id": "name",
+     "label": "name",
+     "say": [
+      "Corvin. The Crow, on the docks. I pick up anything shiny. Don't take it personally."
+     ]
+    },
+    {
+     "id": "job",
+     "label": "job",
+     "say": [
+      "Trader in other people's belongings. Locks, purses, the occasional window.",
+      "The guards and I have an understanding. They chase me, I run. Keeps us both fit."
+     ]
+    },
+    {
+     "id": "trade_skills",
+     "label": "thy skills",
+     "say": [
+      "Locks and pockets. Ask me about either. Or don't, and just watch."
+     ],
+     "topics": [
+      {
+       "id": "locks",
+       "label": "locks",
+       "say": [
+        "Every lock is a puzzle some smith was too proud to finish. Show me a locked door and I'll show thee the inside.",
+        "Lockpicks? Picks are for amateurs. A bent nail and a steady hand."
+       ]
+      },
+      {
+       "id": "steal",
+       "label": "stealing",
+       "say": [
+        "I don't rob the poor. They've nothing worth having. I rob the rich, and guards, who are rich in the evenings.",
+        "If I'm seen, mind, the whole street comes running. So pick thy moments. And pick mine."
+       ]
+      }
+     ]
+    },
+    {
+     "id": "docks",
+     "label": "the docks",
+     "say": [
+      "The docks are where Tenebrae keeps its secrets: smugglers, fishermen and the headsman's block. Lovely spot for an execution. Terrible for a picnic."
+     ]
+    },
+    {
+     "id": "titans",
+     "label": "Titans",
+     "say": [
+      "Titans? Big, angry, invisible. I give them the same respect I give the tax collector. I avoid them."
+     ]
+    },
+    {
+     "id": "tenebrae",
+     "label": "Tenebrae",
+     "say": [
+      "Best city in the world for a man of my talents. Lots of locks, lots of guards with short legs."
+     ],
+     "alt": [
+      {
+       "when": {
+        "step_done": [
+         "trial"
+        ]
+       },
+       "say": [
+        "Devon on the throne! I knew him when he was gutting fish. Now I'll have to rob him respectfully."
+       ]
+      }
+     ]
+    },
+    {
+     "id": "quest",
+     "label": "my quest",
+     "say": [
+      "A way home, eh? If there's a door between worlds, somebody has locked it. Lucky thou met me."
+     ],
+     "alt": [
+      {
+       "when": {
+        "step_done": [
+         "meet_mythran"
+        ]
+       },
+       "say": [
+        "Thou hast met Mythran. Did he try to sell thee something? He sold me a lucky ring once. Not lucky."
+       ]
+      }
+     ]
+    },
+    {
+     "id": "honest",
+     "label": "art thou honest?",
+     "say": [
+      "Honest? Me? I'm wounded. ...Look. I've never robbed a widow and never left a friend behind. That's more than most honest men can say.",
+      "Don't spread it about. It would ruin my reputation."
+     ]
+    },
+    {
+     "id": "varn",
+     "label": "Varn",
+     "when": {
+      "present": [
+       "varn"
+      ]
+     },
+     "say": [
+      "The warden glares at me as if I'd lifted his sword. I haven't. Yet."
+     ]
+    },
+    {
+     "id": "join",
+     "label": "join me",
+     "when": {
+      "in_party": false
+     },
+     "action": "join"
+    },
+    {
+     "id": "orders",
+     "label": "orders",
+     "when": {
+      "in_party": true
+     },
+     "topics": [
+      {
+       "id": "wait",
+       "label": "wait here",
+       "when": {
+        "waiting": false
+       },
+       "action": "wait"
+      },
+      {
+       "id": "follow",
+       "label": "follow me",
+       "when": {
+        "waiting": true
+       },
+       "action": "follow"
+      },
+      {
+       "id": "trade",
+       "label": "trade",
+       "action": "trade"
+      },
+      {
+       "id": "picklock",
+       "label": "pick a lock",
+       "action": "picklock"
+      },
+      {
+       "id": "steal",
+       "label": "steal",
+       "action": "steal"
+      },
+      {
+       "id": "part",
+       "label": "part ways",
+       "action": "leave"
+      }
+     ]
+    },
+    {
+     "id": "bye",
+     "label": "bye",
+     "action": "bye"
+    }
+   ],
+   "barks": {
+    "found_again": [
+     "Don't ask me. One moment I'm dying, the next I'm on these rocks with all my teeth. Best trick I ever pulled, and I wish I knew how I did it."
+    ],
+    "greet": [
+     "Well, if it isn't the drowned rat himself. Corvin. Friends call me the Crow. Enemies call the guards.",
+     "Shh. Pretend thou didst not see me. ...Too late? Corvin, at thy service. For a fee."
+    ],
+    "greet_again": [
+     "Back for more of my charm? That's free. Everything else costs."
+    ],
+    "greet_party": [
+     "Boss?"
+    ],
+    "join": [
+     "Partners, then. I take a fair share. That is, most of it.",
+     "Lead the way, boss. I'll watch thy back. And thy purse."
+    ],
+    "refuse_full": [
+     "Full house. Three's company, seven's a parade."
+    ],
+    "wait": [
+     "I'll wait. Nobody watching? Good."
+    ],
+    "follow": [
+     "Right behind thee. Always am."
+    ],
+    "leave": [
+     "No hard feelings. I'll be about, admiring other people's boots."
+    ],
+    "bye": [
+     "Mind thy pockets.",
+     "See thee around. Or not, if I'm doing it right."
+    ],
+    "home": [
+     "A smuggler's boat came in last night. I know nothing. Nothing at all.",
+     "Sand gets into locks and ruins them. Good for business, really.",
+     "Psst. Nice boots."
+    ],
+    "idle": [
+     "That merchant's purse was practically waving at me.",
+     "Keep thy voice down. We're being clever.",
+     "I know a shortcut. Never mind, it involves a window."
+    ],
+    "waiting": [
+     "Waiting. Not stealing. Mostly."
+    ],
+    "combat": [
+     "Don't mind me, just stabbing.",
+     "From behind, if thou please!",
+     "Ooh, that one's got a purse."
+    ],
+    "low_hp": [
+     "I'm too pretty for this!",
+     "Time for a strategic exit!"
+    ],
+    "ally_down": [
+     "Oi! Who's going to carry the loot now?",
+     "No, no, no. Get up, friend."
+    ],
+    "kill": [
+     "Mine! The kill, I mean. And whatever's in his pockets.",
+     "Sorry, mate."
+    ],
+    "revived": [
+     "Was I dead? Did anyone go through my pockets?"
+    ],
+    "theft": [
+     "Hah! A natural. I'm almost proud.",
+     "Not bad. Bit clumsy."
+    ],
+    "innocent": [
+     "Hey. That wasn't a job, that was murder. I don't do murder."
+    ],
+    "picklock_picked": [
+     "Click. There's a sweet sound.",
+     "Open. Thou mayest applaud."
+    ],
+    "picklock_failed": [
+     "Stubborn one. Ask me again.",
+     "Blast. The tumblers are rusted."
+    ],
+    "picklock_not_locked": [
+     "It isn't locked. Even I can't unlock an open door."
+    ],
+    "picklock_not_a_lock": [
+     "That's not a lock, boss. That's a... thing."
+    ],
+    "picklock_too_far": [
+     "Get me closer to it. I can't pick it from here."
+    ],
+    "picklock_cancel": [
+     "Changed thy mind? Fine."
+    ],
+    "picklock_nothing": [
+     "Pick what, exactly?"
+    ],
+    "steal_stolen": [
+     "Got it. Quiet as a crow.",
+     "Lighter purse for them, heavier for us."
+    ],
+    "steal_stolen_seen": [
+     "Got it, but they saw! Walk. Don't run. Run!"
+    ],
+    "steal_caught": [
+     "Ah. Caught. Act natural!",
+     "Bad timing. Very bad timing."
+    ],
+    "steal_too_far": [
+     "I need to be close enough to brush past them."
+    ],
+    "steal_no_victim": [
+     "Steal from whom, exactly?"
+    ],
+    "steal_dead": [
+     "The dead keep their pockets. Morvain would never forgive me."
+    ],
+    "steal_cancel": [
+     "Another time."
+    ]
+   },
+   "area_barks": [
+    {
+     "maps": [
+      3
+     ],
+     "say": [
+      "Ah, the docks. Smell that? Fish and opportunity."
+     ]
+    },
+    {
+     "maps": [
+      40,
+      39,
+      41
+     ],
+     "say": [
+      "Tenebrae. Hood up, eyes down, hands busy."
+     ]
+    },
+    {
+     "maps": [
+      14
+     ],
+     "say": [
+      "The Obsidian Fortress. So many shiny things. So many sorcerers."
+     ]
+    },
+    {
+     "maps": [
+      15
+     ],
+     "say": [
+      "Treasure Cove? Why did nobody tell me about this place?"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "wynna",
+   "name": "Wynna",
+   "title": "thaumaturge",
+   "sex": "F",
+   "element": "Ether",
+   "school": "Thaumaturgy",
+   "role": "caster: lightning and a gust that knocks foes down",
+   "stats": {
+    "str": 11,
+    "dex": 18,
+    "int": 23,
+    "hp": 28,
+    "mana": 44
+   },
+   "leveling": {"class": "caster", "str": 9, "dex": 11, "int": 14},
+   "art": {
+    "shape": 189,
+    "note": "Mordea's gown (cast 27-29); the white dress tinted lavender",
+    "recolour": [
+     {
+      "hues": [
+       0,
+       360
+      ],
+      "min_sat": 0.0,
+      "max_sat": 0.16,
+      "min_val": 0.45,
+      "to_hue": 268,
+      "add_sat": 0.32,
+      "val": 0.95
+     }
+    ],
+    "paperdoll_recolour": [
+     {
+      "hues": [
+       345,
+       15
+      ],
+      "min_sat": 0.35,
+      "to_hue": 270,
+      "sat": 0.6,
+      "val": 1.0
+     },
+     {
+      "hues": [
+       35,
+       60
+      ],
+      "min_sat": 0.25,
+      "to_hue": 12,
+      "sat": 0.9,
+      "val": 0.8
+     }
+    ]
+   },
+   "equipment": [
+    {
+     "shape": 418
+    }
+   ],
+   "backpack": [
+    {
+     "shape": 399,
+     "frame": 0,
+     "qty": 4
+    },
+    {
+     "shape": 766,
+     "frame": 1
+    }
+   ],
+   "spells": [
+    "lightning",
+    "gust"
+   ],
+   "caster": true,
+   "spawn": {
+    "x": 16250,
+    "y": 5686,
+    "z": 8,
+    "dir": 6
+   },
+   "home": {
+    "map": 8,
+    "x": 11000,
+    "y": 14500,
+    "z": 48,
+    "dir": 4,
+    "place": "The Plateau, by the pond"
+   },
+   "talk": [
+    {
+     "id": "name",
+     "label": "name",
+     "say": [
+      "Wynna. Just Wynna. Mythran called me 'that girl' for three years, so Wynna is a step up."
+     ]
+    },
+    {
+     "id": "job",
+     "label": "job",
+     "say": [
+      "I studied with Mythran on the plateau. Thaumaturgy, the magic of the ether, the stuff between everything!",
+      "He said I asked too many questions. I said that was the point of studying. He disagreed. Loudly. So here I am!"
+     ]
+    },
+    {
+     "id": "thaum",
+     "label": "thaumaturgy",
+     "say": [
+      "The other schools beg a Titan for scraps. Thaumaturgy goes round them, straight to the ether: the fifth thing, the glue of the world.",
+      "Reagents, gestures, a bit of nerve. I can throw lightning, knock a man flat with a gust of nothing, and once I made Mythran's beard float. He did not laugh."
+     ],
+     "topics": [
+      {
+       "id": "mythran",
+       "label": "Mythran",
+       "say": [
+        "Mythran is brilliant and grumpy and sells his spells far too dear. Don't tell him I said brilliant."
+       ],
+       "alt": [
+        {
+         "when": {
+          "step_done": [
+           "meet_mythran"
+          ]
+         },
+         "say": [
+          "Thou hast met him! Did he mention me? He didn't, did he. Typical."
+         ]
+        }
+       ]
+      },
+      {
+       "id": "danger",
+       "label": "danger",
+       "say": [
+        "Danger is only excitement with bad manners. Ha! Thou shouldst see thy face."
+       ]
+      }
+     ]
+    },
+    {
+     "id": "world",
+     "label": "thy world",
+     "say": [
+      "Tell me about thy world! Is there magic there? Titans? Do people really sail between the stars? I'd give my last reagent to see it.",
+      "Promise thou wilt describe everything. Every detail. Especially the food."
+     ]
+    },
+    {
+     "id": "titans",
+     "label": "Titans",
+     "say": [
+      "Four Titans, four elements, and then the ether, which belongs to nobody. That's why I like it."
+     ],
+     "alt": [
+      {
+       "when": {
+        "present": [
+         "kalvax"
+        ]
+       },
+       "say": [
+        "Four Titans, four elements, and the ether, which belongs to nobody. That's why I like it.",
+        "Please don't let Kalvax start on Pyros again. I'm begging thee."
+       ]
+      }
+     ]
+    },
+    {
+     "id": "tenebrae",
+     "label": "Tenebrae",
+     "say": [
+      "Tenebrae has a library! A small, damp, guarded library. I may have borrowed a book. Permanently."
+     ]
+    },
+    {
+     "id": "quest",
+     "label": "my quest",
+     "say": [
+      "A gate home! Between worlds! Oh, I want to see that. Take me when thou findest it. I'll only look, I promise."
+     ],
+     "alt": [
+      {
+       "when": {
+        "step_done": [
+         "ethereal_travel"
+        ]
+       },
+       "say": [
+        "Thou hast walked in the ether itself! Is it blue? I always imagined it blue."
+       ]
+      },
+      {
+       "when": {
+        "step_done": [
+         "buy_ethereal_travel"
+        ]
+       },
+       "say": [
+        "Ethereal Travel! Thou hast it! Teach me. No? Not even a little? Just the hand movements?"
+       ]
+      }
+     ]
+    },
+    {
+     "id": "join",
+     "label": "join me",
+     "when": {
+      "in_party": false
+     },
+     "action": "join"
+    },
+    {
+     "id": "orders",
+     "label": "orders",
+     "when": {
+      "in_party": true
+     },
+     "topics": [
+      {
+       "id": "wait",
+       "label": "wait here",
+       "when": {
+        "waiting": false
+       },
+       "action": "wait"
+      },
+      {
+       "id": "follow",
+       "label": "follow me",
+       "when": {
+        "waiting": true
+       },
+       "action": "follow"
+      },
+      {
+       "id": "trade",
+       "label": "trade",
+       "action": "trade"
+      },
+      {
+       "id": "part",
+       "label": "part ways",
+       "action": "leave"
+      }
+     ]
+    },
+    {
+     "id": "reagents_out",
+     "label": "What do you mean you're out of spells?",
+     "when": {
+      "in_party": true,
+      "leveling": true,
+      "reagents": "out"
+     },
+     "say": [
+      "Thaumaturgy needs reagents! Eye of newt, bat wing, serpent scale, dragon blood. And I've used them all up. Sorry!",
+      "Next time thou goest to Mythran, I'll buy at the same time. But I need money on me! Drop some obsidian in my pack, please?"
+     ]
+    },
+    {
+     "id": "reagents",
+     "label": "your reagents",
+     "when": {
+      "in_party": true,
+      "leveling": true,
+      "not_reagents": "out"
+     },
+     "say": [
+      "Every spell uses a pinch of something. I count! I'll tell thee when I'm running low.",
+      "Mythran sells all of them. When thou talkest with him I'll buy more, if I have obsidian on me. His prices are terrible, though."
+     ]
+    },
+    {
+     "id": "bye",
+     "label": "bye",
+     "action": "bye"
+    }
+   ],
+   "barks": {
+    "found_again": [
+     "Oh! There thou art! I don't know what happened, I just opened my eyes here, soaking wet! Isn't that strange? I thought thou hadst left me!"
+    ],
+    "greet": [
+     "Oh! Thou art the one from the sea! Is it true thou comest from another world? What's it like? Do the stars move? Sorry. Wynna. Hello!",
+     "Wynna! Thaumaturge. Well, nearly. Mostly. Hello!"
+    ],
+    "greet_again": [
+     "Thou art back! I have twelve new questions."
+    ],
+    "greet_party": [
+     "Yes? Yes? What is it?"
+    ],
+    "join": [
+     "Yes! Yes, yes. Oh, this will be wonderful. Where are we going?",
+     "An adventure, with a man from another world! Mythran will be so jealous."
+    ],
+    "refuse_full": [
+     "Oh, thou hast so many friends already. Make room for me later?"
+    ],
+    "wait": [
+     "I'll wait! I'll study the clouds. Or the moss. Moss is interesting, didst thou know?"
+    ],
+    "follow": [
+     "Coming! Wait for me!"
+    ],
+    "leave": [
+     "Oh. Oh, all right. Come back and tell me everything!"
+    ],
+    "bye": [
+     "Bye! Come back soon!",
+     "Don't get eaten!"
+    ],
+    "home": [
+     "If the ether is in everything, is it in the pond? Is the pond thinking?",
+     "I counted the mushrooms. Eleven hundred and four. Then I lost count.",
+     "Hello again, toad."
+    ],
+    "idle": [
+     "What's that? Oh, just a rock. A very interesting rock.",
+     "Does thy world have beaches? Are they this cold?",
+     "My fingertips are prickling. Can we fight something?"
+    ],
+    "waiting": [
+     "Still waiting! Still curious!"
+    ],
+    "combat": [
+     "Ha! Lightning!",
+     "Oh, this is exciting!",
+     "Stand back, I'm improvising!"
+    ],
+    "low_hp": [
+     "Ow! Ow! That's real blood!",
+     "Not so exciting now!"
+    ],
+    "ally_down": [
+     "No! Somebody help them!",
+     "Get up, get up, please get up!"
+    ],
+    "kill": [
+     "Didst thou see that? Didst thou SEE that?",
+     "Ha!"
+    ],
+    "revived": [
+     "I was dead! What was it like? I can't remember. How annoying!"
+    ],
+    "theft": [
+     "Ooh, naughty!"
+    ],
+    "innocent": [
+     "Why did thou do that? That was... horrible."
+    ],
+    "no_mana": [
+     "Reagents spent, head empty. Give me a moment!"
+    ],
+    "reagents_low": [
+     "Oh! I'm nearly out of newt eyes. Can we go and see Mythran soon? Please?"
+    ],
+    "reagents_out": [
+     "That was my last bat wing. I'm out! Completely out! We need Mythran."
+    ],
+    "restock": [
+     "Dragon blood! Real dragon blood! Oh, I'll be careful with it. Mostly."
+    ],
+    "restock_poor": [
+     "I couldn't buy anything, I've no money! Put some obsidian in my pack and I'll buy next time."
+    ]
+   },
+   "area_barks": [
+    {
+     "maps": [
+      8
+     ],
+     "say": [
+      "The plateau. Mythran's tower is near. Hide me."
+     ]
+    },
+    {
+     "maps": [
+      43
+     ],
+     "say": [
+      "The ether! Look at it! LOOK at it!"
+     ]
+    },
+    {
+     "maps": [
+      37
+     ],
+     "say": [
+      "Argentrock. So many riddles, so little time."
+     ]
+    }
+   ]
+  },
+  {
+   "id": "nerissa",
+   "name": "Nerissa",
+   "title": "tide-seer",
+   "sex": "F",
+   "element": "Water",
+   "school": "Tempestry",
+   "role": "caster: tide's mending, ice shards, calming a foe; the rite that calls Ilvaran back",
+   "stats": {
+    "str": 12,
+    "dex": 14,
+    "int": 23,
+    "hp": 30,
+    "mana": 46
+   },
+   "leveling": {"class": "caster", "str": 9, "dex": 10, "int": 14, "mana": 30},
+   "art": {
+    "shape": 2048,
+    "note": "her own figure (data/shapes/nerissa.shp, painted over the Avatar's frames by pagan_skin): long dark hair, a sea-foam dress to mid-calf with a pale sash and deep-blue hem, bare arms, blue slippers; the paperdoll shows the same figure",
+    "paperdoll": "own",
+    "portrait": "portraits/nerissa_bar.png",
+    "paperdoll_head": {
+     "file": "portraits/nerissa_doll_head.png",
+     "dx": 0,
+     "dy": 0
+    },
+    "paperdoll_recolour": [
+     {
+      "hues": [
+       15,
+       40
+      ],
+      "min_sat": 0.72,
+      "max_val": 0.45,
+      "sat": 0.45,
+      "val": 0.6,
+      "note": "her figure's hair below the painted head, as dark as the portrait's"
+     }
+    ],
+    "fallback": {
+     "shape": 387,
+     "note": "Cyrrus' white robe, white and blue turned sea-foam green (only if data/shapes/ is not found)",
+     "recolour": [
+      {
+       "hues": [
+        195,
+        265
+       ],
+       "min_sat": 0.2,
+       "to_hue": 165,
+       "sat": 0.9,
+       "val": 0.9
+      },
+      {
+       "hues": [
+        0,
+        360
+       ],
+       "min_sat": 0.0,
+       "max_sat": 0.14,
+       "min_val": 0.5,
+       "to_hue": 175,
+       "add_sat": 0.25,
+       "val": 0.95
+      }
+     ],
+     "paperdoll_recolour": [
+      {
+       "hues": [
+        345,
+        15
+       ],
+       "min_sat": 0.35,
+       "to_hue": 170,
+       "sat": 0.7,
+       "val": 0.9
+      },
+      {
+       "hues": [
+        35,
+        60
+       ],
+       "min_sat": 0.25,
+       "to_hue": 48,
+       "sat": 0.5,
+       "val": 1.15
+      }
+     ]
+    }
+   },
+   "equipment": [
+    {
+     "shape": 418
+    }
+   ],
+   "backpack": [
+    {
+     "shape": 766,
+     "frame": 1
+    },
+    {
+     "shape": 766,
+     "frame": 1
+    }
+   ],
+   "spells": [
+    "tide_heal",
+    "ice_shards",
+    "calm",
+    "tide_rite"
+   ],
+   "caster": true,
+   "healer": true,
+   "spawn": {
+    "x": 16355,
+    "y": 5712,
+    "z": 8,
+    "dir": 6
+   },
+   "home": {
+    "map": 4,
+    "x": 22220,
+    "y": 21640,
+    "z": 8,
+    "dir": 4,
+    "place": "Fisherman's Reef, the shore"
+   },
+   "talk": [
+    {
+     "id": "name",
+     "label": "name",
+     "say": [
+      "Nerissa. A fisherman's daughter, once. Now the fishermen leave me bread and do not meet my eyes."
+     ]
+    },
+    {
+     "id": "job",
+     "label": "job",
+     "say": [
+      "I hear Hydros in the waves. Not words, not quite. Moods. Warnings. What is coming.",
+      "They call it Tempestry, the little I have. Mordea has the throne. I have the shore."
+     ]
+    },
+    {
+     "id": "hydros",
+     "label": "Hydros",
+     "say": [
+      "She is not cruel, only deep. Everything that falls into the sea, she keeps. Sometimes she gives something back.",
+      "She gave thee back. Remember that."
+     ],
+     "topics": [
+      {
+       "id": "seeing",
+       "label": "what dost thou see?",
+       "say": [
+        "I see thee walking into fire, and out again. I see a gate of black stone. I see thee alone at the end.",
+        "Do not look so grave. The sea is often wrong about endings."
+       ]
+      },
+      {
+       "id": "rite",
+       "label": "the rite of the tide",
+       "say": [
+        "There is an old rite: sea water, a name spoken into it, and a soul not yet gone far comes back along the current.",
+        "It is meant for one who heals others. If Ilvaran falls, I can call him back that way. Only him. The tide knows his name."
+       ]
+      }
+     ]
+    },
+    {
+     "id": "titans",
+     "label": "Titans",
+     "say": [
+      "The Titans are tired, I think. Old and tired, and angry because they are tired. Hydros dreams of rest."
+     ]
+    },
+    {
+     "id": "tenebrae",
+     "label": "Tenebrae",
+     "say": [
+      "When the rains come too hard, Tenebrae floods at the docks first. The poor drown first. The sea told me so."
+     ]
+    },
+    {
+     "id": "devon",
+     "label": "Devon",
+     "say": [
+      "Devon is kind. He cut thee free of his nets. The sea favours him more than he knows."
+     ],
+     "alt": [
+      {
+       "when": {
+        "step_done": [
+         "read_journal"
+        ]
+       },
+       "say": [
+        "So thou knowest now what Devon is. The sea knew all along. She sang it to me as a lullaby."
+       ]
+      }
+     ]
+    },
+    {
+     "id": "quest",
+     "label": "my quest",
+     "say": [
+      "Thou wilt leave this world. I have seen it. But not soon."
+     ],
+     "alt": [
+      {
+       "when": {
+        "step_done": [
+         "free_hydros"
+        ]
+       },
+       "say": [
+        "Hydros is free. The waves sound glad, for the first time in my life."
+       ]
+      }
+     ]
+    },
+    {
+     "id": "join",
+     "label": "join me",
+     "when": {
+      "in_party": false
+     },
+     "action": "join"
+    },
+    {
+     "id": "orders",
+     "label": "orders",
+     "when": {
+      "in_party": true
+     },
+     "topics": [
+      {
+       "id": "wait",
+       "label": "wait here",
+       "when": {
+        "waiting": false
+       },
+       "action": "wait"
+      },
+      {
+       "id": "follow",
+       "label": "follow me",
+       "when": {
+        "waiting": true
+       },
+       "action": "follow"
+      },
+      {
+       "id": "trade",
+       "label": "trade",
+       "action": "trade"
+      },
+      {
+       "id": "heal",
+       "label": "heal us",
+       "action": "cast:tide_heal"
+      },
+      {
+       "id": "rite",
+       "label": "call Ilvaran back",
+       "when": {
+        "dead_ally": true
+       },
+       "action": "cast:tide_rite"
+      },
+      {
+       "id": "part",
+       "label": "part ways",
+       "action": "leave"
+      }
+     ]
+    },
+    {
+     "id": "bye",
+     "label": "bye",
+     "action": "bye"
+    }
+   ],
+   "barks": {
+    "found_again": [
+     "I don't know what happened. The tide laid me on this shore, the way it lays down shells. I thought thou hadst left me. I am glad thou didst not."
+    ],
+    "greet": [
+     "The sea said thou wouldst come today. It did not say thou wouldst be so tall.",
+     "I am Nerissa. I listen to the tide. Sit a while, if thou wish."
+    ],
+    "greet_again": [
+     "Thou hast come back. The tide said thou might."
+    ],
+    "greet_party": [
+     "I am listening."
+    ],
+    "join": [
+     "I will come. The tide says I must.",
+     "Yes. I have seen us walking together. It is better than the other way."
+    ],
+    "refuse_full": [
+     "Thou art not alone enough to need me now."
+    ],
+    "wait": [
+     "I will wait by the water's voice."
+    ],
+    "follow": [
+     "I am coming."
+    ],
+    "leave": [
+     "The sea will keep me. Go well."
+    ],
+    "bye": [
+     "Go well.",
+     "Listen to the water when thou canst."
+    ],
+    "home": [
+     "Shh. She is singing.",
+     "The foam is pink at the edges tonight. Someone drowned far out.",
+     "The gulls know when a storm is coming. So do I."
+    ],
+    "idle": [
+     "Rain soon.",
+     "The water under the ground is moving. Canst thou feel it?",
+     "Hydros dreams of thee sometimes."
+    ],
+    "waiting": [
+     "I am still here."
+    ],
+    "combat": [
+     "Forgive me, tide.",
+     "Cold water, take them!"
+    ],
+    "low_hp": [
+     "The current is pulling me under...",
+     "I need to step back."
+    ],
+    "ally_down": [
+     "No... I did not see this. Why did I not see this?",
+     "Hold on to the current. Hold on."
+    ],
+    "kill": [
+     "Back to the deep.",
+     "It is over."
+    ],
+    "revived": [
+     "The water carried me back. It is cold, coming back."
+    ],
+    "theft": [
+     "The sea sees what thou hast taken. So do I."
+    ],
+    "innocent": [
+     "The sea will remember that one."
+    ],
+    "no_mana": [
+     "The tide in me is low. Give it time to come in."
+    ],
+    "cast_ok": [
+     "Let the cold water close the wound.",
+     "There. Salt and water, as it always was."
+    ],
+    "cast_nobody": [
+     "No one needs the water's care just now."
+    ],
+    "spell_locked": [
+     "The sea is not ready to give me that yet."
+    ]
+   },
+   "area_barks": [
+    {
+     "maps": [
+      45
+     ],
+     "say": [
+      "Her home. Do not be afraid. She knows us."
+     ]
+    },
+    {
+     "maps": [
+      16,
+      26,
+      28
+     ],
+     "say": [
+      "Carthax. Where all the waters begin."
+     ]
+    },
+    {
+     "maps": [
+      4
+     ],
+     "say": [
+      "The reef. My father fished here."
+     ]
+    }
+   ]
+  }
+ ]
+}

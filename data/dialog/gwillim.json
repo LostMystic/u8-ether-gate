@@ -1,0 +1,255 @@
+{
+  "id": "gwillim",
+  "name": "Gwillim",
+  "npc": 14,
+  "about": "Gwillim, the torax herdsman of Herdsman's Valley (map 7): Corinth's husband, Cyrrus' father, law-abiding, warm but proud and touchy, doubts that any magic but the Titans' is real. New topics in the engine's own words (engine/docs/gwillim_dialogue.md). Each top-level topic is an answer in his own menu; topics in one slot replace each other (the last one in the file that holds), at most max_entries slots at a time.",
+  "menu": {"max_entries": 2, "first_menu": true, "exits_only_menu": true, "back": "Back.", "leave": "Something else."},
+  "stages": [
+    {"id": "arrived",      "title": "Just arrived",                   "when": {}},
+    {"id": "execution",    "title": "After the execution",            "when": {"step_done": ["execution"]}},
+    {"id": "seek_mythran", "title": "Told to seek Mythran",           "when": {"step_done": ["ask_bentic"]}},
+    {"id": "mythran",      "title": "Met Mythran",                    "when": {"step_done": ["meet_mythran"]}},
+    {"id": "necromancers", "title": "Among the Necromancers",         "when": {"step_done": ["to_cemetery"]}},
+    {"id": "lithos",       "title": "Met Lithos",                     "when": {"step_done": ["meet_lithos"]}},
+    {"id": "mordea",       "title": "Mordea has fallen",              "when": {"step_done": ["trial"]}},
+    {"id": "lothian",      "title": "Lothian laid to rest",           "when": {"step_done": ["inter_lothian"]}},
+    {"id": "pilgrimage",   "title": "The Zealan shrine",              "when": {"step_done": ["ancient_ones"]}},
+    {"id": "titan_tasks",  "title": "The Theurgists, Hydros, the Sorcerers", "when": {"step_done": ["to_argentrock"]}},
+    {"id": "blackrock",    "title": "Gathering the blackrock",        "when": {"step_done": ["show_tongue"]}},
+    {"id": "ether",        "title": "Beyond the world",               "when": {"step_done": ["ethereal_travel"]}}
+  ],
+  "topics": [
+    {
+      "id": "execution", "slot": "news", "label": "The execution",
+      "when": {"step_done": ["execution"], "step_not_done": ["ask_bentic"]},
+      "say": [
+        "So you were at the docks for the hanging. Corinth heard of it from a drover before the dust had settled.",
+        "I keep away from such things. A man tends his flock, pays what is owed, and the Lady's justice passes him by."
+      ],
+      "topics": [
+        {"id": "execution_fear", "label": "Are you afraid of her?",
+         "say": ["Afraid? I am careful. There is a difference, friend, though I could not tell you where it lies today."]},
+        {"id": "execution_what_now", "label": "Where should I go?",
+         "say": ["I am a herdsman, not a sage. In town there are men who live among books. Ask the learned ones what you need to know."]}
+      ]
+    },
+    {
+      "id": "plateau_path", "slot": "news", "label": "The plateau path",
+      "when": {"step_done": ["ask_bentic"], "step_not_done": ["meet_mythran"]},
+      "say": [
+        "You have the look of someone bound uphill. Most who come this far are going to see the old hermit.",
+        "The trail past our house climbs all the way. Keep to it and mind your footing where the stones are loose."
+      ],
+      "topics": [
+        {"id": "plateau_safe", "label": "Is the way safe?",
+         "say": ["Safer than town on a hanging day. There are beasts about, but nothing a man in armour like yours should fear."]},
+        {"id": "plateau_hermit", "label": "What is he like?",
+         "say": ["Odd. Polite enough. He keeps a house full of things no sensible man would buy. But he has never done us harm."]}
+      ]
+    },
+    {
+      "id": "mythran", "slot": "news", "label": "Mythran",
+      "when": {"step_done": ["meet_mythran"]},
+      "say": [
+        "Back from the plateau, are you? Did the old man try to sell you one of his scrolls?",
+        "Do not let him take all your coin. Paper and ink, that is all they are. The Titans hold the only true power."
+      ],
+      "topics": [
+        {"id": "mythran_real", "label": "His magic is real.",
+         "say": ["So you say. I have watched a storm flatten my barley. That is power. A scroll is a scroll."],
+         "alt": [{"when": {"step_done": ["meet_lithos"]},
+                  "say": ["After all you have told me, I am less sure than I was. But I will not buy one, all the same."]}]},
+        {"id": "mythran_friend", "label": "He spoke well of you.",
+         "say": ["Did he? Well. He always nods to Corinth on the road. Perhaps I have been hard on him."]}
+      ]
+    },
+    {
+      "id": "necromancers", "slot": "news", "label": "The Necromancers",
+      "when": {"step_done": ["to_cemetery"], "step_not_done": ["meet_lithos"]},
+      "say": [
+        "You smell of grave dirt, friend. Have you been out among the Necromancers?",
+        "They serve Lithos and keep the dead. We leave them be and they leave us be. That is how it has always been."
+      ],
+      "alt": [
+        {"when": {"step_done": ["apprentice"]},
+         "say": [
+           "Word is that you keep company with old Vividos and his people now. Out by the graves.",
+           "I will not judge you for it. Someone must see the dead into the earth. Only wash before you sit at Corinth's table."
+         ]}
+      ],
+      "topics": [
+        {"id": "necro_fear", "label": "Do you fear them?",
+         "say": ["Fear the ones who bury us? No. I would sooner fear the day they stop."]},
+        {"id": "necro_lithos", "label": "What of Lithos?",
+         "say": ["The Mountain King. Every furrow I plough is his. I give him thanks at sowing and say little else to him."]}
+      ]
+    },
+    {
+      "id": "lithos", "slot": "news", "label": "The Mountain King",
+      "when": {"step_done": ["meet_lithos"]},
+      "say": [
+        "The torax would not settle last night. They stood with their heads low, as if the hills were talking under them.",
+        "Corinth says it is nothing. But you have been deep under the hills of late, I think. Is it nothing?"
+      ],
+      "topics": [
+        {"id": "lithos_met", "label": "I met Lithos.",
+         "say": [
+           "You... spoke with the Titan of Earth? And he let you walk away?",
+           "Then you are either a great man or a great liar, and I cannot tell which. Sit down. I will fetch the ale."
+         ]},
+        {"id": "lithos_nothing", "label": "It is nothing.",
+         "say": ["Then I will tell the torax so. They will not believe me either."]}
+      ]
+    },
+    {
+      "id": "mordea", "slot": "news", "label": "Mordea",
+      "when": {"step_done": ["trial"]},
+      "say": [
+        "Is it true? A drover swears Mordea is cast down and young Devon sits in the palace now.",
+        "I told Corinth to keep her voice low. Twenty years of keeping your voice low is a hard habit to lose."
+      ],
+      "topics": [
+        {"id": "mordea_true", "label": "It is true.",
+         "say": [
+           "Then I can say it. She was a hard ruler, and I praised her laws because I had a family to keep safe.",
+           "Corinth danced in the kitchen. Do not tell anyone I told you that."
+         ]},
+        {"id": "mordea_devon", "label": "What of Devon?",
+         "say": ["A fisherman on the throne. Well, he knows what a hard day's work is. That is more than most rulers can say."]}
+      ]
+    },
+    {
+      "id": "lothian", "slot": "news", "label": "The cemetery",
+      "when": {"step_done": ["inter_lothian"]},
+      "say": [
+        "Shaana passed by from town. She says the Necromancers have laid their old master in the earth at last.",
+        "Strange. Even up here the nights feel quieter. Perhaps the dead sleep better when their own are at rest."
+      ],
+      "topics": [
+        {"id": "lothian_part", "label": "I helped them.",
+         "say": ["Did you now? There is nothing you will not put your hand to, is there? Lithos must think well of you."]}
+      ]
+    },
+    {
+      "id": "shrine", "slot": "news", "label": "The Zealans",
+      "when": {"step_done": ["ancient_ones"]},
+      "say": [
+        "My grandfather spoke of the Zealans. Folk who prayed to no Titan at all, he said, and built in white stone.",
+        "They are gone, long before his time. If you have been walking in their ruins, I hope you left them as you found them."
+      ],
+      "topics": [
+        {"id": "shrine_gone", "label": "What became of them?",
+         "say": ["The old songs say they warred with our people and lost. The songs do not say why. Songs seldom do."]}
+      ]
+    },
+    {
+      "id": "hydros", "slot": "news", "label": "Hydros",
+      "when": {"step_done": ["free_hydros"]},
+      "say": [
+        "Have you seen the streams? They came down the valley white and loud three nights ago, and the well is full to the brim.",
+        "Corinth says the Lady of the Lake is awake again. Funny, Mordea made us honour her, and now she has outlived Mordea."
+      ],
+      "topics": [
+        {"id": "hydros_freed", "label": "I set her free.",
+         "say": ["You did? Then mind yourself. A Titan freed is a Titan who remembers who held the chains."]},
+        {"id": "hydros_crops", "label": "Is it good for the crops?",
+         "say": ["Too much of a good thing drowns the roots. But the grass for the torax has never looked so green."]}
+      ]
+    },
+    {
+      "id": "stratos", "slot": "news", "label": "The wind",
+      "when": {"step_done": ["test_belief"]},
+      "say": [
+        "The wind has changed. It comes off the sea steady now, like a thing that has made up its mind.",
+        "Cyrrus always said the Theurgists could feel the moods of Stratos. I think even an old herdsman can feel this one."
+      ],
+      "topics": [
+        {"id": "stratos_met", "label": "I stood before Stratos.",
+         "say": ["Of course you did. Air, earth, what next? I will stop being surprised by you when you stop surprising me."]}
+      ]
+    },
+    {
+      "id": "pyros", "slot": "news", "label": "The fire isle",
+      "when": {"step_done": ["pyros_ceremony"]},
+      "say": [
+        "There was a red glow over the sea toward Morgaelin. The whole sky looked like a forge with the door left open.",
+        "The sorcerers live out there. Whatever they did, I hope they keep it on their own island."
+      ],
+      "alt": [
+        {"when": {"step_done": ["kill_malchir"]},
+         "say": [
+           "The glow over Morgaelin is gone. Folk say the master of the sorcerers is dead, and that you had a hand in it.",
+           "I do not want to know the details. I only want my son to stay well away from fire."
+         ]}
+      ],
+      "topics": [
+        {"id": "pyros_fear", "label": "Are you afraid?",
+         "say": ["Of fire? Every herdsman is. One dry summer and one spark, and a lifetime of work is ash."]}
+      ]
+    },
+    {
+      "id": "blackrock", "slot": "news", "label": "Blackrock",
+      "when": {"step_done": ["show_tongue"]},
+      "say": [
+        "You carry yourself like a man about to set off on a long road. Corinth noticed it first.",
+        "Mythran was by, asking after a black stone. I told him we have only grey ones. Is that your business too?"
+      ],
+      "topics": [
+        {"id": "blackrock_leave", "label": "I may be leaving.",
+         "say": [
+           "Leaving Pagan? There is nowhere else. Or so I always believed.",
+           "Well. If you find a road off this island, you take it. Only stop by first and let Corinth feed you."
+         ]},
+        {"id": "blackrock_what", "label": "What do you know of it?",
+         "say": ["Nothing, friend. Black stone is a sorcerer's worry. My worries have four legs and horns."]}
+      ]
+    },
+    {
+      "id": "titans", "slot": "news", "label": "The Titans",
+      "when": {"step_done": ["ethereal_travel"]},
+      "say": [
+        "The sky has been wrong these last days. Too still. The torax will not graze and the hens will not lay.",
+        "My whole life I said the Titans were the only magic in the world. I think you are about to prove me wrong."
+      ],
+      "topics": [
+        {"id": "titans_end", "label": "What if they fall?",
+         "say": [
+           "Then the rain will still come, I think, and the grass will still grow. It did before anyone named them.",
+           "And a man will still have to get up before dawn to tend his flock. That is a comfort, in its way."
+         ]}
+      ]
+    },
+    {
+      "id": "cyrrus_ask", "slot": "son", "label": "Cyrrus",
+      "when": {"step_done": ["to_argentrock"], "step_not_done": ["ask_cyrrus"]},
+      "say": [
+        "You have been out to Argentrock? Then you might have seen my boy. Cyrrus. Tall, freckled, never stops washing his hands.",
+        "If you see him, tell him his mother asks whether he eats. That is all she ever asks."
+      ],
+      "topics": [
+        {"id": "cyrrus_not_yet", "label": "I have not met him.",
+         "say": ["He will be at the healers' house, I should think. The Theurgists keep him busy. Look for him there."]}
+      ]
+    },
+    {
+      "id": "cyrrus_met", "slot": "son", "label": "Your son",
+      "when": {"step_done": ["ask_cyrrus"]},
+      "say": [
+        "Corinth has had a letter. She says you met our Cyrrus on the isle and that he spoke of you. Is he well?"
+      ],
+      "alt": [
+        {"when": {"step_done": ["test_skills"]},
+         "say": [
+           "Cyrrus writes that you healed a torax under the Theurgists' eyes. A torax!",
+           "Then you have done what I do every spring, with none of my swearing. Perhaps you missed your calling."
+         ]}
+      ],
+      "topics": [
+        {"id": "cyrrus_well", "label": "He is well.",
+         "say": ["Good. Good. Do not tell Corinth I asked twice. She thinks I do not worry."]},
+        {"id": "cyrrus_herdsman", "label": "Will he come home?",
+         "say": ["To visit, I hope. To stay, no. He has his calling, and I have mine. That is how it should be."]}
+      ]
+    }
+  ]
+}

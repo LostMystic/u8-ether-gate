@@ -1,0 +1,38 @@
+{
+ "id": "bane",
+ "name": "Bane",
+ "npc": 29,
+ "about": "Bane the Red (class 1053), Acolyte of the Enclave on Daemon's Crag, a linguist of the Elder Tongue, one of the two mentors; dies if Vardion wins (G[142:2] = 1). INT-gated topic (PLAN-LEVELING.md 5; game/npc_dialog.h 'avatar_int'): shown only when the Avatar's INT is at least the number, behind New Dialogue.",
+ "menu": {
+  "max_entries": 1,
+  "first_menu": true,
+  "exits_only_menu": true,
+  "back": "Back.",
+  "leave": "Something else."
+ },
+ "topics": [
+  {
+   "id": "arianna",
+   "slot": "mind",
+   "label": "When the father cried out Arianna's name, was that the first Truename?",
+   "when": {
+    "cond": [
+     {
+      "global": [
+       142,
+       2
+      ],
+      "ne": 1
+     }
+    ],
+    "avatar_int": 23
+   },
+   "say": [
+    "Oh, my. Perhaps I should have named you Daemient after all. Fire of the Brain.",
+    "Consider it. A daemon is one vanquished by flame. The girl went into the lava. The beast came out. And it stopped at the sound of her name.",
+    "If that was a binding, then the first Sorcerer on this crag was not a scholar at all, but a grieving father. How very unlike the histories.",
+    "Do not repeat that theory to Vardion. He would not understand it, and then he would be offended that he did not."
+   ]
+  }
+ ]
+}

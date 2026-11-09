@@ -1,0 +1,117 @@
+{
+  "notes": [
+    "Leveling stage 4 (game/stat_growth.h, NOTES.md 'Trainers, tomes, elixirs and ordeals'): the only ways besides levels that raise a stat, all only with Leveling on. Our own design and words.",
+    "training: a session raises one stat by 1 up to cap. Its price is base x (1 + growth_permille / 1000) ^ (stat - from_stat), rounded to round: 50 at 10, 85 at 15, 155 at 20, 265 at 25, 415 at 29. Stat 20 to 30 costs about 2,650 in all; the game holds about 1,430 placed obsidian plus about 1,400 from one pass of its monsters (ctest growth prints both).",
+    "tomes and elixirs: x, y, z is the item's corner as the map files store it (high x, high y, low z). Each is created on its map the first time the map is entered with Leveling on; ctest growth checks that each spot is free, that nothing is stamped over, and that a flood of the real collision tests from the map's arrivals stands beside it.",
+    "ordeals: box is x0, y0, z0, x1, y1, z1 for the Avatar's position; ctest growth checks that the flood reaches it and that every way in needs at least min_climbs climbs."
+  ],
+  "training": {
+    "cap": 30,
+    "price": {"base": 50, "from_stat": 10, "growth_permille": 118, "round": 5},
+    "trainers": [
+      {
+        "npc": 5, "name": "Darion", "stats": ["str", "dex"],
+        "lines": {
+          "intro": ["Training costs coin, and I take no promises. Who is it to be?"],
+          "intro_alone": ["Coin first, sweat after. Strength or speed?"],
+          "label_self": ["Train me."],
+          "label_other": ["Train {who}."],
+          "pick": ["Strength or speed? Choose, and do not waste my morning."],
+          "pick_other": ["{who}, is it? We will see what they are made of. Strength or speed?"],
+          "done": ["Again. Again! ... Enough. You will feel that tomorrow, but you are the better for it."],
+          "done_other": ["Not bad. {who} has more in them than I thought. Come back when the bruises fade."],
+          "poor": ["That is {price} obsidian. I do not train on credit."],
+          "capped": ["I have nothing left to teach {who} there. Find a harder master, if there is one."]
+        }
+      },
+      {
+        "npc": 33, "name": "Mythran", "stats": ["int"],
+        "lines": {
+          "intro": ["A lesson for the mind, then. The price is the same for any pupil. Who will sit with me?"],
+          "intro_alone": ["Ah, you wish to sharpen your mind. It can be done, though not cheaply."],
+          "label_self": ["Teach me."],
+          "label_other": ["Teach {who}."],
+          "pick": ["Sit, and clear your thoughts. We begin when you have paid."],
+          "pick_other": ["{who} has an able look. Let us see how far it goes."],
+          "done": ["There. A small door opened in your mind. Walk through it often, or it will close again."],
+          "done_other": ["Well done. {who} learns quickly, once they stop talking."],
+          "poor": ["The lesson is {price} obsidian. I am patient, but I am not a charity."],
+          "capped": ["I can teach {who} no more by talk alone. Beyond this, only the rarest books will serve."]
+        }
+      }
+    ]
+  },
+  "words": {
+    "tome_read": ["The last page turns. Something in your mind has shifted and will not shift back."],
+    "tome_spent": ["You have taken all this book can give."],
+    "tome_beyond": ["The words slide away as you read them. This is beyond you for now. Perhaps when your mind is keener."],
+    "tome_read_companion": ["I see it now. Every word of it. I will not forget this."],
+    "tome_spent_companion": ["This one has given all it has. The words are only ink now."],
+    "tome_beyond_companion": ["This is beyond me for now. Keep it, and ask me again some day."],
+    "elixir": ["It burns all the way down, and then something wakes in you."],
+    "elixir_companion": ["Bitter! But I feel it. {Stat}, unless I miss my guess."],
+    "elixir_inert": ["It smells of nothing at all."]
+  },
+  "tomes": {
+    "min_int": 30,
+    "items": [
+      {"id": "tome_catacombs", "name": "the Ledger of the Unquiet", "gain": 2, "frame": 8, "map": 50, "x": 16351, "y": 4927, "z": 144,
+       "where": "Upper Catacombs, a raised floor far from either way in (one climb)",
+       "text": ["THE LEDGER OF THE UNQUIET\nkept by a gravekeeper whose name is scratched out",
+                "Every soul that passes leaves a weight behind. I have counted them, as my master counted, and his before him. The count is not of bodies. It is of what they meant to say and never did.",
+                "Learn to hear the unsaid, and the said becomes simple."]},
+      {"id": "tome_mountain", "name": "the Stone Psalter", "gain": 2, "frame": 1, "map": 31, "x": 27999, "y": 15679, "z": 136,
+       "where": "Hall of the Mountain King, the far end of the red hall (one climb)",
+       "text": ["THE STONE PSALTER",
+                "The mountain does not hurry, and so it is never wrong. A thought set down like a stone, then another upon it, will stand when hasty towers fall.",
+                "Lay each idea on the one beneath. Test it with your weight. Only then build higher."]},
+      {"id": "tome_cove", "name": "the Salt-Stained Codex", "gain": 2, "frame": 2, "map": 15, "x": 4831, "y": 16543, "z": 8,
+       "where": "Treasure Cove, behind the hidden pads of the East Road (one climb)",
+       "text": ["A CODEX, ITS PAGES STIFF WITH SALT",
+                "Whoever hid this here hid it from someone clever. The cipher changes every page, and the key to each lies in the one before.",
+                "By the last page you no longer need a key. You simply see how the pieces fit."]},
+      {"id": "tome_fortress", "name": "the Ninth Treatise on Fire", "gain": 2, "frame": 3, "map": 14, "x": 14687, "y": 2655, "z": 40,
+       "where": "Obsidian Fortress, the raised study by the pentagram (one climb)",
+       "text": ["THE NINTH TREATISE ON FIRE\nthe eight before it were burned",
+                "Fire is not a thing but a change. The wise Sorcerer does not ask what burns, but what it becomes, and how fast, and why.",
+                "Ask why of everything. Most answers will burn away. Keep the ones that remain."]},
+      {"id": "tome_fire", "name": "the Book Without Ash", "gain": 2, "frame": 0, "map": 44, "x": 30495, "y": 25759, "z": 24,
+       "where": "Plane of Fire, a ledge above the lava (one climb)",
+       "text": ["A BOOK THE FLAMES WILL NOT TOUCH",
+                "Here, where nothing lasts, this lasts. It holds a single thought, written over and over in a hundred hands: a mind that knows itself cannot be consumed.",
+                "You read the line again. And again. It begins to mean more each time."]}
+    ]
+  },
+  "elixirs": {
+    "items": [
+      {"id": "elixir_catacombs_walk", "name": "an elixir of might", "stat": "str", "gain": 1, "frame": 3, "map": 51, "x": 15391, "y": 2015, "z": 96,
+       "where": "Lower Catacombs, the raised walk above the lava (one climb)"},
+      {"id": "elixir_catacombs_gallery", "name": "an elixir of grace", "stat": "dex", "gain": 1, "frame": 6, "map": 50, "x": 13983, "y": 6175, "z": 144,
+       "where": "Upper Catacombs, a high gallery (one climb)"},
+      {"id": "elixir_cove", "name": "an elixir of might", "stat": "str", "gain": 1, "frame": 3, "map": 15, "x": 10207, "y": 17791, "z": 8,
+       "where": "Treasure Cove, by the blue-tiled dais (one climb)"},
+      {"id": "elixir_ancients", "name": "an elixir of grace", "stat": "dex", "gain": 1, "frame": 6, "map": 62, "x": 2751, "y": 23551, "z": 72,
+       "where": "Ancient Necromancers' caves, a ruined platform on pillars (one climb)"},
+      {"id": "elixir_ghost_house", "name": "an elixir of might", "stat": "str", "gain": 1, "frame": 3, "map": 63, "x": 16191, "y": 15007, "z": 48,
+       "where": "the ghost's house (armour area), the far bedroom"},
+      {"id": "elixir_pit", "name": "an elixir of grace", "stat": "dex", "gain": 1, "frame": 6, "map": 57, "x": 26623, "y": 18079, "z": 8,
+       "where": "Pit of the Dead, a ledge by the lava, east (one climb)"},
+      {"id": "elixir_fortress", "name": "an elixir of might", "stat": "str", "gain": 1, "frame": 3, "map": 14, "x": 13439, "y": 2271, "z": 24,
+       "where": "Obsidian Fortress, a stalagmite cave west of the entry"}
+    ]
+  },
+  "ordeals": [
+    {"id": "ordeal_plateau_cave", "name": "the Plateau climb", "stat": "str", "gain": 2, "map": 8, "min_climbs": 2,
+     "box": [27711, 27135, 104, 27839, 27263, 136],
+     "where": "Plateau, the high cave beside the iron fence (two climbs)",
+     "line": "Ordeal complete: you hauled yourself up to the Plateau's high cave."},
+    {"id": "ordeal_stone_cove", "name": "the Stone Cove climb", "stat": "str", "gain": 2, "map": 21, "min_climbs": 2,
+     "box": [4319, 1855, 120, 4447, 1983, 152],
+     "where": "Stone Cove, the high nook with the table (two climbs)",
+     "line": "Ordeal complete: you reached Stone Cove's high nook."},
+    {"id": "ordeal_earthen_stair", "name": "the Earthen Stair", "stat": "dex", "gain": 2, "map": 47, "min_climbs": 4,
+     "box": [2655, 5215, 48, 2783, 5343, 80],
+     "where": "Plane of Earth, the highest rocks west of the arrival (four climbs)",
+     "line": "Ordeal complete: you kept your footing up the Earthen Stair."}
+  ]
+}

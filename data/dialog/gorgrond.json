@@ -1,0 +1,38 @@
+{
+ "id": "gorgrond",
+ "name": "Gorgrond",
+ "npc": 31,
+ "about": "Gorgrond (class 1055), the strong, slow Acolyte of the Enclave on Daemon's Crag, Vardion's devoted follower; hostile once Bane has won (G[142:2] = 2). INT-gated topic (PLAN-LEVELING.md 5; game/npc_dialog.h 'avatar_int'): shown only when the Avatar's INT is at least the number, behind New Dialogue.",
+ "menu": {
+  "max_entries": 1,
+  "first_menu": true,
+  "exits_only_menu": true,
+  "back": "Back.",
+  "leave": "Something else."
+ },
+ "topics": [
+  {
+   "id": "drawn",
+   "slot": "mind",
+   "label": "What does it feel like when the Master draws on your power?",
+   "when": {
+    "cond": [
+     {
+      "global": [
+       142,
+       2
+      ],
+      "ne": 2
+     }
+    ],
+    "avatar_int": 19
+   },
+   "say": [
+    "Huh? Nobody asks me that. Vardion says not to think about it.",
+    "It's cold. Like the fire goes out in my belly. Then I'm sleepy, very sleepy, and my hands won't do spells.",
+    "It comes back. Slowly. A few days. Then I'm strong again, and he needs it again.",
+    "That's good, isn't it? Being needed? ...Why are you looking at me like that, Dungbreath?"
+   ]
+  }
+ ]
+}

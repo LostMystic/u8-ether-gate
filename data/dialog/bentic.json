@@ -1,0 +1,45 @@
+{
+ "id": "bentic",
+ "name": "Bentic",
+ "npc": 12,
+ "about": "Bentic (class 1036), Tenebrae's librarian in East Tenebrae, a student of names and of history; executed when Vividos sends the Avatar for reagents (G[93:1]). INT-gated topic (PLAN-LEVELING.md 5; game/npc_dialog.h 'avatar_int'): shown only when the Avatar's INT is at least the number, behind New Dialogue.",
+ "menu": {
+  "max_entries": 1,
+  "first_menu": true,
+  "exits_only_menu": true,
+  "back": "Back.",
+  "leave": "Something else."
+ },
+ "topics": [
+  {
+   "id": "old_word",
+   "slot": "mind",
+   "label": "Why did the old word for champion fall out of use?",
+   "when": {
+    "cond": [
+     {
+      "global": [
+       89,
+       1
+      ],
+      "eq": 1
+     },
+     {
+      "global": [
+       93,
+       1
+      ],
+      "eq": 0
+     }
+    ],
+    "avatar_int": 18
+   },
+   "say": [
+    "Ah! A question about words! Most people's eyes glaze over at etymology.",
+    "A word dies when nobody needs it any more. If the old Pagans had a word for a champion, perhaps they once expected one.",
+    "And then, I suppose, they stopped expecting. Or they stopped hoping. The words go first, you see. The hope goes after.",
+    "Mind you, that is not for certain. I must make a note of this. Fascinating!"
+   ]
+  }
+ ]
+}

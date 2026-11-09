@@ -1,0 +1,38 @@
+{
+ "id": "stellos",
+ "name": "Stellos",
+ "npc": 23,
+ "about": "Stellos (class 1047), the blind elder of the Order of Enlightenment on Argentrock, over two hundred years old; his last scene follows the taking of the Breath of Air (G[568:1]). INT-gated topic (PLAN-LEVELING.md 5; game/npc_dialog.h 'avatar_int'): shown only when the Avatar's INT is at least the number, behind New Dialogue.",
+ "menu": {
+  "max_entries": 1,
+  "first_menu": true,
+  "exits_only_menu": true,
+  "back": "Back.",
+  "leave": "Something else."
+ },
+ "topics": [
+  {
+   "id": "channel",
+   "slot": "mind",
+   "label": "If a focus is only a channel, where does the danger lie?",
+   "when": {
+    "cond": [
+     {
+      "global": [
+       568,
+       1
+      ],
+      "eq": 0
+     }
+    ],
+    "avatar_int": 24
+   },
+   "say": [
+    "Ah. It is good for a Child of Stratos to seek knowledge. And that is a deep question, friend.",
+    "The channel is silver, forged and blessed. It does not tire and it does not want. The danger is always in the one who holds it.",
+    "A healer who is unsteady reaches too deeply into her power, and it pours through him faster than he can bear. A wider channel only makes the flood swifter.",
+    "Some of the young believe two channels would carry twice the power. Perhaps they would. I have never met a heart that could carry twice as much. Mine can barely carry what it has."
+   ]
+  }
+ ]
+}

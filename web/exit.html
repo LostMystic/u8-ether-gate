@@ -1,0 +1,195 @@
+<!doctype html>
+<!-- Pagan engine - a clean-room reimplementation of the Ultima 8 engine.
+     Copyright (c) 2026 Mark B. Licensed under the GNU GPL v3 or later, see LICENSE.
+     Where the main menu's Quit leads on the web: the game isn't running here (no sound, nothing
+     in the background). It compares the version kept in this browser with the server's, shows
+     the patch notes, can download a new version (only the packs that changed, see packs.js) and
+     starts the game again. Saves and settings stay in the browser untouched. -->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>U8 Ether Gate</title>
+<link rel="icon" href="favicon.ico" sizes="16x16 32x32 48x48">
+<link rel="icon" type="image/png" href="pagan_icon_32.png" sizes="32x32">
+<link rel="icon" type="image/png" href="pagan_icon_256.png" sizes="256x256">
+<link rel="apple-touch-icon" href="pagan_icon_256.png">
+<style>
+  :root {
+    --bg: #0a0606; --panel: #1a0f0d; --panel2: #140b0a; --fg: #e6d6c8; --red: #c8402c; --ember: #e8743a;
+    --dim: #8f7a70; --ok: #9fcf7a; --line: #7a2a1e; --stone: #2a1c18;
+  }
+  html, body { margin: 0; min-height: 100%; color: var(--fg);
+    background: radial-gradient(ellipse at 50% -10%, #3a1410 0%, #160a08 45%, var(--bg) 80%) fixed, var(--bg);
+    font: 16px/1.5 Georgia, "Times New Roman", serif; }
+  main { max-width: 580px; margin: 0 auto; padding: 44px 16px 56px; }
+  h1 { color: var(--red); font-weight: normal; letter-spacing: .14em; font-size: 2rem; margin: 0 0 2px; text-align: center;
+    text-shadow: 0 0 18px #c8402c66, 0 2px 0 #000; }
+  .sub { color: var(--dim); text-align: center; margin: 0 0 26px; }
+  .card { background: linear-gradient(180deg, var(--panel), var(--panel2)); border: 1px solid var(--line);
+    box-shadow: inset 0 0 0 1px #000, 0 4px 14px #0008; padding: 16px 18px; margin: 0 0 16px; }
+  .row { display: flex; justify-content: space-between; gap: 12px; padding: 3px 0; flex-wrap: wrap; }
+  .row span:first-child { color: var(--dim); }
+  .row span:last-child { text-align: right; }
+  #state { margin: 10px 0 0; }
+  #progress { white-space: pre-line; }
+  #state.new { color: var(--ember); }
+  #state.ok { color: var(--ok); }
+  #bar { height: 8px; border: 1px solid var(--red); margin: 12px 0 4px; background: #000; }
+  #bar div { height: 100%; width: 0; background: linear-gradient(90deg, var(--red), var(--ember)); transition: width .15s; }
+  ul { margin: 6px 0 0; padding-left: 20px; }
+  li { margin: 3px 0; }
+  h2 { font-weight: normal; color: var(--ember); font-size: 1.05rem; margin: 0 0 4px; letter-spacing: .04em; }
+  h2 small { color: var(--dim); font-size: .85rem; letter-spacing: 0; }
+  details { border-top: 1px solid var(--stone); padding: 6px 0; }
+  details:first-of-type { border-top: 0; }
+  summary { cursor: pointer; color: var(--fg); }
+  summary small { color: var(--dim); }
+  details ul { color: #cdbdb0; }
+  .buttons { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; margin-top: 22px; }
+  button { font: inherit; padding: 10px 22px; cursor: pointer; border: 1px solid var(--red); background: #0006; color: var(--fg); min-width: 9em; }
+  button:hover:not(:disabled) { background: #3a1410; }
+  button.main { background: var(--red); border-color: var(--ember); color: #fff; }
+  button.main:hover:not(:disabled) { background: #d8503a; }
+  button:disabled { opacity: .45; cursor: default; }
+  button:focus-visible { outline: 2px solid #fff; outline-offset: 2px; }
+  [hidden] { display: none !important; }
+  @media (max-width: 420px) { h1 { font-size: 1.5rem; } button { flex: 1 1 100%; } }
+</style>
+</head>
+<body>
+<main>
+  <h1>U8 ETHER GATE</h1>
+  <p class="sub">An engine for Ultima VIII: Pagan. The game is closed. Your saves and settings are kept in this browser.</p>
+  <div class="card">
+    <div class="row"><span>In this browser</span><span id="have">…</span></div>
+    <div class="row"><span>On the server</span><span id="server">checking…</span></div>
+    <div class="row" id="copy-row" hidden><span>Your game copy</span><span id="copy"></span></div>
+    <p id="state"></p>
+    <div id="bar" hidden><div></div></div>
+    <p id="progress" class="sub" style="margin:0;text-align:left" hidden></p>
+  </div>
+  <div class="card" id="whatsnew" hidden>
+    <h2 id="whatsnew-title">What's new</h2>
+    <ul id="notes"></ul>
+    <div id="next" hidden>
+      <h2 style="margin-top:14px">Also in this build <small>(coming in the next version)</small></h2>
+      <ul id="unreleased"></ul>
+    </div>
+  </div>
+  <div class="card" id="history-card" hidden>
+    <h2>Earlier versions</h2>
+    <div id="history"></div>
+  </div>
+  <div class="buttons">
+    <button id="update" class="main" hidden>Update now</button>
+    <button id="start">Start the game</button>
+    <button id="check">Check again</button>
+    <button id="change" hidden>Change game folder</button>
+  </div>
+  <p class="sub" id="legal" style="margin-top:26px;font-size:.85rem" hidden>Free software under the <a href="LICENSE.txt" style="color:inherit">GNU GPL v3</a>.
+    Requires your own copy of Ultima VIII: Pagan, kept only in this browser. Not affiliated with Electronic Arts or Origin. Ultima is a trademark of its owner.</p>
+</main>
+<script src="packs.js"></script>
+<script>
+  const $ = id => document.getElementById(id);
+  let server = null;
+  const label = v => v ? v.version + (v.built ? ' (' + v.built + ')' : '') : 'none yet';
+  const size = b => b < 1048576 ? Math.max(1, Math.round(b / 1024)) + ' KB' : (b / 1048576).toFixed(1) + ' MB';
+  const items = list => (list || []).map(n => Object.assign(document.createElement('li'), { textContent: n }));
+
+  function showNotes(m) {
+    const title = 'What\'s new in ' + m.version + (m.date ? ' (' + m.date + ')' : '');
+    $('whatsnew-title').textContent = title;
+    $('notes').replaceChildren(...items(m.notes));
+    $('unreleased').replaceChildren(...items(m.unreleased));
+    $('next').hidden = !(m.unreleased && m.unreleased.length);
+    $('whatsnew').hidden = !((m.notes && m.notes.length) || !$('next').hidden);
+    const hist = (m.history || []).map(h => {
+      const d = document.createElement('details');
+      const s = document.createElement('summary');
+      s.textContent = h.version + ' ';
+      if (h.date) s.appendChild(Object.assign(document.createElement('small'), { textContent: h.date }));
+      const ul = document.createElement('ul');
+      ul.replaceChildren(...items(h.notes));
+      d.append(s, ul);
+      return d;
+    });
+    $('history').replaceChildren(...hist);
+    $('history-card').hidden = !hist.length;
+  }
+
+  async function check() {
+    $('state').className = '';
+    $('state').textContent = '';
+    $('server').textContent = 'checking…';
+    $('have').textContent = label(PGPacks.installed());
+    try {
+      server = await PGPacks.manifest();
+    } catch (e) {
+      $('server').textContent = 'not reachable';
+      $('state').textContent = 'Could not reach the server. Check your connection and try again.';
+      return;
+    }
+    $('server').textContent = label(server);
+    showNotes(server);
+    if (server.public) {
+      $('change').hidden = false;
+      $('legal').hidden = false;
+    }
+    const miss = await PGPacks.missing(server);
+    const need = miss.chunks, bytes = miss.bytes;
+    const have = PGPacks.installed();
+    if (!need.length && have && have.version === server.version && have.build === server.build) {
+      $('state').className = 'ok';
+      $('state').textContent = 'You have the latest version.';
+      $('update').hidden = true;
+      $('start').classList.add('main');
+    } else if (!need.length) {
+      $('state').className = 'ok';
+      $('state').textContent = 'The newest version is downloaded. Start the game to play it.';
+      $('update').hidden = true;
+      $('start').classList.add('main');
+    } else {
+      $('state').className = 'new';
+      const what = have && have.version === server.version ? 'A new build of ' + server.version + ' is available'
+                 : have ? 'A new version is available: ' + server.version : 'The game is not downloaded yet';
+      $('state').textContent = what + ' (' + size(bytes) + ' to download' + (have ? ', only what changed).' : ').') +
+        (!have && miss.have ? ' ' + size(miss.have) + ' already downloaded.' : '');
+      $('update').hidden = false;
+      $('start').classList.remove('main');
+    }
+  }
+
+  $('update').onclick = async () => {
+    if (!server) return;
+    $('update').disabled = $('check').disabled = true;
+    $('bar').hidden = $('progress').hidden = false;
+    try {
+      const n = await PGPacks.fetch_all(server, s => {
+        const d = PGPacks.describe(s);
+        $('bar').firstElementChild.style.width = d.pct + '%';
+        $('progress').textContent = d.lines.join('\n');
+      });
+      PGPacks.set_installed(server);
+      await PGPacks.prune(server);
+      $('progress').textContent = 'Done: ' + n + ' piece' + (n === 1 ? '' : 's') + ' downloaded.';
+      await check();
+    } catch (e) {
+      $('state').className = '';
+      $('state').textContent = 'The download stopped (' + e.message + '). Try again.';
+    }
+    $('update').disabled = $('check').disabled = false;
+  };
+  $('start').onclick = () => { location.href = './'; };
+  $('check').onclick = check;
+  $('change').onclick = () => { location.href = './?choose'; };
+  try {
+    const copy = localStorage.getItem('pagan.copy');
+    if (copy) { $('copy').textContent = copy; $('copy-row').hidden = false; }
+  } catch (e) {}
+  check();
+</script>
+</body>
+</html>

@@ -1,0 +1,175 @@
+{
+ "id": "vividos",
+ "name": "Vividos",
+ "npc": 21,
+ "about": "Vividos (class 1045), Lothian's Scion and then the Necromancer, keeper of the Tomb of Moriens in the Cemetery. INT-gated topic (PLAN-LEVELING.md 5; game/npc_dialog.h 'avatar_int'): shown only when the Avatar's INT is at least the number, behind New Dialogue. Virtues topic (PLAN-VIRTUES.md 3.11; feature virtues): words for Lothian beside Vividos after the burial (Humility, Spirituality). Honor (2026-11-08): the promise to bring back the ceremonial dagger (mark vividos_promise; the deed vividos_promise_kept pays when it is handed over, G[189:1]).",
+ "menu": {
+  "max_entries": 1,
+  "first_menu": true,
+  "exits_only_menu": true,
+  "back": "Back.",
+  "leave": "Something else."
+ },
+ "topics": [
+  {
+   "id": "voices",
+   "slot": "mind",
+   "label": "If the dead live on in Lithos' realm, whose voice spoke from the bones?",
+   "when": {
+    "cond": [
+     {
+      "global": [
+       206,
+       1
+      ],
+      "eq": 1
+     }
+    ],
+    "avatar_int": 20
+   },
+   "say": [
+    "You have a sharp wit, friend. Sharper than is comfortable, perhaps.",
+    "The dead do dwell in the City of the Dead, under the Mountain King. And yet their bones answered you. Both are true.",
+    "I think of it this way. The bone is a door, and Death Speak knocks upon it. What answers is not the bone, but neither is it far away.",
+    "Do not ask me to say more. I would not wish to color your expectations. Lithos keeps His own counsel, and so should His servants."
+   ]
+  },
+  {
+   "id": "rite",
+   "slot": "rite",
+   "feature": "virtues",
+   "label": "Lothian's rest",
+   "when": {
+    "step_done": [
+     "inter_lothian"
+    ]
+   },
+   "say": [
+    "Lothian is with Lithos now. The tomb is sealed. What more would you have?"
+   ],
+   "topics": [
+    {
+     "id": "rite_kneel",
+     "label": "Let me kneel and say words for Lothian with you, in your way, not mine.",
+     "virtue": {
+      "Humility": 4,
+      "Spirituality": 2
+     },
+     "mark": "lothian_rite",
+     "leave": true,
+     "say": [
+      "An outlander, asking to learn our words. That is not a thing I expected to hear.",
+      "Kneel, then. Say after me: from the earth, to the earth, and through the earth to Lithos.",
+      "...It is done. The Necromancers will hear of this. They do not forget a kindness, or a slight."
+     ],
+     "alt": [
+      {
+       "when": {
+        "mark": [
+         "known_avatar"
+        ]
+       },
+       "say": [
+        "The Avatar of Tenebrae, asking to learn our words. That is not a thing I expected to hear.",
+        "Kneel, then. Say after me: from the earth, to the earth, and through the earth to Lithos.",
+        "...It is done. The Necromancers will hear of this. They do not forget a kindness, or a slight."
+       ]
+      }
+     ]
+    },
+    {
+     "id": "rite_no",
+     "label": "Nothing. Farewell.",
+     "leave": true,
+     "say": [
+      "Go in peace, then."
+     ]
+    }
+   ]
+  },
+  {
+   "id": "promise",
+   "slot": "promise",
+   "feature": "virtues",
+   "label": "About the dagger",
+   "when": {
+    "cond": [
+     {
+      "global": [
+       212,
+       1
+      ],
+      "eq": 1
+     },
+     {
+      "global": [
+       189,
+       1
+      ],
+      "eq": 0
+     }
+    ],
+    "not_mark": [
+     "vividos_promise"
+    ]
+   },
+   "say": [
+    "The dagger. Without it, Lothian cannot pass to Lithos. Do not tell me it is harder than you thought."
+   ],
+   "topics": [
+    {
+     "id": "promise_give",
+     "label": "I give you my word: the dagger will come back to this tomb.",
+     "mark": "vividos_promise",
+     "leave": true,
+     "say": [
+      "Your word. Outlanders give it easily. Let us see whether yours weighs anything."
+     ],
+     "alt": [
+      {
+       "when": {
+        "mark": [
+         "known_avatar"
+        ]
+       },
+       "say": [
+        "Your word. Even an Avatar's word must be weighed. Let us see whether yours weighs anything."
+       ]
+      }
+     ]
+    },
+    {
+     "id": "promise_not",
+     "label": "I will do what I can.",
+     "leave": true,
+     "say": [
+      "That is what they all say."
+     ]
+    },
+    {
+     "id": "promise_cruel",
+     "label": "Lothian can rot for all I care.",
+     "vice": 2,
+     "leave": true,
+     "say": [
+      "Vividos goes very still.",
+      "Speak of the dead that way again in this place, outlander, and you will join them."
+     ],
+     "alt": [
+      {
+       "when": {
+        "mark": [
+         "known_avatar"
+        ]
+       },
+       "say": [
+        "Vividos goes very still.",
+        "Speak of the dead that way again in this place, Avatar or no, and you will join them."
+       ]
+      }
+     ]
+    }
+   ]
+  }
+ ]
+}

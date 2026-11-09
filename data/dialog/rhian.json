@@ -1,0 +1,84 @@
+{
+ "id": "rhian",
+ "name": "Rhian",
+ "npc": 18,
+ "about": "Rhian (class 1042), the weaver: widow of Toran the gem cutter and mother of Torwin; runs Toran's shop after the execution (specs/world/leveling_facts.md 6). Virtues topic (PLAN-VIRTUES.md 3.2 and 3.3; feature virtues): helping Toran's family with obsidian (Sacrifice, Compassion), once.",
+ "menu": {
+  "max_entries": 1,
+  "first_menu": true,
+  "exits_only_menu": true,
+  "back": "Back.",
+  "leave": "Something else."
+ },
+ "topics": [
+  {
+   "id": "family",
+   "slot": "family",
+   "feature": "virtues",
+   "label": "Toran's family",
+   "when": {
+    "step_done": [
+     "execution"
+    ],
+    "not_mark": [
+     "rhian_helped"
+    ]
+   },
+   "say": [
+    "You were on the dock that morning. I saw you. Most people looked away.",
+    "We manage. The shop still sells a little. Some weeks it does not."
+   ],
+   "topics": [
+    {
+     "id": "family_give",
+     "label": "Take these 20 obsidian. For the family.",
+     "cost": 20,
+     "virtue": {
+      "Sacrifice": 4,
+      "Compassion": 2
+     },
+     "mark": "rhian_helped",
+     "leave": true,
+     "cant_pay": [
+      "You reach for your purse and find too little in it to offer. Rhian pretends not to notice."
+     ],
+     "say": [
+      "I... I cannot refuse it. Not this winter.",
+      "Thank you, stranger. Toran would have liked you. He always said the kind ones come from far away."
+     ],
+     "alt": [
+      {
+       "when": {
+        "mark": [
+         "known_avatar"
+        ]
+       },
+       "say": [
+        "I... I cannot refuse it. Not this winter.",
+        "Thank you, Avatar. Toran would have liked you. He always said the kind ones come from far away."
+       ]
+      }
+     ]
+    },
+    {
+     "id": "family_no",
+     "label": "I am sorry for your loss.",
+     "leave": true,
+     "say": [
+      "So are many. Sorrow does not buy bread, but it is kind of you to say it."
+     ]
+    },
+    {
+     "id": "family_cruel",
+     "label": "Toran was a thief. His family gets what it deserves.",
+     "vice": 3,
+     "leave": true,
+     "say": [
+      "Rhian's face goes white. She says nothing at all, and turns back to her loom.",
+      "You hear her weeping before you reach the door."
+     ]
+    }
+   ]
+  }
+ ]
+}

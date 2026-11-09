@@ -1,0 +1,249 @@
+<!doctype html>
+<!-- Pagan engine - a clean-room reimplementation of the Ultima 8 engine.
+     Copyright (c) 2026 Mark B. Licensed under the GNU GPL v3 or later, see LICENSE. -->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>U8 Ether Gate</title>
+<link rel="icon" href="favicon.ico" sizes="16x16 32x32 48x48">
+<link rel="icon" type="image/png" href="pagan_icon_32.png" sizes="32x32">
+<link rel="icon" type="image/png" href="pagan_icon_256.png" sizes="256x256">
+<link rel="apple-touch-icon" href="pagan_icon_256.png">
+<style>
+  html, body { margin: 0; height: 100%; background: #000; color: #ccc; font: 14px sans-serif; overflow: hidden; }
+  #canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; outline: none; cursor: none; }
+  #loader { position: absolute; inset: 0; display: grid; place-items: center; background: #000; text-align: center;
+    font: 15px/1.5 Georgia, "Times New Roman", serif; color: #e6d6c8; padding: 0 16px; }
+  #loader h1 { color: #c8402c; font-weight: normal; letter-spacing: .14em; font-size: 1.8rem; margin: 0 0 14px;
+    text-shadow: 0 0 18px #c8402c66; }
+  #bar { width: min(420px, 80vw); height: 10px; border: 1px solid #c8402c; margin: 0 auto 10px; background: #000; }
+  #bar div { height: 100%; width: 0; background: linear-gradient(90deg, #c8402c, #e8743a); transition: width .2s; }
+  #status { white-space: pre-line; min-height: 4.5em; color: #b8a89a; }
+  #status.err { color: #e87060; }
+  #sub { color: #8f7a70; margin: -8px 0 14px; }
+  #chooser { max-width: 520px; margin: 0 auto 14px; }
+  #chooser label { display: inline-block; padding: 10px 22px; cursor: pointer; border: 1px solid #e8743a; background: #c8402c; color: #fff; }
+  #chooser label:hover { background: #d8503a; }
+  #chooser input { position: absolute; width: 1px; height: 1px; opacity: 0; }
+  #chooser label:focus-within { outline: 2px solid #fff; outline-offset: 2px; }
+  #chooser p { margin: 12px 0 0; }
+  #change { color: #b8a89a; }
+  [hidden] { display: none !important; }
+</style>
+</head>
+<body>
+<canvas id="canvas" tabindex="-1" oncontextmenu="event.preventDefault()"></canvas>
+<div id="loader"><div><h1>U8 ETHER GATE</h1><p id="sub">An engine for Ultima VIII: Pagan</p>
+  <div id="chooser" hidden>
+    <label>Choose your Ultima VIII folder<input id="folder" type="file" webkitdirectory directory multiple></label>
+    <p>You need your own copy of Ultima VIII: Pagan. Choose the folder holding STATIC, GAMEDAT and USECODE.</p>
+    <p>Its files are read here and kept in this browser. Nothing is uploaded.</p>
+  </div>
+  <div id="bar"><div></div></div><div id="status">Loading...</div>
+  <p><a id="change" href="?choose" hidden>Change game folder</a></p></div></div>
+<script src="packs.js"></script>
+<script>
+  // Command-line arguments come from the page URL. No arguments: a new game (game mode).
+  // ?map=40&at=13038,15042,48 opens the map viewer, ?hud=1 shows the status line,
+  // ?args=--view-map+40+--test-pattern passes anything else.
+  const q = new URLSearchParams(location.search);
+  const args = [];
+  if (q.get('args')) args.push(...q.get('args').split(/\s+/).filter(Boolean));
+  if (q.get('map')) args.push('--view-map', q.get('map'));
+  if (q.get('at')) args.push('--at', q.get('at'));
+  if (q.get('hud')) args.push('--hud');
+  if (q.get('skip')) args.push('--skip-opening');  // debug: no opening scene
+  if (q.has('noname')) args.push('--no-name');      // no name entry at the start
+  if (q.get('load')) args.push('--load', q.get('load'));  // start with diary entry N
+  if (q.has('nointro')) args.push('--no-intro');    // no intro movie at a new game
+  if (q.has('mute')) args.push('--mute');           // no audio at all
+  // ?atlas: the world atlas; ?zoom=8: the map viewer at 1/8 (wheel or +/- zoom, M atlas).
+  if (q.has('atlas')) args.push('--atlas');
+  if (q.get('zoom')) args.push('--zoom', q.get('zoom'));
+  // ?edit: the world editor (edit mode; areas autosave in this browser; Download / Upload as backup).
+  // ?choose (public build): ask for the game folder again.
+  if (q.has('edit')) args.push('--edit');
+  const status = document.getElementById('status'), loader = document.getElementById('loader');
+  const bar = document.querySelector('#bar div');
+  const showStatus = (t, err) => { status.textContent = t; status.className = err ? 'err' : ''; };
+  let fatalShown = false;
+  const hideLoader = () => { if (loader && !fatalShown) loader.remove(); };
+
+  // The game's data and the program come in packs of 512 KB chunks kept in the browser (packs.js,
+  // version.json): only chunks not kept yet are downloaded, each kept as soon as it is in (a
+  // reload resumes), then the packs' files are written into the virtual file system (/game,
+  // /data) before main() runs. The loading screen shows MB, %, speed, resuming and retries; it
+  // never just stops. No version.json (a build with PAGAN_WEB_PACKS=OFF): pagan.data is preloaded
+  // the old way and pagan.wasm fetched directly.
+  const failed = e => {
+    if (e && e.gone) {  // the server got a new version while this was loading: start again with it
+      showStatus('A new version arrived on the server while loading. Starting again...', true);
+      setTimeout(() => location.reload(), 3000);
+      return;
+    }
+    showStatus('Could not load the game: ' + (e && e.message || e) + '\nReload the page to try again.', true);
+  };
+  const manifestP = PGPacks.manifest().catch(e => { console.warn('packs: no version.json, using pagan.data', e); return null; });
+  manifestP.then(m => { if (m && m.public) gameFolder().catch(failed); });
+  let lastStatus = null;
+  function onStatus(s) {
+    lastStatus = s;
+    if (!s.need) return;
+    const d = PGPacks.describe(s);
+    bar.style.width = d.pct + '%';
+    showStatus('Downloading ' + d.lines.join('\n'));
+  }
+  // Started at once (not in preRun, which only runs once the program is in).
+  const packsP = manifestP.then(async m => {
+    if (!m) return null;
+    const miss = await PGPacks.missing(m);
+    console.log('packs: version ' + m.version + ' (' + m.build + '), ' + miss.chunks.length + ' chunks to download (' +
+                (miss.bytes / 1048576).toFixed(1) + ' MB, ' + (miss.have / 1048576).toFixed(1) + ' MB kept)');
+    window.paganChunksDownloaded = miss.chunks.map(c => c.file);
+    const out = await PGPacks.load(m, onStatus);
+    bar.style.width = '100%';
+    if (!window.paganWaitingForFolder) showStatus('Starting...');
+    else showStatus('');
+    return out;
+  });
+  packsP.catch(failed);
+  async function loadPacks() {
+    const m = await manifestP;
+    if (!m) return;
+    Module.pgVersion = m.version;
+    const packs = await packsP;
+    const game = m.public ? await gameFolder() : null;
+    for (const p of m.packs) {
+      if (p.kind === 'wasm') continue;
+      for (const f of PGPacks.unpack(packs[p.name])) {
+        const dir = f.path.substring(0, f.path.lastIndexOf('/'));
+        if (dir) FS.mkdirTree(dir);
+        FS.writeFile(f.path, f.data);
+      }
+      delete packs[p.name];
+    }
+    if (game) {
+      for (const f of game) {
+        FS.mkdirTree(f.path.substring(0, f.path.lastIndexOf('/')));
+        FS.writeFile(f.path, f.data);
+      }
+    }
+  }
+  // The public build: the player's own game folder, from this browser or chosen now (PGGame in packs.js).
+  let gameFolderP = null;
+  function gameFolder() {
+    if (!gameFolderP) gameFolderP = (async () => {
+      const forceChoose = q.has('choose');
+      const kept = forceChoose ? null : await PGGame.stored();
+      if (kept) {
+        document.getElementById('change').hidden = false;
+        return kept;
+      }
+      const chooser = document.getElementById('chooser'), input = document.getElementById('folder');
+      chooser.hidden = false;
+      showStatus('');
+      window.paganWaitingForFolder = true;
+      return new Promise(done => {
+        input.addEventListener('change', async () => {
+          try {
+            const sel = PGGame.select(input.files);
+            showStatus('Reading your game files...');
+            const files = await PGGame.read(sel, (n, all) => { bar.style.width = Math.floor(100 * n / all) + '%'; });
+            const kept = await PGGame.store(files, sel.name);
+            chooser.hidden = true;
+            window.paganWaitingForFolder = false;
+            showStatus(kept ? 'Starting...' : 'Starting... (This browser could not keep the files; you will be asked for the folder next time.)');
+            if (forceChoose) history.replaceState(null, '', location.pathname);
+            done(files);
+          } catch (e) {
+            input.value = '';
+            showStatus(e.message || String(e), true);
+          }
+        });
+      });
+    })();
+    return gameFolderP;
+  }
+  // A newer version on the server? The game shows a notice (it keeps running the one it has).
+  async function checkForUpdate() {
+    const have = await manifestP;
+    if (!have || Module.pgUpdateReady) return;
+    try {
+      const m = await PGPacks.manifest();
+      if (m.version !== have.version) { Module.pgUpdateReady = m.version; console.log('update: version ' + m.version + ' is on the server'); }
+    } catch (e) { /* offline for a moment */ }
+  }
+  setInterval(checkForUpdate, 5 * 60 * 1000);
+  addEventListener('focus', checkForUpdate);
+
+  var Module = {
+    arguments: args,
+    canvas: document.getElementById('canvas'),
+    // The program could not start (engine message); keep the page up with the words.
+    pgFatal(text) {
+      fatalShown = true;
+      bar.parentElement.hidden = true;
+      showStatus(text, true);
+      manifestP.then(m => { if (m && m.public) document.getElementById('change').hidden = false; });
+    },
+    print: t => console.log(t),
+    printErr: t => console.warn(t),
+    setStatus: t => { if (t && !/^(Preparing|Downloading)/.test(t)) showStatus(t); },
+    instantiateWasm(imports, receive) {
+      (async () => {
+        const m = await manifestP;
+        const w = m && m.packs.find(p => p.kind === 'wasm');
+        let bytes;
+        if (w) { const packs = await packsP; bytes = packs[w.name]; delete packs[w.name]; }
+        else {
+          const r = await fetch('pagan.wasm', { credentials: 'same-origin' });
+          if (!r.ok) throw new Error('pagan.wasm: ' + r.status);
+          bytes = await r.arrayBuffer();
+        }
+        const out = await WebAssembly.instantiate(bytes, imports);
+        receive(out.instance, out.module);
+      })().catch(failed);
+      return {};
+    },
+    preRun: [() => {
+      Module.addRunDependency('pg-packs');
+      loadPacks().then(() => Module.removeRunDependency('pg-packs'), failed);
+    }],
+    onRuntimeInitialized: () => {
+      window.paganReady = true;
+      requestAnimationFrame(() => requestAnimationFrame(hideLoader));  // after the first frame
+      document.getElementById('canvas').focus();
+      manifestP.then(m => { if (m) { PGPacks.set_installed(m); PGPacks.prune(m); } });
+    },
+    // The main menu's Quit (and the quit box's Yes): the game has saved its settings; write the
+    // saves folder to IndexedDB, then go to the update / patch notes page.
+    pgExit() {
+      try { const c = paganAudioContext(); if (c) c.suspend(); } catch (e) {}
+      let gone = false;
+      const go = () => { if (!gone) { gone = true; location.href = 'exit.html'; } };
+      try { FS.syncfs(false, () => go()); } catch (e) { go(); }
+      setTimeout(go, 1500);
+    },
+  };
+  // Audio: browsers start the AudioContext suspended until the page gets a user gesture.
+  // Resume it on the first click / key / touch. No permission (Web MIDI or other) is ever asked.
+  function paganAudioContext() {
+    try { return (Module.SDL2 && Module.SDL2.audioContext) || null; } catch (e) { return null; }
+  }
+  window.paganAudioState = () => { const c = paganAudioContext(); return c ? c.state : 'none'; };
+  function paganResumeAudio() {
+    const c = paganAudioContext();
+    if (c && c.state === 'suspended') { try { c.resume(); } catch (e) {} }
+  }
+  for (const ev of ['pointerdown', 'mousedown', 'keydown', 'touchstart'])
+    window.addEventListener(ev, paganResumeAudio, true);
+  window.addEventListener('keydown', e => {
+    if (e.key.startsWith('Arrow') || e.key === ' ' || e.key === 'Tab' || e.key === 'Backspace') e.preventDefault();
+    // The editor's Ctrl+S / Ctrl+Z / Ctrl+Y and F1 are not the browser's.
+    if (q.has('edit') && (((e.ctrlKey || e.metaKey) && /^[szy]$/i.test(e.key)) || e.key === 'F1')) e.preventDefault();
+  });
+</script>
+{{{ SCRIPT }}}
+</body>
+</html>

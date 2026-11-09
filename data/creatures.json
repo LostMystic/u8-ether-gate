@@ -1,0 +1,673 @@
+{
+ "notes": [
+  "The new creatures (PLAN-CREATURES.md; NOTES.md 'New creatures'). Read by game/creatures.cpp; behind the option 'New creatures' (default On), with Leveling on or off. Facts from specs/world/creature_facts.md.",
+  "body: the engine shape (data/shapes/shapes.json 2060-2064) that carries HP, collision and the monster row; draw: what the engine draws instead, [shape, first, last, game frames a step] or \"own\" (the body's own stand frame). Phases: water and lava creatures are hidden (under), rising, up (only then hittable when a rule says so) and sinking; walkers and floaters are always up.",
+  "Stats (hp, dex, str, damage, armour) are used both with Leveling on (as its level variant) and off (as the monster row). level and xp: Leveling's kill XP, the same per level as data/monster_levels.json (24, 152, 176 for levels 6, 7, 8), counted in test_leveling's budget and pacing. damage_type: the bits of combat.md 1 (1 normal, 2 blade, 8 fire, 0x80 pierce).",
+  "rules: the first rule whose 'when' tags are all on a hit sets its damage to pct percent. Tags of a hit: weapon (a melee blow) or spell (anything else: spells, blasts, traps); blade, blunt, fire, undead, magic, pierce (its damage bits); magic_weapon (a weapon in magic_weapons, or one whose damage has the magic bit, or a daemon's blow); a companion spell's id and its spell_tags; grant_peace (an Avatar spell of type 0xA8 with no companion spell named); lava; and the creature's state: hidden, weakened.",
+  "magic_weapons: the eight artifact weapons (creature_facts.md 3). metal_armour: [shape, frame] by picture (creature_facts.md 6, unconfirmed there); -1 = every frame; a piece's odd frame counts as its even one. spell_tags: elements for the companions' spells (the Avatar's damaging spells are all plain fire or normal, creature_facts.md 4; no Avatar spell is water).",
+  "places: where each rises, the first time the Avatar is on that map with the option on ('after': only once that critical-path step is done). Each place once per game. Checked by tests/test_creatures.cpp (places): free, in its habitat, near a spot the party can stand on that a flood of the real collision tests reaches from the map's arrivals. 'alt': the same place in another state of the map (24 and 25 are one tunnel), not counted twice in the XP budget."
+ ],
+ "magic_weapons": [
+  815,
+  816,
+  817,
+  818,
+  819,
+  820,
+  821,
+  822
+ ],
+ "metal_armour": [
+  [
+   523,
+   0
+  ],
+  [
+   523,
+   2
+  ],
+  [
+   530,
+   2
+  ],
+  [
+   530,
+   6
+  ],
+  [
+   531,
+   -1
+  ],
+  [
+   532,
+   2
+  ],
+  [
+   539,
+   -1
+  ],
+  [
+   64,
+   0
+  ]
+ ],
+ "spell_tags": {
+  "fire_bolt": [
+   "fire"
+  ],
+  "fire_field": [
+   "fire"
+  ],
+  "lightning": [
+   "air",
+   "lightning"
+  ],
+  "gust": [
+   "air"
+  ],
+  "wave": [
+   "water",
+   "tempest"
+  ],
+  "slowing_tide": [
+   "water",
+   "tempest"
+  ],
+  "ice_shards": [
+   "water",
+   "ice",
+   "tempest"
+  ],
+  "calm": [
+   "water",
+   "tempest"
+  ],
+  "grave_drain": [
+   "death"
+  ],
+  "ancient_light": [
+   "light"
+  ]
+ },
+ "creatures": [
+  {
+   "id": "lurker_pet",
+   "name": "lurker's pet",
+   "look": "a serpent of the Lurker's, all teeth and spines",
+   "kind": "water",
+   "body": 2060,
+   "level": 6,
+   "xp": 24,
+   "hp": [
+    139,
+    177
+   ],
+   "dex": [
+    15,
+    19
+   ],
+   "str": 18,
+   "damage": [
+    13,
+    23
+   ],
+   "damage_type": 2,
+   "armour": 12,
+   "attack": {
+    "name": "bite",
+    "reach": 160,
+    "every": 50,
+    "sound": 63
+   },
+   "speed": 5,
+   "aggro": 900,
+   "surface": {
+    "up_frames": 120,
+    "down_frames": 150,
+    "bait_frames": 360
+   },
+   "rules": [
+    {
+     "when": [
+      "hidden"
+     ],
+     "pct": 0,
+     "say": "The lurker's pet is under the water."
+    }
+   ],
+   "draw": {
+    "hidden": [
+     81,
+     15,
+     23,
+     10
+    ],
+    "rising": [
+     81,
+     0,
+     4,
+     8
+    ],
+    "up": [
+     81,
+     4,
+     9,
+     8
+    ],
+    "sinking": [
+     81,
+     10,
+     14,
+     8
+    ],
+    "strike": [
+     580,
+     40,
+     58,
+     2
+    ]
+   },
+   "places": [
+    {
+     "map": 26,
+     "x": 17504,
+     "y": 11414,
+     "z": 104,
+     "note": "Carthax Lake, the north shore by the way in from the catacombs"
+    },
+    {
+     "map": 26,
+     "x": 18348,
+     "y": 17148,
+     "z": 96,
+     "note": "Carthax Lake, the south-west shore on the way out to map 28"
+    },
+    {
+     "map": 26,
+     "x": 20480,
+     "y": 16788,
+     "z": 104,
+     "note": "Carthax Lake, the south shore"
+    },
+    {
+     "map": 37,
+     "x": 27500,
+     "y": 24300,
+     "z": 0,
+     "note": "Argentrock, the arrival beach"
+    },
+    {
+     "map": 37,
+     "x": 29340,
+     "y": 24176,
+     "z": 0,
+     "note": "Argentrock, the arrival beach east of the bridge"
+    }
+   ]
+  },
+  {
+   "id": "wraith",
+   "name": "wraith",
+   "look": "a wraith, a shape of cold smoke",
+   "kind": "walker",
+   "body": 2061,
+   "level": 7,
+   "xp": 152,
+   "hp": [
+    95,
+    120
+   ],
+   "dex": [
+    18,
+    22
+   ],
+   "str": 16,
+   "damage": [
+    14,
+    22
+   ],
+   "damage_type": 1,
+   "armour": 8,
+   "attack": {
+    "name": "touch",
+    "reach": 72,
+    "every": 45
+   },
+   "speed": 4,
+   "aggro": 640,
+   "mana_drain": 6,
+   "weakened_by": {
+    "spell": "ancient_light",
+    "seconds": 20,
+    "rounds": 3,
+    "say": "The Light of the Ancients burns the wraith: it can be cut now."
+   },
+   "rules": [
+    {
+     "when": [
+      "spell"
+     ],
+     "pct": 0,
+     "say": "The spell passes through the wraith."
+    },
+    {
+     "when": [
+      "magic_weapon"
+     ],
+     "pct": 100
+    },
+    {
+     "when": [
+      "weakened",
+      "weapon"
+     ],
+     "pct": 100
+    },
+    {
+     "when": [
+      "weapon"
+     ],
+     "pct": 0,
+     "say": "Only a magic weapon can hurt the wraith."
+    }
+   ],
+   "draw": {
+    "up": "own",
+    "ghost": true,
+    "tint": "dark",
+    "particle": [
+     757,
+     0,
+     3,
+     4
+    ],
+    "particle_every": 12,
+    "strike": [
+     757,
+     8,
+     11,
+     3
+    ]
+   },
+   "places": [
+    {
+     "map": 57,
+     "x": 19456, "y": 27392, "z": 0, "note": "Pit of the Dead, a quiet south passage (over 2700 from any monster egg)"
+    },
+    {
+     "map": 57,
+     "x": 26624, "y": 27904, "z": 0, "note": "Pit of the Dead, an empty stretch south of the way in from Stone Cove (over 1900 from any monster egg)"
+    },
+    {
+     "map": 57,
+     "x": 14495,
+     "y": 10047,
+     "z": 0,
+     "note": "Pit of the Dead, the far west (over 3100 from any monster egg)"
+    },
+    {
+     "map": 51,
+     "x": 12159,
+     "y": 5663,
+     "z": 0,
+     "after": "to_pit_of_death",
+     "note": "Lower Catacombs, on the way to the Pit link"
+    },
+    {
+     "map": 62,
+     "x": 19519,
+     "y": 12575,
+     "z": 0,
+     "after": "to_pit_of_death",
+     "note": "map 62, the ghost egg by necromancer 6 (only once the Pit chapter has begun)"
+    }
+   ]
+  },
+  {
+   "id": "lava_wyrm",
+   "name": "lava wyrm",
+   "look": "a lava wyrm, glowing through its crust",
+   "kind": "lava",
+   "body": 2062,
+   "level": 7,
+   "xp": 152,
+   "hp": [
+    260,
+    320
+   ],
+   "dex": [
+    14,
+    18
+   ],
+   "str": 20,
+   "damage": [
+    23,
+    39
+   ],
+   "damage_type": 8,
+   "armour": 14,
+   "attack": {
+    "name": "fire spray",
+    "reach": 224,
+    "every": 60,
+    "sound": 172
+   },
+   "speed": 4,
+   "aggro": 800,
+   "surface": {
+    "up_frames": 120,
+    "down_frames": 120
+   },
+   "fire_protect": true,
+   "rules": [
+    {
+     "when": [
+      "hidden"
+     ],
+     "pct": 0,
+     "say": "The lava wyrm is under the lava."
+    },
+    {
+     "when": [
+      "magic_weapon"
+     ],
+     "pct": 100
+    },
+    {
+     "when": [
+      "fire"
+     ],
+     "pct": 0,
+     "say": "Fire only feeds the lava wyrm."
+    },
+    {
+     "when": [
+      "water"
+     ],
+     "pct": 150
+    }
+   ],
+   "draw": {
+    "hidden": [
+     604,
+     0,
+     5,
+     5
+    ],
+    "rising": [
+     480,
+     0,
+     3,
+     6
+    ],
+    "up": [
+     480,
+     4,
+     7,
+     6
+    ],
+    "sinking": [
+     480,
+     8,
+     9,
+     8
+    ],
+    "strike": [
+     580,
+     81,
+     104,
+     2
+    ],
+    "particle": [
+     603,
+     0,
+     4,
+     4
+    ],
+    "particle_every": 20
+   },
+   "places": [
+    {
+     "map": 12,
+     "x": 11000,
+     "y": 15332,
+     "z": 0,
+     "note": "Daemon's Crag, the lava under the west bridge (reached by spells and thrown things from the bridge)"
+    },
+    {
+     "map": 24,
+     "x": 20600,
+     "y": 27500,
+     "z": 0,
+     "note": "Lava River tunnel, east of the crossing"
+    },
+    {
+     "map": 24,
+     "x": 18968,
+     "y": 26200,
+     "z": 0,
+     "note": "Lava River tunnel, west of the crossing by the island"
+    },
+    {
+     "map": 25,
+     "x": 20600,
+     "y": 27000,
+     "z": 0,
+     "note": "Lava River tunnel (cooled), east of the crossing (the same place as map 24's first: the tunnel after the water is freed; counted once in the XP budget)",
+     "alt": true
+    }
+   ],
+   "lash": {
+    "name": "lash",
+    "reach": 64,
+    "damage_type": 4
+   }
+  },
+  {
+   "id": "storm_eye",
+   "name": "storm eye",
+   "look": "a storm eye, a ball of light that crackles",
+   "kind": "floater",
+   "body": 2063,
+   "level": 7,
+   "xp": 152,
+   "hp": [
+    96,
+    128
+   ],
+   "dex": [
+    18,
+    22
+   ],
+   "str": 10,
+   "damage": [
+    9,
+    14
+   ],
+   "damage_type": 128,
+   "armour": 4,
+   "attack": {
+    "name": "lightning",
+    "reach": 288,
+    "every": 75,
+    "sound": 27
+   },
+   "speed": 3,
+   "aggro": 640,
+   "arc": {
+    "range": 128,
+    "pct": 60,
+    "metal_range": 224
+   },
+   "metal_draws": true,
+   "rules": [
+    {
+     "when": [
+      "lightning"
+     ],
+     "pct": 0,
+     "say": "Lightning only feeds the storm eye."
+    }
+   ],
+   "draw": {
+    "up": [
+     703,
+     2,
+     7,
+     3
+    ],
+    "strike": [
+     511,
+     0,
+     4,
+     2
+    ],
+    "particle": [
+     511,
+     0,
+     4,
+     1
+    ],
+    "particle_every": 18
+   },
+   "places": [
+    {
+     "map": 46,
+     "x": 13624,
+     "y": 6408,
+     "z": 176,
+     "note": "Plane of Air, the arrival island"
+    },
+    {
+     "map": 46,
+     "x": 14000,
+     "y": 6900,
+     "z": 176,
+     "note": "Plane of Air, the arrival island, north side"
+    }
+   ]
+  },
+  {
+   "id": "pyros_flame",
+   "name": "Flame of Pyros",
+   "look": "a Flame of Pyros, walking fire",
+   "kind": "walker",
+   "body": 2064,
+   "level": 8,
+   "xp": 176,
+   "hp": [
+    176,
+    228
+   ],
+   "dex": [
+    16,
+    20
+   ],
+   "str": 20,
+   "damage": [
+    21,
+    35
+   ],
+   "damage_type": 8,
+   "armour": 10,
+   "attack": {
+    "name": "flames",
+    "reach": 80,
+    "every": 50,
+    "sound": 38
+   },
+   "speed": 4,
+   "aggro": 640,
+   "lava_ok": true,
+   "rules": [
+    {
+     "when": [
+      "magic_weapon"
+     ],
+     "pct": 150
+    },
+    {
+     "when": [
+      "fire"
+     ],
+     "pct": 0,
+     "say": "Fire only feeds the Flame of Pyros."
+    },
+    {
+     "when": [
+      "lava"
+     ],
+     "pct": 0
+    },
+    {
+     "when": [
+      "water"
+     ],
+     "pct": 200
+    },
+    {
+     "when": [
+      "weapon"
+     ],
+     "pct": 50,
+     "say": "Steel passes half through the flame."
+    }
+   ],
+   "draw": {
+    "up": [
+     480,
+     4,
+     7,
+     5
+    ],
+    "strike": [
+     578,
+     20,
+     34,
+     1
+    ],
+    "particle": [
+     400,
+     0,
+     9,
+     3
+    ],
+    "particle_every": 16
+   },
+   "places": [
+    {
+     "map": 44,
+     "x": 26431,
+     "y": 24895,
+     "z": 0,
+     "note": "Plane of Fire, on the route north (by a guardian bark egg)"
+    },
+    {
+     "map": 44,
+     "x": 26591,
+     "y": 19839,
+     "z": 8,
+     "note": "Plane of Fire, on the route north"
+    },
+    {
+     "map": 44,
+     "x": 22272, "y": 17920, "z": 0, "note": "Plane of Fire, an empty stretch west of the route north (over 4700 from any monster egg)"
+    },
+    {
+     "map": 14,
+     "x": 15615,
+     "y": 16200,
+     "z": 72,
+     "note": "Obsidian Fortress, below the central teleporter point"
+    },
+    {
+     "map": 14,
+     "x": 12600,
+     "y": 20100,
+     "z": 16,
+     "note": "Obsidian Fortress, by the small lava pool"
+    }
+   ]
+  }
+ ]
+}

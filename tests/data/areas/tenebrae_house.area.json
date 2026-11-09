@@ -1,0 +1,21 @@
+{
+  "format": "pagan-area",
+  "version": 1,
+  "name": "Tenebrae house",
+  "theme": "tenebrae",
+  "seed": 3,
+  "styles": {"wall": "ws149", "interior_floor": "fs163", "floor": "fs242"},
+  "rows": [
+    "..........",
+    ".#######..",
+    ".#.....#..",
+    ".#.....#..",
+    ".#.....+..",
+    ".#.....#..",
+    ".#######..",
+    ".........."
+  ],
+  "pois": [
+    {"id": "table", "x": 4, "y": 3, "note": "a table with chairs for dinner", "tags": ["table"], "radius": 1}
+  ]
+}

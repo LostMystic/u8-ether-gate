@@ -1,0 +1,636 @@
+{
+ "id": "beren",
+ "name": "Beren",
+ "npc": 32,
+ "about": "Beren, Acolyte Sorcerer of the Cabal in the Enclave on Daemon's Crag (map 12), Bane's pupil and lover, and the sorcerer Tenebrae's people call on when they are wronged. Courteous, dry and proud, quick to take offence, loyal to Bane, scornful of Vardion and Gorgrond. New topics and a scene patch in the engine's own words (engine/docs/beren_dialogue.md). His topics hide while he is angry with the Avatar (G[396:2] non-zero) or grieving for Bane (G[142] bit 0 set), states his own conversation handles. INT-gated topic (PLAN-LEVELING.md 5; game/npc_dialog.h 'avatar_int'): shown only when the Avatar's INT is at least the number, behind New Dialogue.",
+ "menu": {
+  "max_entries": 3,
+  "first_menu": true,
+  "exits_only_menu": true,
+  "back": "Back.",
+  "leave": "Something else."
+ },
+ "stages": [
+  {
+   "id": "enclave",
+   "title": "Reached the Enclave (the lava river cooled)",
+   "when": {
+    "step_done": [
+     "to_daemons_crag"
+    ]
+   }
+  },
+  {
+   "id": "disciple",
+   "title": "A disciple of Bane or Vardion",
+   "when": {
+    "step_done": [
+     "choose_mentor"
+    ]
+   }
+  },
+  {
+   "id": "trials",
+   "title": "Passed the first test",
+   "when": {
+    "step_done": [
+     "first_test"
+    ]
+   }
+  },
+  {
+   "id": "fortress",
+   "title": "Through the Obsidian Fortress",
+   "when": {
+    "step_done": [
+     "arcadion_done"
+    ]
+   }
+  },
+  {
+   "id": "ceremony",
+   "title": "After the Pyros ceremony",
+   "when": {
+    "step_done": [
+     "pyros_ceremony"
+    ]
+   }
+  },
+  {
+   "id": "master",
+   "title": "Malchir is dead",
+   "when": {
+    "step_done": [
+     "kill_malchir"
+    ]
+   }
+  },
+  {
+   "id": "blackrock",
+   "title": "Gathering the blackrock",
+   "when": {
+    "step_done": [
+     "show_tongue"
+    ]
+   }
+  },
+  {
+   "id": "ether",
+   "title": "Beyond the world",
+   "when": {
+    "step_done": [
+     "ethereal_travel"
+    ]
+   }
+  }
+ ],
+ "topics": [
+  {
+   "id": "duties",
+   "slot": "beren",
+   "label": "Your duties",
+   "when": {
+    "step_done": [
+     "to_daemons_crag"
+    ],
+    "step_not_done": [
+     "choose_mentor"
+    ],
+    "cond": [
+     {
+      "global": [
+       396,
+       2
+      ],
+      "eq": 0
+     },
+     {
+      "global": [
+       142,
+       1
+      ],
+      "eq": 0
+     }
+    ]
+   },
+   "say": [
+    "My duties? Study, chiefly. But the Cabal lends me out, now and then, to places that need a sorcerer's hand.",
+    "You may find this room empty some days. Do not take it as an invitation to look through my things."
+   ],
+   "topics": [
+    {
+     "id": "duties_where",
+     "label": "Where do they send you?",
+     "say": [
+      "Across the water, where people are many and patience is short. When they are wronged, they call. I answer."
+     ]
+    },
+    {
+     "id": "duties_who",
+     "label": "Who calls you?",
+     "say": [
+      "Those who have been robbed or struck. Pray you never hear one of them call my name on your account."
+     ]
+    },
+    {
+     "id": "duties_like",
+     "label": "Do you like the work?",
+     "say": [
+      "I like order. The work keeps it. Whether I like the people I keep it for is another matter."
+     ]
+    }
+   ]
+  },
+  {
+   "id": "townsfolk",
+   "slot": "beren",
+   "label": "The townsfolk",
+   "when": {
+    "step_done": [
+     "choose_mentor"
+    ],
+    "step_not_done": [
+     "trial"
+    ],
+    "cond": [
+     {
+      "global": [
+       396,
+       2
+      ],
+      "eq": 0
+     },
+     {
+      "global": [
+       142,
+       1
+      ],
+      "eq": 0
+     }
+    ]
+   },
+   "say": [
+    "Now that you are one of us, I may speak plainly. I spend more of my days in Tenebrae than I would like.",
+    "Some of its people are worth the trouble. Some are not. Ask, if you have met them."
+   ],
+   "topics": [
+    {
+     "id": "town_korick",
+     "label": "Korick the smith",
+     "say": [
+      "A strong arm and a short temper. He once dealt with a brawler himself before I could arrive.",
+      "I should be annoyed. I find that I am mostly grateful. Do not tell him."
+     ]
+    },
+    {
+     "id": "town_bentic",
+     "label": "Bentic the librarian",
+     "say": [
+      "The librarian. He will tell you the history of a doorknob if you stand still long enough.",
+      "Still, he knows where every book is kept. That is rarer than wisdom, and more useful."
+     ]
+    },
+    {
+     "id": "town_devon",
+     "label": "Devon the fisherman",
+     "say": [
+      "An honest man, I am told, which in Tenebrae makes him nearly a curiosity. The guards watch him closely."
+     ]
+    },
+    {
+     "id": "town_mordea",
+     "label": "Lady Mordea",
+     "say": [
+      "The Tempest rules the town; the Cabal keeps its own counsel. We get on by not asking each other questions.",
+      "I would advise you to follow the same rule. She does not care for curious strangers."
+     ]
+    }
+   ]
+  },
+  {
+   "id": "tenebrae_news",
+   "slot": "beren",
+   "label": "Tenebrae",
+   "when": {
+    "step_done": [
+     "trial"
+    ],
+    "step_not_done": [
+     "kill_malchir"
+    ],
+    "cond": [
+     {
+      "global": [
+       396,
+       2
+      ],
+      "eq": 0
+     },
+     {
+      "global": [
+       142,
+       1
+      ],
+      "eq": 0
+     }
+    ]
+   },
+   "say": [
+    "So the Tempest has fallen, and a fisherman sits in her palace. The town talks of nothing else.",
+    "My work there will not change. Thieves do not care who wears the crown."
+   ],
+   "topics": [
+    {
+     "id": "news_devon",
+     "label": "Devon is a good man.",
+     "say": [
+      "Then he will find the palace a lonely place. I will do him the courtesy of keeping his streets quiet."
+     ]
+    },
+    {
+     "id": "news_korick",
+     "label": "And Korick?",
+     "say": [
+      "Hammering, as ever. He forged half the new guards' blades in a week. He seems almost cheerful."
+     ]
+    }
+   ]
+  },
+  {
+   "id": "servant",
+   "slot": "beren",
+   "label": "The Cabal now",
+   "when": {
+    "step_done": [
+     "kill_malchir"
+    ],
+    "cond": [
+     {
+      "global": [
+       396,
+       2
+      ],
+      "eq": 0
+     },
+     {
+      "global": [
+       142,
+       1
+      ],
+      "eq": 0
+     }
+    ]
+   },
+   "say": [
+    "Master. Forgive me for speaking first. The Cabal is uneasy, and someone should tell you so.",
+    "I will keep the town across the water in order, as before, unless you command otherwise."
+   ],
+   "topics": [
+    {
+     "id": "servant_on",
+     "label": "Carry on as before.",
+     "say": [
+      "As you wish. It is good to serve someone who knows what he wants."
+     ]
+    },
+    {
+     "id": "servant_bane",
+     "label": "How is Bane?",
+     "when": {
+      "cond": {
+       "not": {
+        "npc_dead": 29
+       }
+      }
+     },
+     "say": [
+      "Watching you, as am I. She says you have the makings of a legend. I have stopped arguing with her."
+     ]
+    }
+   ]
+  },
+  {
+   "id": "flooded_mouth",
+   "slot": "world",
+   "label": "The flooded Mouth",
+   "when": {
+    "step_done": [
+     "to_daemons_crag"
+    ],
+    "step_not_done": [
+     "first_test"
+    ],
+    "cond": [
+     {
+      "global": [
+       396,
+       2
+      ],
+      "eq": 0
+     },
+     {
+      "global": [
+       142,
+       1
+      ],
+      "eq": 0
+     }
+    ]
+   },
+   "say": [
+    "Since the lake overflowed, the Mouth hisses like a kettle day and night. Half the river is black stone now.",
+    "For generations that fire kept out anyone not worthy of the Enclave. Now a determined goat could walk in."
+   ],
+   "topics": [
+    {
+     "id": "mouth_me",
+     "label": "That was my doing.",
+     "say": [
+      "I had guessed as much. Few would think to drown a volcano. It was clever. It was also extremely rude."
+     ]
+    },
+    {
+     "id": "mouth_undo",
+     "label": "Will the fire return?",
+     "say": [
+      "Pyros is patient. The rock will crack, the fire will rise. But not in my lifetime, I suspect, nor yours."
+     ]
+    },
+    {
+     "id": "mouth_others",
+     "label": "What do the others say?",
+     "say": [
+      "Vardion rages, which pleases me. Gorgrond asked whether the steam was a spell. Bane laughed.",
+      "When Bane laughs, I have learned not to worry."
+     ]
+    }
+   ]
+  },
+  {
+   "id": "trials",
+   "slot": "world",
+   "label": "The trials",
+   "when": {
+    "step_done": [
+     "first_test"
+    ],
+    "step_not_done": [
+     "pyros_ceremony"
+    ],
+    "cond": [
+     {
+      "global": [
+       396,
+       2
+      ],
+      "eq": 0
+     },
+     {
+      "global": [
+       142,
+       1
+      ],
+      "eq": 0
+     }
+    ]
+   },
+   "say": [
+    "You have passed your first test. Do not let it go to your head; the later ones have killed better students.",
+    "Rest before each. Think before you touch anything. That is all the advice the Cabal allows me to give."
+   ],
+   "topics": [
+    {
+     "id": "trials_mouth",
+     "label": "And the Mouth?",
+     "say": [
+      "Still steaming. The new acolytes walk in over wet stone. Bane says it teaches them humility."
+     ]
+    }
+   ]
+  },
+  {
+   "id": "ceremony",
+   "slot": "world",
+   "label": "The ceremony",
+   "when": {
+    "step_done": [
+     "pyros_ceremony"
+    ],
+    "step_not_done": [
+     "kill_malchir"
+    ],
+    "cond": [
+     {
+      "global": [
+       396,
+       2
+      ],
+      "eq": 0
+     },
+     {
+      "global": [
+       142,
+       1
+      ],
+      "eq": 0
+     }
+    ]
+   },
+   "say": [
+    "I have stood at the rites before, but never felt the Lord of Flame so close. The floor was hot through my boots.",
+    "You were there, at the heart of it. I will not ask what you saw. I am not certain I want to know."
+   ]
+  },
+  {
+   "id": "malchir",
+   "slot": "world",
+   "label": "Malchir",
+   "when": {
+    "step_done": [
+     "kill_malchir"
+    ],
+    "step_not_done": [
+     "show_tongue"
+    ],
+    "cond": [
+     {
+      "global": [
+       396,
+       2
+      ],
+      "eq": 0
+     },
+     {
+      "global": [
+       142,
+       1
+      ],
+      "eq": 0
+     }
+    ]
+   },
+   "say": [
+    "The old Master is gone, and the Enclave is very quiet. Even the lava seems to be holding its breath.",
+    "He was seldom here, and he led us poorly. Still, I find I do not quite know what to do with the silence."
+   ],
+   "topics": [
+    {
+     "id": "malchir_why",
+     "label": "He had to fall.",
+     "say": [
+      "Perhaps. Power that sits still goes bad. You at least seem to be going somewhere with it."
+     ]
+    }
+   ]
+  },
+  {
+   "id": "blackrock",
+   "slot": "world",
+   "label": "The black stone",
+   "when": {
+    "step_done": [
+     "show_tongue"
+    ],
+    "cond": [
+     {
+      "global": [
+       396,
+       2
+      ],
+      "eq": 0
+     },
+     {
+      "global": [
+       142,
+       1
+      ],
+      "eq": 0
+     }
+    ]
+   },
+   "say": [
+    "You carry the Tongue of Flame about as if it were a trinket. It belongs to the Lord of Flame, Master.",
+    "Whatever you mean to do with it, do it quickly. Things like that do not like to be kept waiting."
+   ]
+  },
+  {
+   "id": "titans",
+   "slot": "world",
+   "label": "The Titans",
+   "when": {
+    "step_done": [
+     "ethereal_travel"
+    ],
+    "cond": [
+     {
+      "global": [
+       396,
+       2
+      ],
+      "eq": 0
+     },
+     {
+      "global": [
+       142,
+       1
+      ],
+      "eq": 0
+     }
+    ]
+   },
+   "say": [
+    "The lava under the Enclave has gone dull, as if something far away has stopped listening.",
+    "If that is your doing, I will not pretend to understand it. I only hope you know where you are going."
+   ]
+  },
+  {
+   "id": "unmaking",
+   "slot": "mind",
+   "label": "If worship made the Titans, could its loss unmake them?",
+   "when": {
+    "step_done": [
+     "to_daemons_crag"
+    ],
+    "cond": [
+     {
+      "global": [
+       396,
+       2
+      ],
+      "eq": 0
+     },
+     {
+      "global": [
+       142,
+       1
+      ],
+      "eq": 0
+     }
+    ],
+    "avatar_int": 21
+   },
+   "say": [
+    "Now that is a dangerous question. I find I like it, which is more dangerous still.",
+    "The tale says our ancestors made the Elements into Titanic forces, by sacrifice and adoration, at the Guardian's word. Making is one thing.",
+    "Unmaking... A fire you stop feeding does not go out at once. It burns what it has. And it grows angry first.",
+    "I would keep such thoughts behind your teeth in the Enclave. Some here would call them heresy. I call them interesting. Mostly."
+   ]
+  }
+ ],
+ "scenes": [
+  {
+   "id": "mouth_known",
+   "class": "BERENHCH",
+   "from_ip": "092A",
+   "about": "Data fix: the Mouth of the Daemon scene (egg class BERENHCH, map 25). When the Avatar has met Beren before (G[392:2] non-zero) and he is not angry (G[396:2] = 0; an apology sets it back to 0), the original script skips straight to its parting warning: there are lines only for a stranger and for an angry Beren. These lines fill that state. from_ip: only when his first line comes from the scene's closing part (offset 0x092A on, specs/world/bugfixes.md 6), so if a usecode fix ever sends that state to the stranger's speech instead, this patch stays out of the way.",
+   "when": {
+    "cond": [
+     {
+      "global": [
+       392,
+       2
+      ],
+      "ne": 0
+     },
+     {
+      "global": [
+       396,
+       2
+      ],
+      "eq": 0
+     }
+    ]
+   },
+   "say": [
+    "Well. You again. I wondered who could be fool enough, or clever enough, to send a lake through the Mouth of the Daemon.",
+    "This cavern was the Cabal's first test. Fire kept out the unworthy. Your water has made it a stroll."
+   ],
+   "topics": [
+    {
+     "id": "known_me",
+     "label": "It was my doing.",
+     "say": [
+      "So I assumed. I will not report it. The Master may think a newcomer who can do this is worth a look.",
+      "There is still one stretch the water did not cool. Find a way across to where I stand and the Enclave is beyond. Ask for Bane there."
+     ]
+    },
+    {
+     "id": "known_who",
+     "label": "Who could have done it?",
+     "say": [
+      "Spare me. We have spoken before, and I know that look. Never mind; it is done.",
+      "If you can cross the last of the fire to where I stand, the Enclave is beyond. Seek out Bane. She will hear you."
+     ]
+    },
+    {
+     "id": "known_way",
+     "label": "How do I get in?",
+     "say": [
+      "Most of the river is stone now. The last stretch is not. You will need more than boots to cross it.",
+      "Reach the place where I stand and you will find our home. Ask for Bane. She teaches those worth teaching."
+     ]
+    }
+   ]
+  }
+ ]
+}

@@ -1,0 +1,260 @@
+{
+ "id": "children",
+ "name": "Child",
+ "shape": 708,
+ "about": "The children of Tenebrae and the plateau (shape 708, spawned from monster eggs, no NPC number; game/npc_dialog.h 'shape'). Their own talk is a string of 'why?' questions ending in a menu with 'Bye!' (black-box: engine run). Virtues topics (feature virtues; PLAN-VIRTUES.md: Humility, the user's request 2026-11-08): playing with them and letting them win; each pays once per game, whichever child it is with. After the mark known_avatar (Devon proclaims the Avatar, devon.json), a child who would refuse ('I don't know you.' ... 'My mommie told me never to talk to strangers.', the CHILD use script's 50% branch) talks instead: the scene avatar_friend replaces those lines (scene 'replace', 'line'; game/npc_dialog.h) with her Humility quest, the lost comb (mark kids_comb, Humility 4); afterwards avatar_hello.",
+ "menu": {
+  "max_entries": 2,
+  "first_menu": true,
+  "exits_only_menu": false,
+  "back": "Back.",
+  "leave": "Something else."
+ },
+ "topics": [
+  {
+   "id": "tag",
+   "slot": "tag",
+   "feature": "virtues",
+   "label": "Want to play a game?",
+   "when": {
+    "not_mark": [
+     "kids_tag"
+    ]
+   },
+   "say": [
+    "A game? With you? You're too big for games!",
+    "...All right. Tag! You're it!"
+   ],
+   "topics": [
+    {
+     "id": "tag_lose",
+     "label": "Chase the child, and stumble just before you catch up.",
+     "virtue": {
+      "Humility": 2
+     },
+     "mark": "kids_tag",
+     "leave": true,
+     "say": [
+      "Ha! You fell over your own big feet! Nobody catches me!",
+      "You're fun, for a stranger. Will you come back and play again?"
+     ],
+     "alt": [
+      {
+       "when": {
+        "mark": [
+         "known_avatar"
+        ]
+       },
+       "say": [
+        "Ha! You fell over your own big feet! Nobody catches me, not even the Avatar!",
+        "You're fun, for a hero. Will you come back and play again?"
+       ]
+      }
+     ]
+    },
+    {
+     "id": "tag_win",
+     "label": "Catch the child in three long strides.",
+     "leave": true,
+     "say": [
+      "Hey! That's not fair, your legs are as long as a torax!",
+      "I'm not playing any more."
+     ]
+    }
+   ]
+  },
+  {
+   "id": "hero",
+   "slot": "hero",
+   "feature": "virtues",
+   "label": "What do you like to play?",
+   "when": {
+    "mark": [
+     "kids_tag"
+    ],
+    "not_mark": [
+     "kids_hero"
+    ]
+   },
+   "say": [
+    "Heroes and monsters! But the big kids always want to be the hero.",
+    "Can I be the hero? You can be the troll. You're the right size."
+   ],
+   "topics": [
+    {
+     "id": "hero_troll",
+     "label": "Roar like a troll, and fall down defeated.",
+     "virtue": {
+      "Humility": 3
+     },
+     "mark": "kids_hero",
+     "leave": true,
+     "say": [
+      "Take that, troll! And that! ...Is it dead? You have to stay dead!",
+      "I won! I'm the hero of Tenebrae! Wait till I tell everybody!"
+     ]
+    },
+    {
+     "id": "hero_me",
+     "label": "I am a real hero. I should be the hero.",
+     "leave": true,
+     "say": [
+      "Everybody says that. You're just like the big kids."
+     ]
+    }
+   ]
+  },
+  {
+   "id": "why",
+   "slot": "why",
+   "feature": "virtues",
+   "label": "I have a question for you, too.",
+   "when": {
+    "not_mark": [
+     "kids_why"
+    ]
+   },
+   "say": [
+    "For me? Nobody asks ME things. What is it?"
+   ],
+   "topics": [
+    {
+     "id": "why_teach",
+     "label": "Why ARE toraxes big and brown? I do not know. Will you tell me what you think?",
+     "virtue": {
+      "Humility": 2
+     },
+     "mark": "kids_why",
+     "leave": true,
+     "say": [
+      "You don't know? But you're so old!",
+      "I think they're brown so they can hide in the mud, and big so the trolls don't eat them. That's what I think.",
+      "...You're the first grown-up who ever said they didn't know something."
+     ]
+    },
+    {
+     "id": "why_lecture",
+     "label": "Explain at length what you know about toraxes.",
+     "leave": true,
+     "say": [
+      "...Are you finished? I forgot what I asked."
+     ]
+    }
+   ]
+  }
+ ],
+ "scenes": [
+  {
+   "id": "avatar_friend",
+   "class": "CHILD",
+   "line": "I don't know you.",
+   "feature": "virtues",
+   "replace": true,
+   "when": {
+    "mark": [
+     "known_avatar"
+    ],
+    "not_mark": [
+     "kids_comb"
+    ]
+   },
+   "say": [
+    "Wait... I know you! You're the Avatar!",
+    "Mommy says I mustn't ever talk to strangers. But she says you're not a stranger. You're the Avatar, and the Avatar helped Devon, and the Avatar is everybody's friend.",
+    "So I can talk to you. Can I ask you something? It's important."
+   ],
+   "topics": [
+    {
+     "id": "comb_ask",
+     "label": "Of course. What is it?",
+     "say": [
+      "Mommy lost her comb. Her best one, with the shell on it, that Grandmother gave her. She cried about it when she thought I was asleep.",
+      "I know where it is. I saw the cat take it! But nobody listens to me because I'm little.",
+      "You can help. But you have to do it MY way, because I know where it is and you don't."
+     ],
+     "topics": [
+      {
+       "id": "comb_follow",
+       "label": "Lead the way. You know this city better than I do.",
+       "say": [
+        "This way! Quiet... don't step there, that's where the cats sleep.",
+        "There! Under the big step. See it shining? The cat pushes things in there. She has a whole treasure.",
+        "Your hand is too big to fit. Mine isn't. You lift the stone, and I'll reach in."
+       ],
+       "topics": [
+        {
+         "id": "comb_lift",
+         "label": "Lift the stone, and let the child reach in.",
+         "virtue": {
+          "Humility": 4
+         },
+         "mark": "kids_comb",
+         "leave": true,
+         "say": [
+          "Got it! And a button, and a spoon, and... ew, a fish bone.",
+          "Mommy! Mommy, look! I found your comb! ...Well, the Avatar lifted the stone. But I found it.",
+          "She's crying again, but it's the good kind. Thank you, Avatar. You're really good at doing what you're told."
+         ]
+        },
+        {
+         "id": "comb_grab",
+         "label": "Reach in yourself. You are faster.",
+         "leave": true,
+         "say": [
+          "Hey! You're stuck! Your hand is stuck! Pull, Avatar, pull!",
+          "...Now the cat has scratched you, and the comb went further in. I TOLD you your hand was too big.",
+          "I'll get it myself tomorrow. Come back if you want to help properly."
+         ]
+        }
+       ]
+      },
+      {
+       "id": "comb_fetch",
+       "label": "Tell me where it is, and I will fetch it for you.",
+       "leave": true,
+       "say": [
+        "No! You don't know the way, and the cats run off with everything when a big person comes. You have to follow ME.",
+        "You're just like all the other grown-ups. Come back when you'll do it my way."
+       ]
+      },
+      {
+       "id": "comb_scorn",
+       "label": "I have no time for lost combs.",
+       "vice": 1,
+       "leave": true,
+       "say": [
+        "Oh.",
+        "Mommy was wrong. You ARE a stranger."
+       ]
+      }
+     ]
+    },
+    {
+     "id": "friend_bye",
+     "label": "Bye!",
+     "leave": true,
+     "say": [
+      "Bye, Avatar! I'm going to tell everybody I talked to you!"
+     ]
+    }
+   ]
+  },
+  {
+   "id": "avatar_hello",
+   "class": "CHILD",
+   "line": "I don't know you.",
+   "feature": "virtues",
+   "replace": true,
+   "when": {
+    "mark": [
+     "known_avatar",
+     "kids_comb"
+    ]
+   },
+   "say": [
+    "It's the Avatar! Mommy says hello. She wears her comb every single day now.",
+    "The cat's got a new treasure under the step, but I'm not telling you where. Bye, Avatar!"
+   ]
+  }
+ ]
+}

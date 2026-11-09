@@ -1,0 +1,35 @@
+{
+ "id": "mythran",
+ "name": "Mythran",
+ "npc": 33,
+ "about": "Mythran (class 1057), the hermit mage of the Plateau. With Leveling on (game/stat_growth.h) he gives paid lessons that raise INT by one, for the Avatar or a companion walking with him; the lines and prices are in data/stat_growth.json. He has three menus (first meeting, later visits, after the Tongue of Flame); the entry goes on the first menu of each conversation that has a goodbye. INT-gated topic (PLAN-LEVELING.md 5; game/npc_dialog.h 'avatar_int'): shown only when the Avatar's INT is at least the number, behind New Dialogue.",
+ "menu": {
+  "max_entries": 2,
+  "first_menu": true,
+  "exits_only_menu": true,
+  "back": "Back.",
+  "leave": "Something else."
+ },
+ "topics": [
+  {
+   "id": "lessons",
+   "label": "Sharpen my mind.",
+   "feature": "leveling",
+   "action": "train"
+  },
+  {
+   "id": "thaumaturgy",
+   "slot": "mind",
+   "label": "If no Titan feeds Thaumaturgy, what does?",
+   "when": {
+    "avatar_int": 20
+   },
+   "say": [
+    "Ah. A real question. How refreshing. It is always important to ask questions, my friend.",
+    "The other schools are pacts: a Titan gives, the caster pays. Thaumaturgy borrows a little from every school and owes allegiance to none.",
+    "Where its power truly comes from, I have my suspicions, and they are not the sort one writes down. Suffice it to say it does not ask any Titan's leave.",
+    "Which is, I suspect, exactly why the Titans' power can hold you here and yet cannot quite hold my studies. Think on that, and do not repeat it to anyone with a temper."
+   ]
+  }
+ ]
+}

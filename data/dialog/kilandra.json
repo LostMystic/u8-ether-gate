@@ -1,0 +1,75 @@
+{
+ "id": "kilandra",
+ "name": "Kilandra",
+ "npc": 16,
+ "about": "Kilandra (class 1040, map 4), whose daughter Elaina lies in the Cemetery (specs/world/leveling_facts.md 8.2: G[264:1] after 'Your daughter?!', G[220:1] when her grave is read). Virtues topic (Honor, 2026-11-08): the promise to visit the grave (mark kilandra_promise; deed kilandra_promise_kept).",
+ "menu": {
+  "max_entries": 1,
+  "first_menu": true,
+  "exits_only_menu": true,
+  "back": "Back.",
+  "leave": "Something else."
+ },
+ "topics": [
+  {
+   "id": "promise",
+   "slot": "promise",
+   "feature": "virtues",
+   "label": "Elaina",
+   "when": {
+    "cond": [
+     {
+      "global": [
+       264,
+       1
+      ],
+      "eq": 1
+     },
+     {
+      "global": [
+       220,
+       1
+      ],
+      "eq": 0
+     }
+    ],
+    "not_mark": [
+     "kilandra_promise"
+    ]
+   },
+   "say": [
+    "Elaina. I have not said her name aloud in a long time."
+   ],
+   "topics": [
+    {
+     "id": "promise_give",
+     "label": "I will go to Elaina's grave for you, and see that it is not forgotten. You have my word.",
+     "mark": "kilandra_promise",
+     "leave": true,
+     "say": [
+      "You would do that? For a stranger's child?",
+      "Then go, and come back and tell me. I will not hope too much. But I will hope a little."
+     ]
+    },
+    {
+     "id": "promise_not",
+     "label": "I am sorry for your loss.",
+     "leave": true,
+     "say": [
+      "Thank you. It was long ago."
+     ]
+    },
+    {
+     "id": "promise_cruel",
+     "label": "The dead are dead. Stop wallowing.",
+     "vice": 2,
+     "leave": true,
+     "say": [
+      "Kilandra looks at you as if you had struck her.",
+      "Get out of my house."
+     ]
+    }
+   ]
+  }
+ ]
+}

@@ -1,0 +1,3029 @@
+{
+ "version": 1,
+ "game": "Ultima 8 v2.10 English",
+ "notes": [
+  "See specs/world/critical_path.md for the evaluation rules (milestones, alt_targets, condition and target semantics).",
+  "has_item may carry an optional 'quality' (extension: keys and spell books are told apart by quality).",
+  "target null = no line; show the hint only."
+ ],
+ "chains": {
+  "opening": {
+   "after": []
+  },
+  "plateau": {
+   "after": [
+    "opening"
+   ]
+  },
+  "necromancy": {
+   "after": [
+    "opening"
+   ]
+  },
+  "mountain": {
+   "after": [
+    "necromancy"
+   ]
+  },
+  "mordea": {
+   "after": [
+    "necromancy",
+    "plateau"
+   ]
+  },
+  "scion": {
+   "after": [
+    "mountain"
+   ]
+  },
+  "theurgy": {
+   "after": [
+    "scion"
+   ]
+  },
+  "hydros": {
+   "after": [
+    "scion"
+   ]
+  },
+  "sorcery": {
+   "after": [
+    "scion"
+   ]
+  },
+  "blackrock": {
+   "after": [
+    "sorcery",
+    "theurgy",
+    "hydros",
+    "mordea",
+    "plateau"
+   ]
+  },
+  "ether": {
+   "after": [
+    "blackrock"
+   ]
+  }
+ },
+ "steps": [
+  {
+   "id": "talk_devon",
+   "chain": "opening",
+   "act": "Tenebrae",
+   "title": "Talk to Devon",
+   "hint": "Devon the fisherman pulled you from the sea. He points you to Tenebrae, Bentic and the Lurker. Optional, but it starts the game's thread.",
+   "done_when": {
+    "any": [
+     {
+      "global": [
+       248,
+       1
+      ],
+      "eq": 1
+     },
+     {
+      "global": [
+       251,
+       1
+      ],
+      "eq": 1
+     },
+     {
+      "global": [
+       89,
+       1
+      ],
+      "eq": 1
+     }
+    ]
+   },
+   "target": {
+    "type": "npc",
+    "npc": 2
+   },
+   "evidence": "1026 DEVON sets G[248:1] on 'Who are you?' and G[251:1] on 'I am from far away'/'What should I do?'; G[89:1] included so the step closes once the story has moved on",
+   "confidence": "medium",
+   "milestone": false,
+   "optional": true
+  },
+  {
+   "id": "bedroll",
+   "chain": "opening",
+   "act": "Tenebrae",
+   "title": "Take the bedroll by the campfire",
+   "hint": "Pick up the (open) bedroll at Devon's camp. You need it to sleep until set times of day (Aramina only talks at Bloodwatch).",
+   "done_when": {
+    "any": [
+     {
+      "has_item": 534
+     },
+     {
+      "has_item": 535
+     }
+    ]
+   },
+   "target": {
+    "type": "item",
+    "shape": 535,
+    "map": 3,
+    "x": 14431,
+    "y": 5727,
+    "z": 8
+   },
+   "evidence": "Open bedroll shape 535 placed at map 3 (14431,5727,8) next to the start; class 534 BEDROLL names shape 534 'bedroll'",
+   "confidence": "medium",
+   "milestone": false,
+   "optional": true
+  },
+  {
+   "id": "execution",
+   "chain": "opening",
+   "act": "Tenebrae",
+   "title": "Watch the execution",
+   "hint": "Walk west along the shore to the dock and out to its end. The execution of Toran plays; the gate guard won't open the city until it has happened.",
+   "done_when": {
+    "global": [
+     89,
+     1
+    ],
+    "eq": 1
+   },
+   "target": {
+    "type": "point",
+    "map": 3,
+    "x": 11732,
+    "y": 5844,
+    "z": 48
+   },
+   "evidence": "1155 EXCUTION egg (shape 73 q 4 at map 3 (11732,5844,48)) sets G[89:1]=1 after the scene; 1028 GUARD1 refuses 'Open the gate!' while G[89:1]=0 (specs/world/map_index.md 3)",
+   "confidence": "high",
+   "milestone": true
+  },
+  {
+   "id": "enter_tenebrae",
+   "chain": "opening",
+   "act": "Tenebrae",
+   "title": "Enter Central Tenebrae",
+   "hint": "Go north along the road through the now open gate; the teleporter behind it takes you into Central Tenebrae.",
+   "done_when": {
+    "visited_map": 40
+   },
+   "target": {
+    "type": "point",
+    "map": 3,
+    "x": 11516,
+    "y": 1660,
+    "z": 48
+   },
+   "evidence": "Teleporter egg map 3 (11516,1660,48) -> map 40 egg 0; the portcullis (shape 633) is destroyed by the execution scene",
+   "confidence": "high",
+   "milestone": true
+  },
+  {
+   "id": "central_waypoint",
+   "chain": "opening",
+   "act": "Tenebrae",
+   "title": "Activate the Central Tenebrae waypoint",
+   "hint": "Walk between the dragon statues north of the training dummies in the palace grounds; the waypoint lights up for later Recall use.",
+   "done_when": {
+    "global": [
+     68,
+     1
+    ],
+    "eq": 1
+   },
+   "target": {
+    "type": "point",
+    "map": 40,
+    "x": 13087,
+    "y": 8607,
+    "z": 104
+   },
+   "evidence": "1215 TELPFLAG usecode egg (shape 73 q 64) at map 40 (13087,8607,104) sets G[68:1]; 833 RECALL offers Central Tenebrae when G[68:1]=1",
+   "confidence": "high",
+   "milestone": false
+  },
+  {
+   "id": "ask_bentic",
+   "chain": "opening",
+   "act": "Tenebrae",
+   "title": "Ask Bentic about Mythran",
+   "hint": "Bentic, the librarian in East Tenebrae, knows of Mythran the mage on the Plateau. Ask about neighbours, Devon and leaving Pagan until he mentions Mythran and the Plateau.",
+   "done_when": {
+    "global": [
+     295,
+     1
+    ],
+    "eq": 1
+   },
+   "target": {
+    "type": "npc",
+    "npc": 12
+   },
+   "evidence": "1036 BENTIC sets G[295:1] after 'Mythran is a scholar?' / 'Where is the Plateau?'; G[295:1] is also set by GWILLIM, CORINTH, JENNA and MYTHRAN (any source of 'where Mythran lives'), and read by MYTHRAN",
+   "confidence": "high",
+   "milestone": true
+  },
+  {
+   "id": "to_plateau",
+   "chain": "plateau",
+   "act": "Plateau",
+   "title": "Go through Herdsman's Valley to the Plateau cave",
+   "hint": "Leave Central Tenebrae by the north exit between the lamp posts, follow the track north through Herdsman's Valley to the cave.",
+   "done_when": {
+    "visited_map": 8
+   },
+   "target": {
+    "type": "point",
+    "map": 7,
+    "x": 9498,
+    "y": 19702,
+    "z": 8,
+    "via": [
+     {
+      "map": 40,
+      "x": 13054,
+      "y": 2322,
+      "z": 48,
+      "note": "north exit of Central Tenebrae to Herdsman's Valley"
+     }
+    ]
+   },
+   "evidence": "Teleporter egg map 40 (13054,2322,48) -> map 7; egg map 7 (9498,19702,8) -> map 8 egg 0 at (31583,19135,0)",
+   "confidence": "high",
+   "milestone": true
+  },
+  {
+   "id": "lever_room",
+   "chain": "plateau",
+   "act": "Plateau",
+   "title": "Solve the lever room in the Plateau cave",
+   "hint": "Set the six wall levers (three southern down, three northern up, then levers 2, 4 and 5), then work the winch to lower the fence.",
+   "done_when": {
+    "any": [
+     {
+      "global": [
+       564,
+       1
+      ],
+      "eq": 1
+     },
+     {
+      "global": [
+       284,
+       1
+      ],
+      "eq": 1
+     }
+    ]
+   },
+   "target": {
+    "type": "point",
+    "map": 8,
+    "x": 25183,
+    "y": 25551,
+    "z": 112
+   },
+   "evidence": "0672 LEVER: six levers of quality 20..25 at map 8 x=25183, y 25311..25791, z 112; the winch lever path sets G[564:1]=1 (the class also clears G[557..564] on a wrong combination, so G[284:1] is accepted too)",
+   "confidence": "medium",
+   "milestone": false
+  },
+  {
+   "id": "meet_mythran",
+   "chain": "plateau",
+   "act": "Plateau",
+   "title": "Meet Mythran",
+   "hint": "Mythran's house is south of the cave exit (electric gates inside). Talk to him.",
+   "done_when": {
+    "global": [
+     284,
+     1
+    ],
+    "eq": 1
+   },
+   "target": {
+    "type": "npc",
+    "npc": 33
+   },
+   "evidence": "1057 MYTHRAN sets G[284:1] (and G[285:1]) on 'May I ask your name?' at the first meeting; MYTHAUS egg 1222 branches on G[284:1]",
+   "confidence": "high",
+   "milestone": true
+  },
+  {
+   "id": "recall_item",
+   "chain": "plateau",
+   "act": "Plateau",
+   "title": "Receive the Recall item",
+   "hint": "When you say goodbye Mythran gives you a red potion and an item of recall. It teleports you to any waypoint you have activated.",
+   "done_when": {
+    "has_item": 833
+   },
+   "target": {
+    "type": "npc",
+    "npc": 33
+   },
+   "evidence": "1057 MYTHRAN: 'Wait. Before you go, my friend, I wish to give you two items ... an item of recall'; red potion given as shape 766; recall is shape 833 (class 833 RECALL)",
+   "confidence": "high",
+   "milestone": false
+  },
+  {
+   "id": "portal_scroll",
+   "chain": "plateau",
+   "act": "Plateau",
+   "title": "Buy the Scroll of Dispelling Magic Portals",
+   "hint": "Ask Mythran about scrolls and buy his only one (50 obsidians). You need it to reach Bentic's journal later.",
+   "done_when": {
+    "any": [
+     {
+      "has_item": 827,
+      "quality": 1
+     },
+     {
+      "global": [
+       97,
+       1
+      ],
+      "eq": 1
+     },
+     {
+      "global": [
+       86,
+       1
+      ],
+      "eq": 1
+     }
+    ]
+   },
+   "target": {
+    "type": "npc",
+    "npc": 33
+   },
+   "evidence": "1057 MYTHRAN sets G[305:1]/G[583:1] in the scroll sale and gives shape 827 with quality 1; 0827 MAGSCROL use: quality 1 runs SCROLL2 entry 0x80 'SCROLL OF DISPELLING MAGICAL PORTALS ~By Mythran'",
+   "confidence": "high",
+   "milestone": false
+  },
+  {
+   "id": "plateau_waypoint",
+   "chain": "plateau",
+   "act": "Plateau",
+   "title": "Activate the Plateau waypoint",
+   "hint": "On the upper floor of Mythran's house (east side).",
+   "done_when": {
+    "global": [
+     69,
+     1
+    ],
+    "eq": 1
+   },
+   "target": {
+    "type": "point",
+    "map": 8,
+    "x": 2783,
+    "y": 1823,
+    "z": 56
+   },
+   "evidence": "1215 TELPFLAG egg at map 8 (2783,1823,56) sets G[69:1]",
+   "confidence": "high",
+   "milestone": false
+  },
+  {
+   "id": "to_cemetery",
+   "chain": "necromancy",
+   "act": "Necromancers",
+   "title": "Go to the Cemetery",
+   "hint": "From East Tenebrae take the East Road north, then east and north to the Cemetery.",
+   "done_when": {
+    "visited_map": 6
+   },
+   "target": {
+    "type": "point",
+    "map": 5,
+    "x": 7423,
+    "y": 10943,
+    "z": 48,
+    "via": [
+     {
+      "map": 41,
+      "x": 23103,
+      "y": 11007,
+      "z": 48,
+      "note": "East Tenebrae exit to East Road"
+     }
+    ]
+   },
+   "evidence": "Teleporter eggs map 41 (23103,11007,48) -> map 5; map 5 (7423,10943,48) -> map 6 egg 1",
+   "confidence": "high",
+   "milestone": true
+  },
+  {
+   "id": "volunteer_vividos",
+   "chain": "necromancy",
+   "act": "Necromancers",
+   "title": "Volunteer to recover Vividos' ceremonial dagger",
+   "hint": "Vividos (the Scion) is at the tomb at the end of the dirt track. Ask 'What problems', 'Power mad', 'Get the dagger back'.",
+   "done_when": {
+    "global": [
+     212,
+     1
+    ],
+    "eq": 1
+   },
+   "target": {
+    "type": "npc",
+    "npc": 21
+   },
+   "evidence": "1045 VIVIDOS (NPC 21) use event sets G[212:1] with 'Thank you! I have heard that Mordea keeps the dagger in her chambers'; G[196:1] is set on 'Mordea took the dagger?'",
+   "confidence": "high",
+   "milestone": true
+  },
+  {
+   "id": "aramina_key",
+   "chain": "necromancy",
+   "act": "Necromancers",
+   "title": "Get the chest key from Aramina",
+   "hint": "Aramina, Mordea's maid (palace kitchen), will only talk at her house in East Tenebrae at Bloodwatch. Ask about the dagger, promise not to reveal her, and she gives you the key.",
+   "done_when": {
+    "any": [
+     {
+      "has_item": 82,
+      "quality": 48
+     },
+     {
+      "has_item": 571
+     },
+     {
+      "global": [
+       189,
+       1
+      ],
+      "eq": 1
+     }
+    ]
+   },
+   "target": {
+    "type": "npc",
+    "npc": 13
+   },
+   "evidence": "1037 ARAMINA: 'Yes and I have the key. I will give you the key, but you must promise...' then gives shape 82 (KEY) quality 0x30=48 (give routine args qty 1, quality 48, frame 0, shape 82)",
+   "confidence": "high",
+   "milestone": false
+  },
+  {
+   "id": "get_dagger",
+   "chain": "necromancy",
+   "act": "Necromancers",
+   "title": "Take the ceremonial dagger from Mordea's chest",
+   "hint": "In the Royal Hall take the key under the cushion, unlock Mordea's bedroom and the room with the big chest; the dagger is in the jewellery box inside.",
+   "done_when": {
+    "any": [
+     {
+      "has_item": 571
+     },
+     {
+      "global": [
+       189,
+       1
+      ],
+      "eq": 1
+     }
+    ]
+   },
+   "target": {
+    "type": "item",
+    "shape": 618,
+    "map": 40,
+    "x": 12692,
+    "y": 7796,
+    "z": 64
+   },
+   "evidence": "Ceremonial dagger shape 571 (class 571 VIVDAGR 'ceremonial dagger') is nested two deep (jewellery box) inside chest shape 618 at map 40 (12692,7796,64) in NONFIXED.DAT",
+   "confidence": "high",
+   "milestone": false
+  },
+  {
+   "id": "lothian_ritual",
+   "chain": "necromancy",
+   "act": "Necromancers",
+   "title": "Bring the dagger to Vividos",
+   "hint": "Return to the tomb and hand the dagger over; watch Lothian's passage. Vividos then reveals he is the Necromancer.",
+   "done_when": {
+    "global": [
+     189,
+     1
+    ],
+    "eq": 1
+   },
+   "target": {
+    "type": "npc",
+    "npc": 21
+   },
+   "evidence": "1045 VIVIDOS cast/ritual function sets G[189:1]=1 right after 'You may now greet the Necromancer my friend, for I am he.'",
+   "confidence": "high",
+   "milestone": true
+  },
+  {
+   "id": "apprentice",
+   "chain": "necromancy",
+   "act": "Necromancers",
+   "title": "Become Vividos' apprentice",
+   "hint": "Talk to Vividos again and accept the apprenticeship.",
+   "done_when": {
+    "global": [
+     213,
+     1
+    ],
+    "eq": 1
+   },
+   "target": {
+    "type": "npc",
+    "npc": 21
+   },
+   "evidence": "1045 VIVIDOS (NPC 21) use event sets G[213:1] on 'Yes, I am honored.' and again at 'As my apprentice, I would have you begin your studies immediately.'",
+   "confidence": "high",
+   "milestone": true
+  },
+  {
+   "id": "reagent_task",
+   "chain": "necromancy",
+   "act": "Necromancers",
+   "title": "Ask Vividos what reagents he needs",
+   "hint": "He wants an executioner's hood and a deadman's elbow. (This also advances Tenebrae: Bentic is executed and Devon arrested.)",
+   "done_when": {
+    "global": [
+     197,
+     1
+    ],
+    "eq": 1
+   },
+   "target": {
+    "type": "npc",
+    "npc": 21
+   },
+   "evidence": "1045 VIVIDOS (NPC 21) use event sets G[197:1], G[93:1] and G[88:1] at 'What reagents do you need?'; G[93:1] spawns Bentic's journal (1223 BOOKEGG) and G[88:1] puts Devon in the dungeon",
+   "confidence": "high",
+   "milestone": true
+  },
+  {
+   "id": "executioners_hood",
+   "chain": "necromancy",
+   "act": "Necromancers",
+   "title": "Collect an executioner's hood",
+   "hint": "Changeling pit east of the East Road, south of the Cemetery turn-off; the hoods grow on the mound. Take several (spells use them).",
+   "done_when": {
+    "any": [
+     {
+      "has_item": 395,
+      "frame": 10
+     },
+     {
+      "global": [
+       199,
+       1
+      ],
+      "eq": 1
+     }
+    ]
+   },
+   "target": {
+    "type": "item",
+    "shape": 395,
+    "map": 5,
+    "x": 11487,
+    "y": 13119,
+    "z": 48
+   },
+   "evidence": "0395 ERTHREAG frame 10 = executioner's hood; VIVIDOS checks the Avatar's inventory for shape 395 frames 10 and 20 (sets G[198:1]); seven hoods placed on map 5 around (11455-11615, 12991-13151, 48)",
+   "confidence": "high",
+   "milestone": false
+  },
+  {
+   "id": "deadmans_elbow",
+   "chain": "necromancy",
+   "act": "Necromancers",
+   "title": "Collect a deadman's elbow",
+   "hint": "At the base of the dead tree by the ruined house at the north end of West Tenebrae (ghouls and a ghost nearby). In v2.10 it is called a 'wooden stick'.",
+   "done_when": {
+    "any": [
+     {
+      "has_item": 395,
+      "frame": 20
+     },
+     {
+      "global": [
+       199,
+       1
+      ],
+      "eq": 1
+     }
+    ]
+   },
+   "target": {
+    "type": "item",
+    "shape": 395,
+    "map": 39,
+    "x": 15103,
+    "y": 2655,
+    "z": 48
+   },
+   "evidence": "VIVIDOS checks shape 395 frame 20 (0x14); five frame-20 reagents placed on map 39 at (15039-15103, 2655-2943, 48); ERTHREAG look names frames >= 16 'wooden stick'",
+   "confidence": "high",
+   "milestone": false
+  },
+  {
+   "id": "key_caretaker",
+   "chain": "necromancy",
+   "act": "Necromancers",
+   "title": "Receive the Key of the Caretaker",
+   "hint": "Give Vividos the hood and elbow (drop spare hoods first, he takes all of them).",
+   "done_when": {
+    "global": [
+     199,
+     1
+    ],
+    "eq": 1
+   },
+   "target": {
+    "type": "npc",
+    "npc": 21
+   },
+   "evidence": "1045 VIVIDOS (NPC 21) use event: 'This is the Key of the Caretaker...' then gives shape 232 frame 0 and sets G[199:1]; 0232 KEYONEC frame 0 = 'Key of the Caretaker'",
+   "confidence": "high",
+   "milestone": true
+  },
+  {
+   "id": "make_open_ground",
+   "chain": "necromancy",
+   "act": "Necromancers",
+   "title": "Make the Open Ground spell",
+   "hint": "Upstairs in the tomb library read the spell book (Open Ground, Death Speak) and put the reagents plus the Key of the Caretaker in the bag: Open Ground = blood + blackmoor. Also make Death Speak (blood + bone) and Grant Peace (blackmoor + hood).",
+   "done_when": {
+    "any": [
+     {
+      "has_item": 746,
+      "frame": 4
+     },
+     {
+      "visited_map": 50
+     }
+    ]
+   },
+   "target": {
+    "type": "npc",
+    "npc": 21
+   },
+   "evidence": "0746 ERTHITEM frame 4 = 'Open Ground' (frame 0 Death Speak, 7 Grant Peace); recipes from walkthroughs; ERTHSPEL (1414) handles the casting",
+   "confidence": "medium",
+   "milestone": false
+  },
+  {
+   "id": "enter_catacombs",
+   "chain": "necromancy",
+   "act": "Necromancers",
+   "title": "Open the way into the Upper Catacombs",
+   "hint": "Go through the gargoyle gate north-east of the tomb into the stone building; at the end of the central passage cast Open Ground on the rock wall and step in.",
+   "done_when": {
+    "visited_map": 50
+   },
+   "target": {
+    "type": "point",
+    "map": 6,
+    "x": 7676,
+    "y": 19316,
+    "z": 8
+   },
+   "evidence": "Teleporter egg map 6 (7676,19316,8) -> map 50 egg 10 at (2948,10612,48); walkthroughs: Open Ground on the wall reveals it; the rock wall shape 566 at (7775,19455,8) covers x 7583-7775, y 19423-19455 and blocks the passage at x 7676; Open Ground (ERTHSPEL) replaces it with shape 728 and sets G[216:1] (specs/world/map_index.md 4.4)",
+   "confidence": "high",
+   "milestone": true
+  },
+  {
+   "id": "fall_to_ancients",
+   "chain": "necromancy",
+   "act": "Necromancers",
+   "title": "Reach the Ancient Necromancers",
+   "hint": "Work east and north through Upper Catacombs 1 (switch by the fence, automatic doors). In the cobwebbed room take the magic leggings, then walk on until the floor gives way.",
+   "done_when": {
+    "visited_map": 62
+   },
+   "target": {
+    "type": "item",
+    "shape": 735,
+    "map": 50,
+    "x": 17311,
+    "y": 1919,
+    "z": 0
+   },
+   "evidence": "0735 HIDPAD quality 0 at map 50 (17311,1919,0): teleportToEgg(62, 3) when the Avatar lands on it",
+   "confidence": "high",
+   "milestone": true
+  },
+  {
+   "id": "necromancer_1",
+   "chain": "necromancy",
+   "act": "Necromancers",
+   "title": "Speak with Ancient Necromancer 1",
+   "hint": "Cast Death Speak next to the necromancer's remains to learn Mask of Death. Make six Death Speak scrolls before you start.",
+   "done_when": {
+    "global": [
+     201,
+     1
+    ],
+    "eq": 1
+   },
+   "target": {
+    "type": "item",
+    "shape": 623,
+    "map": 62,
+    "x": 24063,
+    "y": 29503,
+    "z": 64
+   },
+   "evidence": "0623 NEC1 use event (only while Death Speak runs, G[40:1]): item quality 1 sets G[201:1]; NEC1 item quality 1 placed at map 62 (24063,29503,64) (world/bugfixes.md 2.2; the two quality-0 NEC1 items teach nothing). Checked by the clean engine's story replay (ctest story)",
+   "confidence": "high",
+   "milestone": true
+  },
+  {
+   "id": "necromancer_2",
+   "chain": "necromancy",
+   "act": "Necromancers",
+   "title": "Speak with Ancient Necromancer 2",
+   "hint": "Cast Death Speak next to the necromancer's remains to learn Rock Flesh (Bentos). Make six Death Speak scrolls before you start.",
+   "done_when": {
+    "global": [
+     202,
+     1
+    ],
+    "eq": 1
+   },
+   "target": {
+    "type": "item",
+    "shape": 623,
+    "map": 62,
+    "x": 28991,
+    "y": 19999,
+    "z": 96
+   },
+   "evidence": "0623 NEC1 use event (only while Death Speak runs, G[40:1]): item quality 2 sets G[202:1]; NEC1 item quality 2 placed at map 62 (28991,19999,96) (world/bugfixes.md 2.2; the two quality-0 NEC1 items teach nothing). Checked by the clean engine's story replay (ctest story)",
+   "confidence": "high",
+   "milestone": true
+  },
+  {
+   "id": "necromancer_3",
+   "chain": "necromancy",
+   "act": "Necromancers",
+   "title": "Speak with Ancient Necromancer 3",
+   "hint": "Cast Death Speak next to the necromancer's remains to learn Summon Dead. Make six Death Speak scrolls before you start.",
+   "done_when": {
+    "global": [
+     203,
+     1
+    ],
+    "eq": 1
+   },
+   "target": {
+    "type": "item",
+    "shape": 623,
+    "map": 62,
+    "x": 20543,
+    "y": 23327,
+    "z": 24
+   },
+   "evidence": "0623 NEC1 use event (only while Death Speak runs, G[40:1]): item quality 3 sets G[203:1]; NEC1 item quality 3 placed at map 62 (20543,23327,24) (world/bugfixes.md 2.2; the two quality-0 NEC1 items teach nothing). Checked by the clean engine's story replay (ctest story)",
+   "confidence": "high",
+   "milestone": true
+  },
+  {
+   "id": "necromancer_4",
+   "chain": "necromancy",
+   "act": "Necromancers",
+   "title": "Speak with Ancient Necromancer 4",
+   "hint": "Cast Death Speak next to the necromancer's remains to learn Grant Peace. Make six Death Speak scrolls before you start.",
+   "done_when": {
+    "global": [
+     204,
+     1
+    ],
+    "eq": 1
+   },
+   "target": {
+    "type": "item",
+    "shape": 623,
+    "map": 62,
+    "x": 4127,
+    "y": 2687,
+    "z": 128
+   },
+   "evidence": "0623 NEC1 use event (only while Death Speak runs, G[40:1]): item quality 4 sets G[204:1]; NEC1 item quality 4 placed at map 62 (4127,2687,128) (world/bugfixes.md 2.2; the two quality-0 NEC1 items teach nothing). Checked by the clean engine's story replay (ctest story)",
+   "confidence": "high",
+   "milestone": true
+  },
+  {
+   "id": "necromancer_5",
+   "chain": "necromancy",
+   "act": "Necromancers",
+   "title": "Speak with Ancient Necromancer 5",
+   "hint": "Cast Death Speak next to the necromancer's remains to learn Withstand Death. Make six Death Speak scrolls before you start.",
+   "done_when": {
+    "global": [
+     205,
+     1
+    ],
+    "eq": 1
+   },
+   "target": {
+    "type": "item",
+    "shape": 623,
+    "map": 62,
+    "x": 18527,
+    "y": 12671,
+    "z": 56
+   },
+   "evidence": "0623 NEC1 use event (only while Death Speak runs, G[40:1]): item quality 5 sets G[205:1]; NEC1 item quality 5 placed at map 62 (18527,12671,56) (world/bugfixes.md 2.2; the two quality-0 NEC1 items teach nothing). Checked by the clean engine's story replay (ctest story)",
+   "confidence": "high",
+   "milestone": true
+  },
+  {
+   "id": "necromancer_6",
+   "chain": "necromancy",
+   "act": "Necromancers",
+   "title": "Speak with Ancient Necromancer 6",
+   "hint": "Cast Death Speak next to the necromancer's remains to learn Create Golem (Galious). Make six Death Speak scrolls before you start.",
+   "done_when": {
+    "global": [
+     206,
+     1
+    ],
+    "eq": 1
+   },
+   "target": {
+    "type": "item",
+    "shape": 623,
+    "map": 62,
+    "x": 1471,
+    "y": 15167,
+    "z": 24
+   },
+   "evidence": "0623 NEC1 use event (only while Death Speak runs, G[40:1]): item quality 6 sets G[206:1]; NEC1 item quality 6 placed at map 62 (1471,15167,24) (world/bugfixes.md 2.2; the two quality-0 NEC1 items teach nothing). Checked by the clean engine's story replay (ctest story)",
+   "confidence": "high",
+   "milestone": true
+  },
+  {
+   "id": "catacombs_waypoint",
+   "chain": "necromancy",
+   "act": "Necromancers",
+   "title": "Activate the Upper Catacombs waypoint",
+   "hint": "After the last necromancer you come out at the east end of the Upper Catacombs; the waypoint is in map 50.",
+   "done_when": {
+    "global": [
+     70,
+     1
+    ],
+    "eq": 1
+   },
+   "target": {
+    "type": "point",
+    "map": 50,
+    "x": 21470,
+    "y": 11194,
+    "z": 0
+   },
+   "evidence": "1215 TELPFLAG egg at map 50 (21470,11194,0) sets G[70:1]",
+   "confidence": "high",
+   "milestone": false
+  },
+  {
+   "id": "to_stone_cove",
+   "chain": "mountain",
+   "act": "Mountain King",
+   "title": "Go through Upper Catacombs 2 to Stone Cove",
+   "hint": "Jump off the high platform west, go south avoiding sinking pools, through the door into Upper Catacombs 2, then south-west past the bridges and the ghost to the switch and out to Stone Cove.",
+   "done_when": {
+    "visited_map": 21
+   },
+   "target": {
+    "type": "point",
+    "map": 49,
+    "x": 17599,
+    "y": 24927,
+    "z": 48,
+    "via": [
+     {
+      "map": 50,
+      "x": 22623,
+      "y": 6335,
+      "z": 48,
+      "note": "map 50 -> 49 (Upper Catacombs 2)"
+     }
+    ]
+   },
+   "evidence": "Eggs map 50 (22623,6335,48) -> 49; map 49 (17599,24927,48) -> map 21 egg 6",
+   "confidence": "high",
+   "milestone": true
+  },
+  {
+   "id": "make_golem",
+   "chain": "mountain",
+   "act": "Mountain King",
+   "title": "Make a Create Golem spell",
+   "hint": "Stone Cove has every necromantic reagent (they respawn). Create Golem = blood, bone, wood, dirt, blackmoor. Make two (one for the Pit of Death later).",
+   "done_when": {
+    "any": [
+     {
+      "has_item": 746,
+      "frame": 5
+     },
+     {
+      "visited_map": 31
+     }
+    ]
+   },
+   "target": {
+    "type": "point",
+    "map": 21,
+    "x": 4383,
+    "y": 1887,
+    "z": 0
+   },
+   "evidence": "0746 ERTHITEM frame 5 = 'Create Golem'; recipe per necromancer 6 text in 0623 NEC1 ('Blood, Bone, Wood, Dirt and Blackmoor')",
+   "confidence": "medium",
+   "milestone": false
+  },
+  {
+   "id": "hall_mountain_king",
+   "chain": "mountain",
+   "act": "Mountain King",
+   "title": "Enter the Hall of the Mountain King",
+   "hint": "South of the double doors on the north wall, cast Create Golem on the mud and order the golem to open both doors.",
+   "done_when": {
+    "visited_map": 31
+   },
+   "target": {
+    "type": "point",
+    "map": 21,
+    "x": 4383,
+    "y": 1887,
+    "z": 0
+   },
+   "evidence": "Teleporter egg map 21 (4383,1887,0) -> map 31 egg 0 at (27850,23350,128)",
+   "confidence": "high",
+   "milestone": true
+  },
+  {
+   "id": "meet_lithos",
+   "chain": "mountain",
+   "act": "Mountain King",
+   "title": "Meet Lithos, the Mountain King",
+   "hint": "Cross the vanishing bridge, floating platforms and the force-field maze (gem of protection), get the keys, make the leap and go north-west to Lithos.",
+   "done_when": {
+    "global": [
+     42,
+     1
+    ],
+    "eq": 1
+   },
+   "target": {
+    "type": "item",
+    "shape": 433,
+    "map": 31,
+    "x": 1695,
+    "y": 1695,
+    "z": 0
+   },
+   "evidence": "0433 LITHOS sets G[42:1]=1 at the end of the talk ('You may now leave my presence, live one...'); Lithos shape 433 at map 31 (1695,1695,0), started by 1158 LITHHAT egg at (1768,1776,0); G[42:1] is read by VIVIDOS",
+   "confidence": "high",
+   "milestone": true
+  },
+  {
+   "id": "hall_waypoint",
+   "chain": "mountain",
+   "act": "Mountain King",
+   "title": "Activate the Hall of the Mountain King waypoint",
+   "hint": "South and west of the pool on the way back.",
+   "done_when": {
+    "global": [
+     71,
+     1
+    ],
+    "eq": 1
+   },
+   "target": {
+    "type": "point",
+    "map": 31,
+    "x": 2847,
+    "y": 8991,
+    "z": 8
+   },
+   "evidence": "1215 TELPFLAG egg at map 31 (2847,8991,8) sets G[71:1]",
+   "confidence": "high",
+   "milestone": false
+  },
+  {
+   "id": "devon_in_prison",
+   "chain": "mordea",
+   "act": "Tenebrae",
+   "title": "Talk to Devon in the palace dungeon",
+   "hint": "Bentic has been executed and Devon jailed. From the north-west tower go down to the dungeon, lower the metal gate with the switch and promise Devon your help.",
+   "done_when": {
+    "any": [
+     {
+      "global": [
+       90,
+       1
+      ],
+      "eq": 1
+     },
+     {
+      "global": [
+       86,
+       1
+      ],
+      "eq": 1
+     }
+    ]
+   },
+   "target": {
+    "type": "npc",
+    "npc": 2
+   },
+   "evidence": "1026 DEVON sets G[90:1] on 'I will help.' / 'I will assist you.'; he is in prison while G[88:1]=1 (set by VIVIDOS, cleared by LOGBOOK4)",
+   "confidence": "high",
+   "milestone": false
+  },
+  {
+   "id": "read_journal",
+   "chain": "mordea",
+   "act": "Tenebrae",
+   "title": "Read Bentic's journal",
+   "hint": "East of the dungeon gate, the pink book sits behind magic bars in a room with no door. Stand within about 600 of the bars and use the Scroll of Dispelling Magic Portals: the bars (shape 732) dissolve and the two posts go dark; the scroll is not used up. Then read the journal. The guards seize you.",
+   "done_when": {
+    "any": [
+     {
+      "global": [
+       97,
+       1
+      ],
+      "eq": 1
+     },
+     {
+      "global": [
+       86,
+       1
+      ],
+      "eq": 1
+     }
+    ]
+   },
+   "target": {
+    "type": "point",
+    "map": 40,
+    "x": 3839,
+    "y": 4703,
+    "z": 16
+   },
+   "evidence": "1223 BOOKEGG (egg q 72 at map 40 (3912,4744,0)) creates Bentic's journal (shape 607) at (3839,4703,16) once G[93:1]=1; 0607 LOGBOOK use sets G[97:1] and starts the capture scene; SCROLL2 0x0080 destroys every shape 732 within 640 of the Avatar (the bars at map 40 (3615,4895,0), FIXED) and darkens the 733 posts at (3615,4767,0) and (3615,4959,0), not consuming the scroll; LOGBOOK calls the Avatar a cheater if G[89:1]=0 (execution not watched) (specs/world/map_index.md 4.4)",
+   "confidence": "high",
+   "milestone": false
+  },
+  {
+   "id": "trial",
+   "chain": "mordea",
+   "act": "Tenebrae",
+   "title": "Proclaim Devon the rightful heir",
+   "hint": "At the docks, when given the chance, say 'Devon is the rightful heir' and 'I have proof'. Mordea dies and Devon will become the Tempest.",
+   "done_when": {
+    "global": [
+     86,
+     1
+    ],
+    "eq": 1
+   },
+   "target": {
+    "type": "npc",
+    "npc": 2
+   },
+   "evidence": "1406 LOGBOOK4 sets G[86:1]=1, G[85:1]=1, G[93:1]=1 and clears G[88:1], G[97:1] after Devon's 'I will return when the time is right and take my place as the Tempest.'",
+   "confidence": "high",
+   "milestone": true
+  },
+  {
+   "id": "report_lithos",
+   "chain": "scion",
+   "act": "Necromancers",
+   "title": "Tell Vividos the Mountain King gave you a task",
+   "hint": "Walk (do not recall) back to the tomb and tell Vividos you met the Mountain King.",
+   "done_when": {
+    "any": [
+     {
+      "global": [
+       217,
+       1
+      ],
+      "eq": 1
+     },
+     {
+      "global": [
+       208,
+       1
+      ],
+      "eq": 1
+     }
+    ]
+   },
+   "target": {
+    "type": "npc",
+    "npc": 21
+   },
+   "evidence": "1045 VIVIDOS (NPC 21) use event sets G[217:1] on 'Yes, he did.' (the Mountain King told you); VIVIDOS reads G[42:1]",
+   "confidence": "high",
+   "milestone": false
+  },
+  {
+   "id": "key_scion",
+   "chain": "scion",
+   "act": "Necromancers",
+   "title": "Receive the Key of the Scion",
+   "hint": "Vividos gives you the Key of the Scion to inter Lothian.",
+   "done_when": {
+    "global": [
+     208,
+     1
+    ],
+    "eq": 1
+   },
+   "target": {
+    "type": "npc",
+    "npc": 21
+   },
+   "evidence": "1045 VIVIDOS (NPC 21) use event: 'Take this, the Key of the Scion, and use it to inter Lothian.' gives shape 232 frame 3 (KEYONEC 'Key of the Scion') and sets G[208:1]",
+   "confidence": "high",
+   "milestone": true
+  },
+  {
+   "id": "inter_lothian",
+   "chain": "scion",
+   "act": "Necromancers",
+   "title": "Inter Lothian with the Key of the Scion",
+   "hint": "Walk through the cemetery's north plot: Lothian is carried to the grave in the skull shrine east of the tomb. Leave its tall candles unlit, stand among the four skull pedestals and use the grave.",
+   "done_when": {
+    "global": [
+     209,
+     1
+    ],
+    "eq": 1
+   },
+   "target": {
+    "type": "item",
+    "shape": 628,
+    "map": 6,
+    "x": 9471,
+    "y": 24063,
+    "z": 8
+   },
+   "evidence": "1178 CEMHAT (usecode egg 27 at map 6 (7935,28223,8)) destroys Lothian's body (754) and creates the INTERN grave (shape 628 frame 0) at (9471,24063,8); 0628 INTERN use needs within 320 of the Avatar a shape-628 item, no tall candle (453) at frame 0 and three or more skulls (331), then sets G[209:1] ('All has been prepared according to your law, Mountain King.'). Checked by the clean engine's story replay (ctest story); the Key of the Scion itself is not used (KEYONEC frame 3 only runs KEYRING)",
+   "confidence": "high",
+   "milestone": true
+  },
+  {
+   "id": "to_shrine",
+   "chain": "scion",
+   "act": "Pilgrimage",
+   "title": "Go to the Shrine of the Ancient Ones",
+   "hint": "Vividos sends you on a pilgrimage. In Upper Catacombs 1 unlock the 'Towards Fate Do You Travel' building with the Key of the Scion, skirt the lava and go through the double doors.",
+   "done_when": {
+    "visited_map": 54
+   },
+   "target": {
+    "type": "point",
+    "map": 50,
+    "x": 11168,
+    "y": 11264,
+    "z": 48
+   },
+   "evidence": "Teleporter egg map 50 (11168,11264,48) -> map 54 egg 0 at (15694,14786,8)",
+   "confidence": "high",
+   "milestone": true
+  },
+  {
+   "id": "zealan_shield",
+   "chain": "scion",
+   "act": "Pilgrimage",
+   "title": "Get the Zealan ceremonial shield",
+   "hint": "Through the lever cage (Aerial Servant on the chest), the hidden plate gate and an Open Ground pit by a gravestone; the shield lies beyond (Aerial Servant helps reach it).",
+   "done_when": {
+    "any": [
+     {
+      "has_item": 828
+     },
+     {
+      "global": [
+       75,
+       1
+      ],
+      "eq": 1
+     }
+    ]
+   },
+   "target": {
+    "type": "item",
+    "shape": 828,
+    "map": 54,
+    "x": 12319,
+    "y": 10367,
+    "z": 8
+   },
+   "evidence": "Shape 828 (class 828 AORTA, look 'Zealan ceremonial shield') at map 54 (12319,10367,8); ANCTONES searches for shape 828 within 2560 of its egg",
+   "confidence": "high",
+   "milestone": false
+  },
+  {
+   "id": "ancient_ones",
+   "chain": "scion",
+   "act": "Pilgrimage",
+   "title": "Place the shield on the Zealan altar",
+   "hint": "Solve the rolling-sphere and staircase puzzles, cross the beams (Rock Flesh), enter the Zealan Shrine, put the shield on the altar and stand among the statues.",
+   "done_when": {
+    "global": [
+     75,
+     1
+    ],
+    "eq": 1
+   },
+   "target": {
+    "type": "item",
+    "shape": 550,
+    "map": 54,
+    "x": 12128,
+    "y": 2880,
+    "z": 8
+   },
+   "evidence": "1163 ANCTONES egg (q 12, map 54 (11718,2378,8) and (11716,3116,8)) waits for shape 828 near it, then sets G[75:1] and speaks ('Greetings, Avatar...'); altar shape 550 at (12128,2880,8)",
+   "confidence": "medium",
+   "milestone": true
+  },
+  {
+   "id": "obelisk_tip",
+   "chain": "scion",
+   "act": "Pilgrimage",
+   "title": "Take the obelisk tip",
+   "hint": "Dispel the door, Grant Peace on the ghost of Khumash-Gor, and open the jewellery box on the west wall.",
+   "done_when": {
+    "any": [
+     {
+      "has_item": 442,
+      "frame": 0
+     },
+     {
+      "has_item": 793,
+      "frame": 0
+     },
+     {
+      "global": [
+       565,
+       1
+      ],
+      "eq": 1
+     }
+    ]
+   },
+   "target": {
+    "type": "item",
+    "shape": 116,
+    "map": 54,
+    "x": 9804,
+    "y": 2772,
+    "z": 8
+   },
+   "evidence": "Blackrock fragment shape 442 frame 0 ('obelisk tip ', class 442 BROCK look) inside jewellery box shape 116 at map 54 (9804,2772,8)",
+   "confidence": "high",
+   "milestone": false
+  },
+  {
+   "id": "to_argentrock",
+   "chain": "theurgy",
+   "act": "Theurgists",
+   "title": "Reach Argentrock Isle",
+   "hint": "From Upper Catacombs 2, at the stone bridge go east to the door in the spiked wall and open it with the Key of the Scion.",
+   "done_when": {
+    "visited_map": 37
+   },
+   "target": {
+    "type": "point",
+    "map": 49,
+    "x": 19406,
+    "y": 16162,
+    "z": 48
+   },
+   "evidence": "Teleporter egg map 49 (19406,16162,48) -> map 37 egg 0 at (26776,26912,56)",
+   "confidence": "high",
+   "milestone": true
+  },
+  {
+   "id": "argentrock_waypoint",
+   "chain": "theurgy",
+   "act": "Theurgists",
+   "title": "Activate the Argentrock Isle waypoint",
+   "hint": "North-east, over the wooden bridge, then west-north-west.",
+   "done_when": {
+    "global": [
+     72,
+     1
+    ],
+    "eq": 1
+   },
+   "target": {
+    "type": "point",
+    "map": 37,
+    "x": 25055,
+    "y": 19903,
+    "z": 80
+   },
+   "evidence": "1215 TELPFLAG egg at map 37 (25055,19903,80) sets G[72:1]",
+   "confidence": "high",
+   "milestone": false
+  },
+  {
+   "id": "test_wisdom",
+   "chain": "theurgy",
+   "act": "Theurgists",
+   "title": "Pass Xavier's Test of Wisdom",
+   "hint": "Ask Brother Xavier for enlightenment and take the test; five questions on Stratos' teachings (study them in the monastery).",
+   "done_when": {
+    "global": [
+     118,
+     1
+    ],
+    "eq": 1
+   },
+   "target": {
+    "type": "npc",
+    "npc": 25
+   },
+   "evidence": "1049 XAVIER sets G[118:1] with 'Very good, you have earned the right to proceed to the next test.'",
+   "confidence": "high",
+   "milestone": true
+  },
+  {
+   "id": "test_centeredness",
+   "chain": "theurgy",
+   "act": "Theurgists",
+   "title": "Pass the Test of Centeredness at Windy Point",
+   "hint": "South-west of the monastery, climb the cliffs and stand in the circle on the second level against the wind until the thunder ends.",
+   "done_when": {
+    "global": [
+     122,
+     1
+    ],
+    "eq": 1
+   },
+   "target": {
+    "type": "point",
+    "map": 37,
+    "x": 14750,
+    "y": 18898,
+    "z": 168
+   },
+   "evidence": "1161 AIRTEST1 egg (q 10) at map 37 (14750,18898,168) sets G[122:1]; read by STELLOS, XAVIER, CYRRUS, KORICK",
+   "confidence": "high",
+   "milestone": true
+  },
+  {
+   "id": "silver_key",
+   "chain": "theurgy",
+   "act": "Theurgists",
+   "title": "Get the silver mine key from Stellos",
+   "hint": "Tell Stellos you passed both tests; he explains the foci and gives you the key to the silver.",
+   "done_when": {
+    "global": [
+     453,
+     1
+    ],
+    "eq": 1
+   },
+   "target": {
+    "type": "npc",
+    "npc": 23
+   },
+   "evidence": "1047 STELLOS sets G[453:1] at 'Using this key, you will be able to open the door where the silver may be found.' and gives shape 82 quality 8 ('silver mine key')",
+   "confidence": "high",
+   "milestone": true
+  },
+  {
+   "id": "silver_ore",
+   "chain": "theurgy",
+   "act": "Theurgists",
+   "title": "Gather eight silver ore",
+   "hint": "Stairs down from the north-west corner of the monastery, east door (silver mine key). Eight of the eleven ores are enough.",
+   "done_when": {
+    "any": [
+     {
+      "has_item": 586,
+      "qty": 8
+     },
+     {
+      "global": [
+       126,
+       1
+      ],
+      "eq": 1
+     }
+    ]
+   },
+   "target": {
+    "type": "item",
+    "shape": 586,
+    "map": 37,
+    "x": 14623,
+    "y": 3871,
+    "z": 64
+   },
+   "evidence": "Eleven silver ore (shape 586 'silver ore') on map 37 between (8095-18559, 3775-5946, 64-72)",
+   "confidence": "medium",
+   "milestone": false
+  },
+  {
+   "id": "korick_foci",
+   "chain": "theurgy",
+   "act": "Theurgists",
+   "title": "Have Korick forge the foci",
+   "hint": "In West Tenebrae, ask Orlok then Jenna about the ghost tale (optional), then have the smith Korick make one of each focus from the silver.",
+   "done_when": {
+    "any": [
+     {
+      "has_item": 396,
+      "frame": 0
+     },
+     {
+      "has_item": 396,
+      "frame": 1
+     },
+     {
+      "has_item": 396,
+      "frame": 2
+     },
+     {
+      "has_item": 396,
+      "frame": 3
+     },
+     {
+      "has_item": 396,
+      "frame": 4
+     },
+     {
+      "has_item": 396,
+      "frame": 5
+     },
+     {
+      "has_item": 396,
+      "frame": 6
+     },
+     {
+      "has_item": 396,
+      "frame": 7
+     },
+     {
+      "has_item": 396,
+      "frame": 16
+     },
+     {
+      "global": [
+       126,
+       1
+      ],
+      "eq": 1
+     }
+    ]
+   },
+   "target": {
+    "type": "npc",
+    "npc": 9
+   },
+   "evidence": "0396 AIRFOCUS frames 0-7 and 16 are the plain focus shapes ('sextant focus' ... 'open eye focus'); 1033 KORICK reads G[122:1]",
+   "confidence": "medium",
+   "milestone": false
+  },
+  {
+   "id": "enchant_foci",
+   "chain": "theurgy",
+   "act": "Theurgists",
+   "title": "Enchant the foci on the Altar of Focus",
+   "hint": "Put each focus on the Altar of Focus in the monastery.",
+   "done_when": {
+    "any": [
+     {
+      "global": [
+       126,
+       1
+      ],
+      "eq": 1
+     },
+     {
+      "global": [
+       454,
+       1
+      ],
+      "eq": 1
+     }
+    ]
+   },
+   "target": {
+    "type": "item",
+    "shape": 206,
+    "map": 37,
+    "x": 18438,
+    "y": 18474,
+    "z": 72
+   },
+   "evidence": "0206 ALTAR_EW gotHit by shape 396 frame <8 (or 16) turns it into the enchanted frame (+8, 16->17) and sets G[126:1]; altar at map 37 (18438,18474,72)",
+   "confidence": "high",
+   "milestone": false
+  },
+  {
+   "id": "report_foci",
+   "chain": "theurgy",
+   "act": "Theurgists",
+   "title": "Tell Stellos you have made your foci",
+   "hint": "He sets the Test of Skills.",
+   "done_when": {
+    "global": [
+     454,
+     1
+    ],
+    "eq": 1
+   },
+   "target": {
+    "type": "npc",
+    "npc": 23
+   },
+   "evidence": "1047 STELLOS sets G[454:1] on 'I have constructed my Foci.'",
+   "confidence": "high",
+   "milestone": true
+  },
+  {
+   "id": "test_skills",
+   "chain": "theurgy",
+   "act": "Theurgists",
+   "title": "Pass the Test of Skills (heal the torax)",
+   "hint": "Down the stairs at the monastery's west end is an injured torax. Cast Aerial Servant to bring it beside you, then Restoration on it. Report to Stellos and ask about Torwin.",
+   "done_when": {
+    "any": [
+     {
+      "global": [
+       128,
+       1
+      ],
+      "eq": 1
+     },
+     {
+      "global": [
+       131,
+       1
+      ],
+      "eq": 1
+     }
+    ]
+   },
+   "target": {
+    "type": "npc",
+    "npc": 23
+   },
+   "evidence": "1430 AIRSPEL sets G[128:1] when the healing spell (In Mani / Vas In Mani) is cast on 'the animal'; read by STELLOS, XAVIER, CYRRUS",
+   "confidence": "medium",
+   "milestone": false
+  },
+  {
+   "id": "ask_cyrrus",
+   "chain": "theurgy",
+   "act": "Theurgists",
+   "title": "Learn where Torwin went",
+   "hint": "Tell Xavier you passed the third test; cast Hear Truth and ask Holy Cyrrus where Torwin is.",
+   "done_when": {
+    "any": [
+     {
+      "global": [
+       116,
+       1
+      ],
+      "eq": 1
+     },
+     {
+      "global": [
+       440,
+       1
+      ],
+      "eq": 1
+     }
+    ]
+   },
+   "target": {
+    "type": "npc",
+    "npc": 22
+   },
+   "evidence": "1046 CYRRUS sets G[116:1] at 'Where is he?' -> '(He told me he was going to go to Windy Point today...)'; read by TORWIN",
+   "confidence": "high",
+   "milestone": false
+  },
+  {
+   "id": "confront_torwin",
+   "chain": "theurgy",
+   "act": "Theurgists",
+   "title": "Confront Torwin at Windy Point",
+   "hint": "Climb Windy Point and step forward; Torwin jumps and leaves the stolen focus. Take it (and optionally his ring for Rhian).",
+   "done_when": {
+    "global": [
+     440,
+     1
+    ],
+    "eq": 1
+   },
+   "target": {
+    "type": "npc",
+    "npc": 26
+   },
+   "evidence": "1050 TORWIN sets G[440:1], G[129:1], G[112:1] at 'YOU LIE! He is in the Pit of Death and I SHALL BRING HIM BACK!'; he creates the Healing Touch focus (shape 396 frame 9)",
+   "confidence": "high",
+   "milestone": true
+  },
+  {
+   "id": "return_focus",
+   "chain": "theurgy",
+   "act": "Theurgists",
+   "title": "Return the stolen focus to Xavier",
+   "hint": "Give Xavier the Focus of healing.",
+   "done_when": {
+    "global": [
+     111,
+     1
+    ],
+    "eq": 1
+   },
+   "target": {
+    "type": "npc",
+    "npc": 25
+   },
+   "evidence": "1049 XAVIER sets G[111:1] on 'I have found your Focus of healing!'",
+   "confidence": "high",
+   "milestone": true
+  },
+  {
+   "id": "tell_stellos",
+   "chain": "theurgy",
+   "act": "Theurgists",
+   "title": "Tell Stellos of Torwin's fate",
+   "hint": "He then explains the final test (Test of Belief).",
+   "done_when": {
+    "any": [
+     {
+      "global": [
+       137,
+       1
+      ],
+      "eq": 1
+     },
+     {
+      "global": [
+       131,
+       1
+      ],
+      "eq": 1
+     },
+     {
+      "global": [
+       56,
+       1
+      ],
+      "eq": 1
+     }
+    ]
+   },
+   "target": {
+    "type": "npc",
+    "npc": 23
+   },
+   "evidence": "1047 STELLOS sets G[137:1] on 'What has happened?' and G[131:1] on 'Adept?'/'Final test?' after 'Poor Torwin'",
+   "confidence": "medium",
+   "milestone": false
+  },
+  {
+   "id": "test_belief",
+   "chain": "theurgy",
+   "act": "Theurgists",
+   "title": "Take the Test of Belief: bring the Breath of Air past Stratos",
+   "hint": "From the first level of Windy Point jump onto the floating platforms and circle to Stratos; cast Reveal and take the Breath of Air from her platform, then pass her second circle (the STRATHAT egg east of her) with it.",
+   "done_when": {
+    "global": [
+     56,
+     1
+    ],
+    "eq": 1
+   },
+   "target": {
+    "type": "point",
+    "map": 37,
+    "x": 11068,
+    "y": 17172,
+    "z": 112
+   },
+   "evidence": "1156 STRATHAT: the id-1 egg at map 37 (11068,17172,112) sets G[56:1] and G[140:1] only while the Avatar carries shape 442 frame 3 (its 0x01D7 inventory loop); the id-0 egg at (10655,17247,112) only starts Stratos' talk. Checked by the clean engine's story replay (ctest story)",
+   "confidence": "medium",
+   "milestone": true
+  },
+  {
+   "id": "to_carthax",
+   "chain": "hydros",
+   "act": "Hydros",
+   "title": "Reach Carthax Lake",
+   "hint": "From Upper Catacombs 2 go north past the lava, south past the electric gate, flip the hidden switch on the brick pillar and open the south door with the Key of the Scion.",
+   "done_when": {
+    "any": [
+     {
+      "visited_map": 16
+     },
+     {
+      "visited_map": 26
+     }
+    ]
+   },
+   "target": {
+    "type": "point",
+    "map": 49,
+    "x": 22744,
+    "y": 22944,
+    "z": 48
+   },
+   "evidence": "1159 CARTHAXH usecode egg at map 49 (22744,22944,48): teleportToEgg(16 or 26 by G[52:2], 5)",
+   "confidence": "high",
+   "milestone": true
+  },
+  {
+   "id": "carthax_waypoint",
+   "chain": "hydros",
+   "act": "Hydros",
+   "title": "Activate the Carthax Lake waypoint",
+   "hint": "Two steps east of where you arrive.",
+   "done_when": {
+    "global": [
+     73,
+     1
+    ],
+    "eq": 1
+   },
+   "target": {
+    "type": "point",
+    "map": 16,
+    "x": 19808,
+    "y": 9472,
+    "z": 119
+   },
+   "evidence": "1215 TELPFLAG egg at map 16 (19808,9472,119) and map 26 (19776,9440,112) set G[73:1]",
+   "confidence": "high",
+   "milestone": false,
+   "alt_targets": [
+    {
+     "when": {
+      "global": [
+       52,
+       2
+      ],
+      "ne": 0
+     },
+     "target": {
+      "type": "point",
+      "map": 26,
+      "x": 19776,
+      "y": 9440,
+      "z": 112
+     }
+    }
+   ]
+  },
+  {
+   "id": "free_water",
+   "chain": "hydros",
+   "act": "Hydros",
+   "title": "Cast Open Ground on the grave at the lake's source",
+   "hint": "Round the dry lake bed to the cave, west past the trolls, the two switches (left one), the automatic gate, west/north/east to the end, then north to the gravestone. Cast Open Ground 4-5 steps away; the water flows.",
+   "done_when": {
+    "global": [
+     52,
+     2
+    ],
+    "ge": 1
+   },
+   "target": {
+    "type": "item",
+    "shape": 350,
+    "map": 28,
+    "x": 10943,
+    "y": 4639,
+    "z": 104,
+    "via": [
+     {
+      "map": 16,
+      "x": 17764,
+      "y": 18124,
+      "z": 104,
+      "note": "Carthax Lake cave -> map 28"
+     }
+    ]
+   },
+   "evidence": "1414 ERTHSPEL Open Ground: on map 28 (0x1C) within 1280 of shape 350 sets G[52:2]=1 (if 0) and starts STORM; the only shape 350 on map 28 is at (10943,4639,104)",
+   "confidence": "high",
+   "milestone": true
+  },
+  {
+   "id": "free_hydros",
+   "chain": "hydros",
+   "act": "Hydros",
+   "title": "Speak with Hydros",
+   "hint": "Back at Carthax Lake (now filled), go round the west edge, up to the stone bridge, east and north to the white steps and the central pedestal.",
+   "done_when": {
+    "global": [
+     52,
+     2
+    ],
+    "eq": 2
+   },
+   "target": {
+    "type": "point",
+    "map": 26,
+    "x": 20031,
+    "y": 14399,
+    "z": 136
+   },
+   "evidence": "0080 HYDROS sets G[52:2]=2 at 'Ah, I am now free! Thank you, foolish one...'; 1160 HYDHAT egg (q 9) at map 26 (20031,14399,136) / map 16 (19999,14367,128)",
+   "confidence": "high",
+   "milestone": true,
+   "alt_targets": [
+    {
+     "when": {
+      "global": [
+       52,
+       2
+      ],
+      "eq": 0
+     },
+     "target": {
+      "type": "point",
+      "map": 16,
+      "x": 19999,
+      "y": 14367,
+      "z": 128
+     }
+    }
+   ]
+  },
+  {
+   "id": "to_lava_tunnel",
+   "chain": "sorcery",
+   "act": "Sorcerers",
+   "title": "Enter the Lava Tunnel",
+   "hint": "In Upper Catacombs 2: across the water, past the electric gate, over the stone bridge, the two metal gates (Aerial Servant on the lever) and the door opened with the Key of the Scion.",
+   "done_when": {
+    "any": [
+     {
+      "visited_map": 24
+     },
+     {
+      "visited_map": 25
+     },
+     {
+      "visited_map": 12
+     }
+    ]
+   },
+   "target": {
+    "type": "point",
+    "map": 49,
+    "x": 27359,
+    "y": 19935,
+    "z": 48
+   },
+   "evidence": "1152 MAPTELE egg at map 49 (27359,19935,48) -> map 24 (G[52:2]=0) or 25, (20287,24191,64)",
+   "confidence": "high",
+   "milestone": true
+  },
+  {
+   "id": "to_daemons_crag",
+   "chain": "sorcery",
+   "act": "Sorcerers",
+   "title": "Cross the lava to Daemon's Crag",
+   "hint": "Go south to the south-west corner, step onto the dark lava and long-jump west (Air Walk in v2.10), then round the island and out south.",
+   "done_when": {
+    "visited_map": 12
+   },
+   "target": {
+    "type": "point",
+    "map": 25,
+    "x": 19263,
+    "y": 31487,
+    "z": 64
+   },
+   "evidence": "1152 MAPTELE egg at map 24/25 (19263,31487,64) -> map 12 (20275,13904,64)",
+   "confidence": "high",
+   "milestone": true,
+   "alt_targets": [
+    {
+     "when": {
+      "global": [
+       52,
+       2
+      ],
+      "eq": 0
+     },
+     "target": {
+      "type": "point",
+      "map": 24,
+      "x": 19263,
+      "y": 31487,
+      "z": 64
+     }
+    }
+   ]
+  },
+  {
+   "id": "crag_waypoint",
+   "chain": "sorcery",
+   "act": "Sorcerers",
+   "title": "Activate the Daemon's Crag waypoint",
+   "hint": "South-south-east of the arrival point.",
+   "done_when": {
+    "global": [
+     74,
+     1
+    ],
+    "eq": 1
+   },
+   "target": {
+    "type": "point",
+    "map": 12,
+    "x": 21279,
+    "y": 15647,
+    "z": 72
+   },
+   "evidence": "1215 TELPFLAG egg at map 12 (21279,15647,72) sets G[74:1]",
+   "confidence": "high",
+   "milestone": false
+  },
+  {
+   "id": "choose_mentor",
+   "chain": "sorcery",
+   "act": "Sorcerers",
+   "title": "Become a disciple (Bane or Vardion)",
+   "hint": "Talk to Acolyte Bane (house west of the waypoint) about the sorcerers, acolytes and Vardion until she asks for Vardion's Truename; or make the mirror deal with Vardion, the First Acolyte.",
+   "done_when": {
+    "any": [
+     {
+      "global": [
+       385,
+       1
+      ],
+      "eq": 1
+     },
+     {
+      "global": [
+       371,
+       1
+      ],
+      "eq": 1
+     },
+     {
+      "global": [
+       142,
+       2
+      ],
+      "ne": 0
+     }
+    ]
+   },
+   "target": {
+    "type": "npc",
+    "npc": 29
+   },
+   "evidence": "1053 BANE sets G[385:1] at 'Daemion you are to me ... Now your first task as my Disciple...'; 1052 VARDION sets G[371:1] in his offer; the debug 'Key' option of 1025 AVATAR sets G[153], G[385], G[371] together",
+   "confidence": "medium",
+   "milestone": true,
+   "alt_targets": [
+    {
+     "when": {
+      "all": [
+       {
+        "global": [
+         371,
+         1
+        ],
+        "eq": 1
+       },
+       {
+        "global": [
+         385,
+         1
+        ],
+        "eq": 0
+       }
+      ]
+     },
+     "target": {
+      "type": "npc",
+      "npc": 28
+     }
+    }
+   ]
+  },
+  {
+   "id": "truename",
+   "chain": "sorcery",
+   "act": "Sorcerers",
+   "title": "Trade the Truename",
+   "hint": "Give Bane Vardion's Truename (Morduin) or Vardion Bane's (Sabriane). The other acolyte is killed and you receive the library key.",
+   "done_when": {
+    "global": [
+     142,
+     2
+    ],
+    "ne": 0
+   },
+   "target": {
+    "type": "npc",
+    "npc": 29
+   },
+   "evidence": "1429 BANE2 sets G[142:2]=2 on ' Morduin.' (Bane wins); 1391 VARDION2 sets G[142:2]=1 on ' Sabriane.' (Vardion wins)",
+   "confidence": "high",
+   "milestone": true,
+   "alt_targets": [
+    {
+     "when": {
+      "all": [
+       {
+        "global": [
+         371,
+         1
+        ],
+        "eq": 1
+       },
+       {
+        "global": [
+         385,
+         1
+        ],
+        "eq": 0
+       }
+      ]
+     },
+     "target": {
+      "type": "npc",
+      "npc": 28
+     }
+    }
+   ]
+  },
+  {
+   "id": "first_test",
+   "chain": "sorcery",
+   "act": "Sorcerers",
+   "title": "Pass the first test with your mentor",
+   "hint": "Collect the wands, rods, talismans and symbols in the Hall of the Sorcerers library (key in the jewellery box by the big chest) plus candles and reagents; then speak to your mentor and enchant Flash, Flame Bolt and Endure Heat at the house pentagram without leaving the house. Light all five candles; Endure Heat needs a rod, staff or symbol.",
+   "done_when": {
+    "global": [
+     153,
+     1
+    ],
+    "eq": 1
+   },
+   "target": {
+    "type": "npc",
+    "npc": 29
+   },
+   "evidence": "1418 DAEMSCEN sets G[153:1] at 'Well done, Disciple! You are now ready to seek out the Master. Go to the Obsidian Fortress'; 1175 FORTOPEN / 1176 FORTCLOS read G[153:1]; 0124 PENT counts Flash/Flame Bolt/Endure Heat into G[148:2] via G[150..152:1] while G[147:1]=1; layout in specs/world/magic.md 3.3. G[150..152] are never cleared, so a failed partial attempt cannot be retried (specs/world/bugfixes.md 16)",
+   "confidence": "high",
+   "milestone": true,
+   "alt_targets": [
+    {
+     "when": {
+      "global": [
+       142,
+       2
+      ],
+      "eq": 1
+     },
+     "target": {
+      "type": "npc",
+      "npc": 28
+     }
+    }
+   ]
+  },
+  {
+   "id": "to_fortress",
+   "chain": "sorcery",
+   "act": "Sorcerers",
+   "title": "Enter the Obsidian Fortress",
+   "hint": "West along the road, north, west over the bridge; the doors open for a disciple. Prepare Extinguish, Ignite and Banish Daemon foci; carry a red candle.",
+   "done_when": {
+    "visited_map": 14
+   },
+   "target": {
+    "type": "point",
+    "map": 12,
+    "x": 3903,
+    "y": 18687,
+    "z": 56
+   },
+   "evidence": "Teleporter egg map 12 (3903,18687,56) -> map 14 egg 1; 1175 FORTOPEN egg (q 24) at map 12 (5503,18751,96) opens the doors when G[153:1]=1",
+   "confidence": "high",
+   "milestone": true
+  },
+  {
+   "id": "meet_arcadion",
+   "chain": "sorcery",
+   "act": "Sorcerers",
+   "title": "Speak to the daemon Arcadion",
+   "hint": "Run west past Malchir's two daemons into the opening; talk to Arcadion, take the key from the pentacle table, open the chest and step on the platform.",
+   "done_when": {
+    "global": [
+     232,
+     1
+    ],
+    "eq": 1
+   },
+   "target": {
+    "type": "npc",
+    "npc": 57
+   },
+   "evidence": "1081 ARCADION sets G[232:1] at 'You have somehow managed to defeat or evade the first guardians of the Obsidian Fortress'; MAPTELE reads G[232:1]",
+   "confidence": "high",
+   "milestone": true
+  },
+  {
+   "id": "four_symbols",
+   "chain": "sorcery",
+   "act": "Sorcerers",
+   "title": "Collect the four symbols",
+   "hint": "North (Flash over rollers, Rock Flesh over mushrooms), East (Armor of Flames), South (Extinguish on the burning pentagram), West (Endure Heat maze and lava). Return to the centre platform after each; step on it only with all four.",
+   "done_when": {
+    "any": [
+     {
+      "has_item": 397,
+      "frame": 20,
+      "qty": 4
+     },
+     {
+      "global": [
+       145,
+       1
+      ],
+      "eq": 1
+     },
+     {
+      "global": [
+       144,
+       1
+      ],
+      "eq": 1
+     }
+    ]
+   },
+   "target": {
+    "type": "item",
+    "shape": 397,
+    "map": 14,
+    "x": 19240,
+    "y": 5928,
+    "z": 104
+   },
+   "evidence": "1152 MAPTELE egg at map 14 (15615,16639,88) needs four shape 397 frame 20 items in a recursive search of the Avatar (sets G[145:1]); frame-20 FIREITEMs placed at map 14 (19240,5928,104), (31148,23020,88), (15466,24718,72) and one inside chest 117 at (6608,22784,72)",
+   "confidence": "high",
+   "milestone": false,
+   "alt_targets": [
+    {
+     "when": {
+      "not": {
+       "item_gone": {
+        "shape": 397,
+        "map": 14,
+        "x": 19240,
+        "y": 5928,
+        "z": 104
+       }
+      }
+     },
+     "target": {
+      "type": "item",
+      "shape": 397,
+      "map": 14,
+      "x": 19240,
+      "y": 5928,
+      "z": 104
+     }
+    },
+    {
+     "when": {
+      "not": {
+       "item_gone": {
+        "shape": 397,
+        "map": 14,
+        "x": 31148,
+        "y": 23020,
+        "z": 88
+       }
+      }
+     },
+     "target": {
+      "type": "item",
+      "shape": 397,
+      "map": 14,
+      "x": 31148,
+      "y": 23020,
+      "z": 88
+     }
+    },
+    {
+     "when": {
+      "not": {
+       "item_gone": {
+        "shape": 397,
+        "map": 14,
+        "x": 15466,
+        "y": 24718,
+        "z": 72
+       }
+      }
+     },
+     "target": {
+      "type": "item",
+      "shape": 397,
+      "map": 14,
+      "x": 15466,
+      "y": 24718,
+      "z": 72
+     }
+    },
+    {
+     "when": {
+      "not": {
+       "item_gone": {
+        "shape": 117,
+        "map": 14,
+        "x": 6608,
+        "y": 22784,
+        "z": 72
+       }
+      }
+     },
+     "target": {
+      "type": "item",
+      "shape": 117,
+      "map": 14,
+      "x": 6608,
+      "y": 22784,
+      "z": 72
+     }
+    }
+   ]
+  },
+  {
+   "id": "arcadion_done",
+   "chain": "sorcery",
+   "act": "Sorcerers",
+   "title": "Return through the centre platform to Arcadion",
+   "hint": "With all four symbols step on the centre platform, speak to Arcadion, then take the platform to Malchir.",
+   "done_when": {
+    "global": [
+     144,
+     1
+    ],
+    "eq": 1
+   },
+   "target": {
+    "type": "point",
+    "map": 14,
+    "x": 15615,
+    "y": 16639,
+    "z": 88
+   },
+   "evidence": "1081 ARCADION sets G[144:1] at 'You have performed remarkably well, Disciple. Or rather, I should say, Acolyte.'; MAPTELE routes to Malchir when G[144:1]",
+   "confidence": "high",
+   "milestone": true
+  },
+  {
+   "id": "third_test",
+   "chain": "sorcery",
+   "act": "Sorcerers",
+   "title": "Pass Malchir's test",
+   "hint": "Enchant the foci first (a staff for Flame Bolt and Explosion, a talisman or symbol for Summon and Banish Daemon). Then cast Flame Bolt, Explosion and Summon Daemon at Malchir in that order, banish the daemon he summons and drop his staff.",
+   "done_when": {
+    "any": [
+     {
+      "global": [
+       155,
+       1
+      ],
+      "eq": 1
+     },
+     {
+      "global": [
+       55,
+       1
+      ],
+      "eq": 1
+     }
+    ]
+   },
+   "target": {
+    "type": "npc",
+    "npc": 27
+   },
+   "evidence": "1051 MALCHIR sets G[353:3]=1 at 'The test begins now...'; 1411 FIRESPEL / 1417 DAEMSPEL advance G[353:3]; MALCHIR sets G[155:1]=1 at 'Come, Acolyte. We must begin the ceremony.' and moves the Avatar to map 12 (17382,19549,56); G[353:3] 1..6 per specs/world/magic.md 3.3; MALCHIR 0x0BE7 watcher runs 'Come, Acolyte' once G[353:3]>=6",
+   "confidence": "high",
+   "milestone": false
+  },
+  {
+   "id": "pyros_ceremony",
+   "chain": "sorcery",
+   "act": "Sorcerers",
+   "title": "Take part in the Pyros ceremony",
+   "hint": "At the Great Pentacle near the Hall of the Sorcerers: carry a red candle and stay compliant in your replies.",
+   "done_when": {
+    "global": [
+     55,
+     1
+    ],
+    "eq": 1
+   },
+   "target": {
+    "type": "point",
+    "map": 12,
+    "x": 17382,
+    "y": 19549,
+    "z": 56
+   },
+   "evidence": "0109 PYROS sets G[55:1]=1 and clears G[155:1] at the end ('I thank you for your assistance in this matter...' / 'Farewell, Acolyte.')",
+   "confidence": "medium",
+   "milestone": true
+  },
+  {
+   "id": "kill_malchir",
+   "chain": "sorcery",
+   "act": "Sorcerers",
+   "title": "Defeat Malchir",
+   "hint": "Return to the fortress, west to Arcadion's room and the platform, and fight Malchir (keep the Banish Daemon talisman ready).",
+   "done_when": {
+    "npc_dead": 27
+   },
+   "target": {
+    "type": "npc",
+    "npc": 27
+   },
+   "evidence": "Malchir is NPC 27 (class 1051, map 14 (7519,2271,8)); walkthroughs: the Tongue of Flame is on his body",
+   "confidence": "high",
+   "milestone": true
+  },
+  {
+   "id": "tongue_of_flame",
+   "chain": "sorcery",
+   "act": "Sorcerers",
+   "title": "Take the Tongue of Flame from Malchir's body",
+   "hint": "Loot the body (also a book about the Tongue). Recall does not work inside the fortress; walk out first.",
+   "done_when": {
+    "any": [
+     {
+      "has_item": 442,
+      "frame": 4
+     },
+     {
+      "has_item": 793,
+      "frame": 4
+     },
+     {
+      "global": [
+       566,
+       1
+      ],
+      "eq": 1
+     }
+    ]
+   },
+   "target": {
+    "type": "npc",
+    "npc": 27
+   },
+   "evidence": "0442 BROCK look: frame 4 = 'the Tongue of Flame'",
+   "confidence": "high",
+   "milestone": false
+  },
+  {
+   "id": "show_tongue",
+   "chain": "blackrock",
+   "act": "Blackrock",
+   "title": "Show Mythran the Tongue of Flame",
+   "hint": "Tell him 'I found this with the Sorcerers'. A book appears on his upper floor.",
+   "done_when": {
+    "global": [
+     65,
+     1
+    ],
+    "eq": 1
+   },
+   "target": {
+    "type": "npc",
+    "npc": 33
+   },
+   "evidence": "1057 MYTHRAN sets G[65:1] after 'I found this with the Sorcerers.' -> 'That piece of black stone?' and creates shape 288 quality 25 at map 8 (1109,1621,42)",
+   "confidence": "high",
+   "milestone": true
+  },
+  {
+   "id": "read_destruction",
+   "chain": "blackrock",
+   "act": "Blackrock",
+   "title": "Read 'The Destruction of the Temple'",
+   "hint": "The book lies on Mythran's upper floor under the Zealan shield on the west wall.",
+   "done_when": {
+    "global": [
+     64,
+     1
+    ],
+    "eq": 1
+   },
+   "target": {
+    "type": "point",
+    "map": 8,
+    "x": 1109,
+    "y": 1621,
+    "z": 42
+   },
+   "evidence": "0288 GRIMOIRE quality 25 = 'The Destruction of the Temple ' -> BOOK1 entry 0x4DB4, which sets G[64:1] (with G[59], G[61], G[62]); MYTHRAN offers 'I want to recreate the obelisk.' only with G[65:1] and G[64:1]",
+   "confidence": "high",
+   "milestone": true
+  },
+  {
+   "id": "ask_obelisk",
+   "chain": "blackrock",
+   "act": "Blackrock",
+   "title": "Ask Mythran how to recreate the obelisk",
+   "hint": "He tells you that you need the Ethereal Travel spell and all five fragments.",
+   "done_when": {
+    "global": [
+     304,
+     1
+    ],
+    "eq": 1
+   },
+   "target": {
+    "type": "npc",
+    "npc": 33
+   },
+   "evidence": "1057 MYTHRAN sets G[304:1] after 'Recreate the obelisk? ... You must cast the Et[hereal Travel]...'",
+   "confidence": "high",
+   "milestone": true
+  },
+  {
+   "id": "buy_ethereal_travel",
+   "chain": "blackrock",
+   "act": "Blackrock",
+   "title": "Buy the Ethereal Travel spell from Mythran",
+   "hint": "He charges in obsidian (walkthroughs: 250). Money is also in the Tear of the Seas chest.",
+   "done_when": {
+    "has_item": 288,
+    "quality": 86
+   },
+   "target": {
+    "type": "npc",
+    "npc": 33
+   },
+   "evidence": "1057 MYTHRAN gives shape 288 (GRIMOIRE) with quality 0x51..0x56 by spell; 0288 GRIMOIRE quality 0x56 = 'Ethereal Travel ' and runs BOOK1 0x673D -> ETHRSPEL 0x821",
+   "confidence": "high",
+   "milestone": false
+  },
+  {
+   "id": "devon_key",
+   "chain": "blackrock",
+   "act": "Blackrock",
+   "title": "Ask Devon for the Blackrock fragment",
+   "hint": "Devon is in the Royal Hall (bedroom to the north or dining hall to the south). Ask about the Blackrock fragment / Tear of the Seas; he gives you a key.",
+   "done_when": {
+    "any": [
+     {
+      "has_item": 82,
+      "quality": 90
+     },
+     {
+      "has_item": 442,
+      "frame": 2
+     },
+     {
+      "has_item": 793,
+      "frame": 2
+     },
+     {
+      "global": [
+       567,
+       1
+      ],
+      "eq": 1
+     }
+    ]
+   },
+   "target": {
+    "type": "npc",
+    "npc": 2
+   },
+   "evidence": "1026 DEVON: 'I need the Blackrock fragment.' ... gives shape 82 quality 0x5A ('Devon's key' in 0082 KEY look)",
+   "confidence": "high",
+   "milestone": false
+  },
+  {
+   "id": "tear_of_seas",
+   "chain": "blackrock",
+   "act": "Blackrock",
+   "title": "Take the Tear of the Seas",
+   "hint": "From the castle entrance go west into the small room with the chest; unlock it with Devon's key.",
+   "done_when": {
+    "any": [
+     {
+      "has_item": 442,
+      "frame": 2
+     },
+     {
+      "has_item": 793,
+      "frame": 2
+     },
+     {
+      "global": [
+       567,
+       1
+      ],
+      "eq": 1
+     }
+    ]
+   },
+   "target": {
+    "type": "item",
+    "shape": 673,
+    "map": 40,
+    "x": 11871,
+    "y": 11007,
+    "z": 48
+   },
+   "evidence": "Shape 442 frame 2 ('the Tear of the Seas') inside chest shape 673 at map 40 (11871,11007,48)",
+   "confidence": "high",
+   "milestone": false
+  },
+  {
+   "id": "to_pit_of_death",
+   "chain": "blackrock",
+   "act": "Blackrock",
+   "title": "Enter the Pit of Death",
+   "hint": "Recall to the Hall of the Mountain King, take the Earth platform to the start, go south to Stone Cove and through the east door (the golem or the Key of the Scion opens it).",
+   "done_when": {
+    "visited_map": 57
+   },
+   "target": {
+    "type": "point",
+    "map": 21,
+    "x": 5374,
+    "y": 1890,
+    "z": 0
+   },
+   "evidence": "Teleporter egg map 21 (5374,1890,0) -> map 57 egg 1 at (30495,28127,48)",
+   "confidence": "high",
+   "milestone": true
+  },
+  {
+   "id": "heart_of_earth",
+   "chain": "blackrock",
+   "act": "Blackrock",
+   "title": "Dig up the Heart of Earth in the Conventicle of the Dead",
+   "hint": "South and west to the locked Conventicle; Create Golem on the mud to open the door (or the Key of the Conventicler on a body nearby), climb onto the mud, kill the ghoul and cast Open Ground.",
+   "done_when": {
+    "any": [
+     {
+      "has_item": 442,
+      "frame": 1
+     },
+     {
+      "has_item": 793,
+      "frame": 1
+     },
+     {
+      "global": [
+       569,
+       1
+      ],
+      "eq": 1
+     }
+    ]
+   },
+   "target": {
+    "type": "item",
+    "shape": 442,
+    "map": 57,
+    "x": 25280,
+    "y": 29096,
+    "z": 0
+   },
+   "evidence": "Shape 442 frame 1 ('the Heart of Earth') at map 57 (25280,29096,0); 'Key of the Conventicler' (shape 82 quality 59) inside body shape 219 at map 57 (14303,16223,16)",
+   "confidence": "high",
+   "milestone": false
+  },
+  {
+   "id": "breath_of_air",
+   "chain": "blackrock",
+   "act": "Blackrock",
+   "title": "Take the Breath of Air from Stratos' platform",
+   "hint": "Windy Point again: Air Walk onto the platforms, round to Stratos, say goodbye, cast Reveal and use Aerial Servant on the orb: click the orb, then click the Avatar so the servant puts it in your backpack.",
+   "done_when": {
+    "any": [
+     {
+      "has_item": 442,
+      "frame": 3
+     },
+     {
+      "has_item": 793,
+      "frame": 3
+     },
+     {
+      "global": [
+       568,
+       1
+      ],
+      "eq": 1
+     }
+    ]
+   },
+   "target": {
+    "type": "item",
+    "shape": 442,
+    "map": 37,
+    "x": 10474,
+    "y": 16686,
+    "z": 112
+   },
+   "evidence": "Shape 442 frame 3 ('the Breath of Air') at map 37 (10474,16686,112) with the INVISIBLE flag (0x0010) set; 1049 XAVIER reacts to 'I have taken the Breath of Wind.' (G[427:1]); AIRSPEL 0x1093 asks for two targets (item, then destination; the Avatar = into his backpack) (specs/world/magic.md 5)",
+   "confidence": "high",
+   "milestone": false
+  },
+  {
+   "id": "ethereal_travel",
+   "chain": "ether",
+   "act": "Ethereal Void",
+   "title": "Cast Ethereal Travel",
+   "hint": "Carry all five fragments (and Endure Heat). Leave anything else behind. Double-click the Ethereal Travel book to charge it, then again to travel.",
+   "done_when": {
+    "visited_map": 43
+   },
+   "target": null,
+   "evidence": "1413 ETHRSPEL 0x821 teleports the Avatar to map 43 (16767,17279,16); the spell's components are the five fragments (BOOK1 text, ENCHANT)",
+   "confidence": "high",
+   "milestone": true
+  },
+  {
+   "id": "defeat_stratos",
+   "chain": "ether",
+   "act": "Ethereal Void",
+   "title": "Defeat Stratos on the Plane of Air",
+   "hint": "From the central pentagram take the path south and west. Use the Breath of Air on the vortex in front of Stratos. The fragment becomes charged and you return to the pentagram.",
+   "done_when": {
+    "any": [
+     {
+      "has_item": 793,
+      "frame": 3
+     },
+     {
+      "global": [
+       568,
+       1
+      ],
+      "eq": 1
+     }
+    ]
+   },
+   "target": {
+    "type": "item",
+    "shape": 385,
+    "map": 46,
+    "x": 14719,
+    "y": 3295,
+    "z": 216,
+    "via": [
+     {
+      "map": 43,
+      "x": 14770,
+      "y": 19166,
+      "z": 16,
+      "note": "map 43 -> 46"
+     }
+    ]
+   },
+   "evidence": "0442 BROCK use on the Titan sets the fragment's shape to 793 (EBROCK 'glowing ...', same frame 3) and teleports the Avatar to map 43 (16767,17279,16); Stratos shape 385 at map 46 (14719,3295,216); egg map 43 (14770,19166,16) -> map 46",
+   "confidence": "high",
+   "milestone": false
+  },
+  {
+   "id": "defeat_hydros",
+   "chain": "ether",
+   "act": "Ethereal Void",
+   "title": "Defeat Hydros on the Plane of Water",
+   "hint": "From the central pentagram take the path north then west. Cross the vanishing stones (Flash helps) and the three bridges to the white stairs; use the Tear of the Seas on Hydros. The fragment becomes charged and you return to the pentagram.",
+   "done_when": {
+    "any": [
+     {
+      "has_item": 793,
+      "frame": 2
+     },
+     {
+      "global": [
+       567,
+       1
+      ],
+      "eq": 1
+     }
+    ]
+   },
+   "target": {
+    "type": "item",
+    "shape": 80,
+    "map": 45,
+    "x": 7071,
+    "y": 12319,
+    "z": 0,
+    "via": [
+     {
+      "map": 43,
+      "x": 14764,
+      "y": 14036,
+      "z": 16,
+      "note": "map 43 -> 45"
+     }
+    ]
+   },
+   "evidence": "0442 BROCK use on the Titan sets the fragment's shape to 793 (EBROCK 'glowing ...', same frame 2) and teleports the Avatar to map 43 (16767,17279,16); Hydros shape 80 at map 45 (7071,12319,0); egg map 43 (14764,14036,16) -> map 45",
+   "confidence": "high",
+   "milestone": false
+  },
+  {
+   "id": "defeat_pyros",
+   "chain": "ether",
+   "act": "Ethereal Void",
+   "title": "Defeat Pyros on the Plane of Fire",
+   "hint": "From the central pentagram take the path west then north. Fetch the jewellery box of spheres from the far shrine, put a sphere on each glowing square of the nine-point star, jump the rocks and use the Tongue of Flame on Pyros quickly. The fragment becomes charged and you return to the pentagram.",
+   "done_when": {
+    "any": [
+     {
+      "has_item": 793,
+      "frame": 4
+     },
+     {
+      "global": [
+       566,
+       1
+      ],
+      "eq": 1
+     }
+    ]
+   },
+   "target": {
+    "type": "item",
+    "shape": 109,
+    "map": 44,
+    "x": 23583,
+    "y": 14879,
+    "z": 24,
+    "via": [
+     {
+      "map": 43,
+      "x": 13567,
+      "y": 15295,
+      "z": 16,
+      "note": "map 43 -> 44"
+     }
+    ]
+   },
+   "evidence": "0442 BROCK use on the Titan sets the fragment's shape to 793 (EBROCK 'glowing ...', same frame 4) and teleports the Avatar to map 43 (16767,17279,16); Pyros shape 109 at map 44 (23583,14879,24); egg map 43 (13567,15295,16) -> map 44",
+   "confidence": "high",
+   "milestone": false
+  },
+  {
+   "id": "defeat_lithos",
+   "chain": "ether",
+   "act": "Ethereal Void",
+   "title": "Defeat Lithos on the Plane of Earth",
+   "hint": "From the central pentagram take the path east then north. Long route over lava (Endure Heat) and floating rocks; use the Heart of Earth on Lithos as soon as you can act. The fragment becomes charged and you return to the pentagram.",
+   "done_when": {
+    "any": [
+     {
+      "has_item": 793,
+      "frame": 1
+     },
+     {
+      "global": [
+       569,
+       1
+      ],
+      "eq": 1
+     }
+    ]
+   },
+   "target": {
+    "type": "item",
+    "shape": 433,
+    "map": 47,
+    "x": 2719,
+    "y": 14495,
+    "z": 56,
+    "via": [
+     {
+      "map": 43,
+      "x": 18678,
+      "y": 15266,
+      "z": 16,
+      "note": "map 43 -> 47"
+     }
+    ]
+   },
+   "evidence": "0442 BROCK use on the Titan sets the fragment's shape to 793 (EBROCK 'glowing ...', same frame 1) and teleports the Avatar to map 43 (16767,17279,16); Lithos shape 433 at map 47 (2719,14495,56); egg map 43 (18678,15266,16) -> map 47",
+   "confidence": "high",
+   "milestone": false
+  },
+  {
+   "id": "charge_tip",
+   "chain": "ether",
+   "act": "Ethereal Void",
+   "title": "Charge the obelisk tip",
+   "hint": "Stand in the centre of the pentagram and use the obelisk tip on yourself.",
+   "done_when": {
+    "any": [
+     {
+      "has_item": 793,
+      "frame": 0
+     },
+     {
+      "global": [
+       565,
+       1
+      ],
+      "eq": 1
+     }
+    ]
+   },
+   "target": {
+    "type": "point",
+    "map": 43,
+    "x": 16155,
+    "y": 16637,
+    "z": 24
+   },
+   "evidence": "0442 BROCK sets shape 793 on the obelisk tip (frame 0) as well (several setShape 0x319 paths); pentagram centre = mean of the five ENDPLATE positions",
+   "confidence": "medium",
+   "milestone": false
+  },
+  {
+   "id": "place_obelisk_tip",
+   "chain": "ether",
+   "act": "Ethereal Void",
+   "title": "Place the glowing obelisk tip on its pentagram point",
+   "hint": "Drop the charged obelisk tip on the matching point of the pentagram (an uncharged fragment is thrown back).",
+   "done_when": {
+    "global": [
+     565,
+     1
+    ],
+    "eq": 1
+   },
+   "target": {
+    "type": "item",
+    "shape": 686,
+    "map": 43,
+    "x": 16260,
+    "y": 16748,
+    "z": 24
+   },
+   "evidence": "0686 ENDPLATE quality 1 accepts only shape 793 frame 0 (quality-1) and sets G[565:1]; shape 442 is hurled away; plate at map 43 (16260,16748,24)",
+   "confidence": "high",
+   "milestone": true
+  },
+  {
+   "id": "place_breath_of_air",
+   "chain": "ether",
+   "act": "Ethereal Void",
+   "title": "Place the glowing Breath of Air on its pentagram point",
+   "hint": "Drop the charged Breath of Air on the matching point of the pentagram (an uncharged fragment is thrown back).",
+   "done_when": {
+    "global": [
+     568,
+     1
+    ],
+    "eq": 1
+   },
+   "target": {
+    "type": "item",
+    "shape": 686,
+    "map": 43,
+    "x": 16060,
+    "y": 16788,
+    "z": 24
+   },
+   "evidence": "0686 ENDPLATE quality 4 accepts only shape 793 frame 3 (quality-1) and sets G[568:1]; shape 442 is hurled away; plate at map 43 (16060,16788,24)",
+   "confidence": "high",
+   "milestone": true
+  },
+  {
+   "id": "place_tongue_of_flame",
+   "chain": "ether",
+   "act": "Ethereal Void",
+   "title": "Place the glowing Tongue of Flame on its pentagram point",
+   "hint": "Drop the charged Tongue of Flame on the matching point of the pentagram (an uncharged fragment is thrown back).",
+   "done_when": {
+    "global": [
+     566,
+     1
+    ],
+    "eq": 1
+   },
+   "target": {
+    "type": "item",
+    "shape": 686,
+    "map": 43,
+    "x": 15992,
+    "y": 16616,
+    "z": 24
+   },
+   "evidence": "0686 ENDPLATE quality 5 accepts only shape 793 frame 4 (quality-1) and sets G[566:1]; shape 442 is hurled away; plate at map 43 (15992,16616,24)",
+   "confidence": "high",
+   "milestone": true
+  },
+  {
+   "id": "place_tear_of_the_seas",
+   "chain": "ether",
+   "act": "Ethereal Void",
+   "title": "Place the glowing Tear of the Seas on its pentagram point",
+   "hint": "Drop the charged Tear of the Seas on the matching point of the pentagram (an uncharged fragment is thrown back).",
+   "done_when": {
+    "global": [
+     567,
+     1
+    ],
+    "eq": 1
+   },
+   "target": {
+    "type": "item",
+    "shape": 686,
+    "map": 43,
+    "x": 16142,
+    "y": 16474,
+    "z": 24
+   },
+   "evidence": "0686 ENDPLATE quality 3 accepts only shape 793 frame 2 (quality-1) and sets G[567:1]; shape 442 is hurled away; plate at map 43 (16142,16474,24)",
+   "confidence": "high",
+   "milestone": true
+  },
+  {
+   "id": "place_heart_of_earth",
+   "chain": "ether",
+   "act": "Ethereal Void",
+   "title": "Place the glowing Heart of Earth on its pentagram point",
+   "hint": "Drop the charged Heart of Earth on the matching point of the pentagram (an uncharged fragment is thrown back).",
+   "done_when": {
+    "global": [
+     569,
+     1
+    ],
+    "eq": 1
+   },
+   "target": {
+    "type": "item",
+    "shape": 686,
+    "map": 43,
+    "x": 16320,
+    "y": 16560,
+    "z": 24
+   },
+   "evidence": "0686 ENDPLATE quality 2 accepts only shape 793 frame 1 (quality-1) and sets G[569:1]; shape 442 is hurled away; plate at map 43 (16320,16560,24)",
+   "confidence": "high",
+   "milestone": true
+  },
+  {
+   "id": "enter_black_gate",
+   "chain": "ether",
+   "act": "Ethereal Void",
+   "title": "Walk into the Black Gate",
+   "hint": "When all five are placed the obelisk/gate rises from the pentagram; walk into it to end the game.",
+   "done_when": {
+    "global": [
+     570,
+     1
+    ],
+    "eq": 1
+   },
+   "target": {
+    "type": "point",
+    "map": 43,
+    "x": 16155,
+    "y": 16637,
+    "z": 24
+   },
+   "evidence": "0686 ENDPLATE creates the gate (shape 685) once G[565..569] are all 1; 0685 BGATE gotHit by the Avatar sets G[570:1] and calls Game::I_playEndgame",
+   "confidence": "high",
+   "milestone": true
+  }
+ ]
+}

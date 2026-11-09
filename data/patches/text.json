@@ -1,0 +1,405 @@
+{
+ "_comment": "Text corrections for typos in the original game's script strings (books, barks, conversation answers). Applied by the engine to every string a script creates while 'Original bug fixes' is On; the original EUSECODE.FLX is never changed. word=true (default): whole words only. See NOTES.md 'Original bug fixes'.",
+ "replace": [
+  {
+   "find": "Restortation",
+   "replace": "Restoration",
+   "bug": "typo"
+  },
+  {
+   "find": "Etherial",
+   "replace": "Ethereal",
+   "bug": "typo"
+  },
+  {
+   "find": "Acoytes",
+   "replace": "Acolytes",
+   "bug": "typo"
+  },
+  {
+   "find": "afterall",
+   "replace": "after all",
+   "bug": "typo"
+  },
+  {
+   "find": "aquire",
+   "replace": "acquire",
+   "bug": "typo"
+  },
+  {
+   "find": "aquired",
+   "replace": "acquired",
+   "bug": "typo"
+  },
+  {
+   "find": "attact",
+   "replace": "attack",
+   "bug": "typo"
+  },
+  {
+   "find": "barbarisim",
+   "replace": "barbarism",
+   "bug": "typo"
+  },
+  {
+   "find": "beginnig",
+   "replace": "beginning",
+   "bug": "typo"
+  },
+  {
+   "find": "beyound",
+   "replace": "beyond",
+   "bug": "typo"
+  },
+  {
+   "find": "Captian",
+   "replace": "Captain",
+   "bug": "typo"
+  },
+  {
+   "find": "cemetary",
+   "replace": "cemetery",
+   "bug": "typo"
+  },
+  {
+   "find": "certainy",
+   "replace": "certainly",
+   "bug": "typo"
+  },
+  {
+   "find": "comanded",
+   "replace": "commanded",
+   "bug": "typo"
+  },
+  {
+   "find": "commmitted",
+   "replace": "committed",
+   "bug": "typo"
+  },
+  {
+   "find": "Conversly",
+   "replace": "Conversely",
+   "bug": "typo"
+  },
+  {
+   "find": "costum",
+   "replace": "costume",
+   "bug": "typo"
+  },
+  {
+   "find": "diturb",
+   "replace": "disturb",
+   "bug": "typo"
+  },
+  {
+   "find": "embarassing",
+   "replace": "embarrassing",
+   "bug": "typo"
+  },
+  {
+   "find": "Eterity",
+   "replace": "Eternity",
+   "bug": "typo"
+  },
+  {
+   "find": "excercise",
+   "replace": "exercise",
+   "bug": "typo"
+  },
+  {
+   "find": "exchecker",
+   "replace": "exchequer",
+   "bug": "typo"
+  },
+  {
+   "find": "feverisly",
+   "replace": "feverishly",
+   "bug": "typo"
+  },
+  {
+   "find": "fiberous",
+   "replace": "fibrous",
+   "bug": "typo"
+  },
+  {
+   "find": "Fortunatly",
+   "replace": "Fortunately",
+   "bug": "typo"
+  },
+  {
+   "find": "greatful",
+   "replace": "grateful",
+   "bug": "typo"
+  },
+  {
+   "find": "identificaion",
+   "replace": "identification",
+   "bug": "typo"
+  },
+  {
+   "find": "immorial",
+   "replace": "immemorial",
+   "bug": "typo"
+  },
+  {
+   "find": "Irrefutible",
+   "replace": "Irrefutable",
+   "bug": "typo"
+  },
+  {
+   "find": "isolence",
+   "replace": "insolence",
+   "bug": "typo"
+  },
+  {
+   "find": "lengh",
+   "replace": "length",
+   "bug": "typo"
+  },
+  {
+   "find": "malicous",
+   "replace": "malicious",
+   "bug": "typo"
+  },
+  {
+   "find": "monastary",
+   "replace": "monastery",
+   "bug": "typo"
+  },
+  {
+   "find": "musn't",
+   "replace": "mustn't",
+   "bug": "typo"
+  },
+  {
+   "find": "occurence",
+   "replace": "occurrence",
+   "bug": "typo"
+  },
+  {
+   "find": "ocurrences",
+   "replace": "occurrences",
+   "bug": "typo"
+  },
+  {
+   "find": "recomend",
+   "replace": "recommend",
+   "bug": "typo"
+  },
+  {
+   "find": "redish",
+   "replace": "reddish",
+   "bug": "typo"
+  },
+  {
+   "find": "scimiar",
+   "replace": "scimitar",
+   "bug": "typo"
+  },
+  {
+   "find": "Seneshal",
+   "replace": "Seneschal",
+   "bug": "typo"
+  },
+  {
+   "find": "speading",
+   "replace": "spreading",
+   "bug": "typo"
+  },
+  {
+   "find": "suprise",
+   "replace": "surprise",
+   "bug": "typo"
+  },
+  {
+   "find": "suprised",
+   "replace": "surprised",
+   "bug": "typo"
+  },
+  {
+   "find": "sulfous",
+   "replace": "sulphurous",
+   "bug": "typo"
+  },
+  {
+   "find": "tends to explodes",
+   "replace": "tends to explode",
+   "bug": "typo"
+  },
+  {
+   "find": "Througout",
+   "replace": "Throughout",
+   "bug": "typo"
+  },
+  {
+   "find": "tyranical",
+   "replace": "tyrannical",
+   "bug": "typo"
+  },
+  {
+   "find": "unconcious",
+   "replace": "unconscious",
+   "bug": "typo"
+  },
+  {
+   "find": "whould",
+   "replace": "would",
+   "bug": "typo"
+  },
+  {
+   "find": "your're",
+   "replace": "you're",
+   "bug": "typo"
+  },
+  {
+   "find": "dicussion",
+   "replace": "discussion",
+   "bug": "typo"
+  },
+  {
+   "find": "dispell",
+   "replace": "dispel",
+   "bug": "typo"
+  },
+  {
+   "find": "existance",
+   "replace": "existence",
+   "bug": "typo"
+  },
+  {
+   "find": "sorceror",
+   "replace": "sorcerer",
+   "bug": "typo"
+  },
+  {
+   "find": "lightening and fire",
+   "replace": "lightning and fire",
+   "bug": "typo"
+  },
+  {
+   "find": "strengh",
+   "replace": "strength",
+   "bug": "typo"
+  },
+  {
+   "find": "Enlightment",
+   "replace": "Enlightenment",
+   "bug": "typo"
+  },
+  {
+   "find": "adress",
+   "replace": "address",
+   "bug": "typo"
+  },
+  {
+   "find": "wonderous",
+   "replace": "wondrous",
+   "bug": "typo"
+  },
+  {
+   "find": "Tenebrea",
+   "replace": "Tenebrae",
+   "bug": "typo"
+  },
+  {
+   "find": "Tenebraens",
+   "replace": "Tenebraeans",
+   "bug": "typo"
+  },
+  {
+   "find": "Gwilliam",
+   "replace": "Gwillim",
+   "bug": "typo"
+  },
+  {
+   "find": "Necromatic",
+   "replace": "Necromantic",
+   "bug": "typo"
+  },
+  {
+   "find": "theSlayer",
+   "replace": "the Slayer",
+   "bug": "typo"
+  },
+  {
+   "find": "thatas",
+   "replace": "that as",
+   "bug": "typo"
+  },
+  {
+   "find": "yau",
+   "replace": "you",
+   "bug": "typo"
+  },
+  {
+   "find": "Osidian",
+   "replace": "Obsidian",
+   "bug": "typo"
+  },
+  {
+   "find": "It's location is known",
+   "replace": "Its location is known",
+   "bug": "typo"
+  },
+  {
+   "find": "loose your money",
+   "replace": "lose your money",
+   "bug": "typo"
+  },
+  {
+   "find": "taling",
+   "replace": "talking",
+   "bug": "typo"
+  },
+  {
+   "find": "carried in it's arms",
+   "replace": "carried in its arms",
+   "bug": "typo"
+  },
+  {
+   "find": "driven to it's knees",
+   "replace": "driven to its knees",
+   "bug": "typo"
+  },
+  {
+   "find": "begged for it's life",
+   "replace": "begged for its life",
+   "bug": "typo"
+  },
+  {
+   "find": "Grommets blows",
+   "replace": "Grommet's blows",
+   "bug": "typo"
+  },
+  {
+   "find": "within it's range",
+   "replace": "within its range",
+   "bug": "typo"
+  },
+  {
+   "find": "Perhaps it's most important purpose is it's capability",
+   "replace": "Perhaps its most important purpose is its capability",
+   "bug": "typo"
+  },
+  {
+   "find": "The next thing I new",
+   "replace": "The next thing I knew",
+   "bug": "typo"
+  },
+  {
+   "find": "occured",
+   "replace": "occurred",
+   "bug": "typo"
+  },
+  {
+   "find": "begining",
+   "replace": "beginning",
+   "bug": "typo"
+  },
+  {
+   "find": "moneys worth",
+   "replace": "money's worth",
+   "bug": "typo"
+  }
+ ]
+}

@@ -1,0 +1,106 @@
+{
+  "note": "Pagan transformed as the virtues grow (PLAN-VIRTUES.md 5; game/world_stages.h). Only with the Virtues option on; off, or below the first threshold, is stage 0 (the original look and play). Thresholds are in virtue points (Virtues::total), not a share of the 400 maximum: about 110-130 points can be earned in a game, and the endings use 20 and 45 (virtues.json).",
+  "thresholds": [20, 40, 60],
+
+  "looks_note": "Outdoor maps only (the Underworld and the Planes are not listed, so they stay as they are). palette and rays are 0..1 weights for that map; the effect at stage s is weight * s / 3 of the full one below. Maps 12 (Daemon's Crag) and 16 (Carthax Lake still dry) keep their look on purpose.",
+  "looks": [
+    {"map": 3, "about": "Tenebrae docks and shore", "palette": 1.0, "rays": 1.0},
+    {"map": 4, "about": "Fisherman's Reef", "palette": 0.9, "rays": 0.8},
+    {"map": 5, "about": "East Road", "palette": 0.8, "rays": 0.8},
+    {"map": 6, "about": "Cemetery (gentler, few rays)", "palette": 0.45, "rays": 0.35},
+    {"map": 7, "about": "Herdsman's Valley", "palette": 1.0, "rays": 1.0},
+    {"map": 8, "about": "Plateau", "palette": 0.7, "rays": 0.7},
+    {"map": 21, "about": "Stone Cove", "palette": 0.6, "rays": 0.6},
+    {"map": 26, "about": "Carthax Lake with its water back", "palette": 0.8, "rays": 0.8},
+    {"map": 37, "about": "Argentrock Isle", "palette": 0.7, "rays": 0.8},
+    {"map": 39, "about": "West Tenebrae", "palette": 1.0, "rays": 0.9},
+    {"map": 40, "about": "Central Tenebrae", "palette": 1.0, "rays": 0.9},
+    {"map": 41, "about": "East Tenebrae", "palette": 1.0, "rays": 0.9}
+  ],
+  "palette_note": "The full colour shift (stage 3, weight 1): brighter, warmer, a little more colour (less grey-brown), the darks lifted. Multiplies only, so a fade to black stays black. The UI and the side panel are never shifted.",
+  "palette": {"bright": 0.07, "warm": 0.07, "saturation": 0.22, "lift": 0.12},
+  "rays_note": "Sun rays: episodes of `episode` seconds; one is lit with chance `chance` by stage (stage 0 first), fading in and out over `fade` seconds. Beams lean by `slant` (screen x per screen y), sit about every `spacing` world pixels, `width` wide, drift `drift` px/s, peak brightness `strength` (0..1 of a warm white), anchored to the world so they stay put as the Avatar walks.",
+  "rays": {"episode": 26, "fade": 5, "chance": [0, 0.3, 0.5, 0.75], "slant": 0.55, "spacing": 160, "width": [44, 120], "drift": 2.5, "strength": 0.65, "colour": [255, 232, 170]},
+
+  "heartland_note": "PLAN-VIRTUES.md 5.15: monster eggs in these rectangles (map, x0, y0, x1, y1) skip one hatch in `one_in` by stage (stage 0 first; 0 = never skip), counted per egg, so they never go to zero. People (not_shapes) and one-shot eggs (frame 1) are never skipped. The rectangles: map 3 is all of Tenebrae's shore; map 5 the Tenebrae end of East Road (its gates at about 4800, 22800 and 4800, 26300) and the Cemetery gate end (7400, 10900); map 7 the lower track around Tenebrae's north gate (15100, 26200).",
+  "heartland": {
+    "one_in": [0, 4, 3, 2],
+    "areas": [
+      {"map": 3, "rect": [0, 0, 32767, 32767]},
+      {"map": 5, "rect": [0, 18500, 12500, 32767]},
+      {"map": 5, "rect": [2000, 10000, 10000, 14500]},
+      {"map": 7, "rect": [9000, 20500, 21500, 32767]}
+    ],
+    "not_shapes": [574, 707, 708, 835, 836]
+  },
+  "peace_note": "PLAN-VIRTUES.md 5.17: on the Cemetery map the undead monster eggs (shapes) skip one hatch in `one_in` once this many Grant Peace kills (keys Spirituality/peace/N) are done. The catacombs (maps 49, 50, 51, 62) are not listed and stay as dangerous as ever.",
+  "peace": {
+    "maps": [6],
+    "shapes": [119, 142, 411],
+    "steps": [{"peace": 5, "one_in": 4}, {"peace": 10, "one_in": 3}, {"peace": 15, "one_in": 2}]
+  },
+
+  "music_note": "PLAN-VIRTUES.md 5.9: a music egg's track on these maps is swapped from the given stage on (track numbers: specs/formats/music.md). Tenebrae's own theme gives way to the reef's calmer tune; Herdsman's Valley takes the main theme. Danger areas are not listed.",
+  "music": [
+    {"maps": [39, 40, 41], "track": 56, "to": 57, "from_stage": 2},
+    {"maps": [7], "track": 57, "to": 51, "from_stage": 3}
+  ],
+
+  "time_note": "The schedules' day is six game hours (game hour mod 6, each 15 real minutes; time.md 3, leveling_facts.md 4). The original has no night to see, so night is these periods by the clock: the lamps glow, crickets sing, children stay home.",
+  "night_periods": [5, 0],
+  "morning_periods": [1],
+
+  "weather_note": "PLAN-VIRTUES.md 5.3. The only gloom the original has is the rain storm after the water is freed (STORM 1393: the grey transform 3 and lightning with thunder on the maps that show weather; creature_facts.md 5). On these maps the storm's grey eases toward clear by weight x clear[stage], its flashes (and their thunder) are left out with chance weight x skip_flash[stage], and from clear_mornings_from the morning period has no storm at all. Spell, story and Grant Peace flashes are never touched.",
+  "weather": {
+    "maps": [
+      {"map": 3, "weight": 1.0}, {"map": 39, "weight": 1.0}, {"map": 40, "weight": 1.0}, {"map": 41, "weight": 1.0},
+      {"map": 7, "weight": 0.8}, {"map": 4, "weight": 0.6}, {"map": 5, "weight": 0.5}, {"map": 6, "weight": 0.3}
+    ],
+    "clear": [0, 0.35, 0.6, 0.85],
+    "skip_flash": [0, 0.3, 0.5, 0.7],
+    "clear_mornings_from": 2,
+    "thunder": [89, 91, 94, 96]
+  },
+
+  "lamps_note": "PLAN-VIRTUES.md 5.4. Tenebrae's lamps already burn in the original (the hanging lamps 690 / 691 on the posts 67, the wall lamps 314 / 317, braziers and hearths), but cast no light: the game has none (rendering.md 5.3). At night from stage 1 each casts a soft warm pool, by_stage strong, flickering a little; radius in world screen pixels, dz lifts the centre (world units). No window shapes were found, so windows stay as they are.",
+  "lamps": {
+    "maps": [3, 39, 40, 41],
+    "by_stage": [0, 0.6, 0.8, 1.0],
+    "colour": [255, 186, 104],
+    "shapes": [
+      {"about": "hanging street lamps on the posts", "shapes": [690, 691], "radius": 64, "strength": 0.6, "dz": -8},
+      {"about": "wall lamps", "shapes": [314, 317], "radius": 40, "strength": 0.5, "dz": 0},
+      {"about": "fire pit, campfire", "shapes": [318, 267], "radius": 60, "strength": 0.5, "dz": 0},
+      {"about": "hearths and fireplaces", "shapes": [276, 277, 724], "radius": 46, "strength": 0.4, "dz": 0},
+      {"about": "candelabra and candles", "shapes": [452, 453, 454], "radius": 20, "strength": 0.3, "dz": 8}
+    ]
+  },
+
+  "ambience_note": "PLAN-VIRTUES.md 5.10, the game's own sounds: 218 TROODLE (a warbling call, our birdsong), 30 CRICKET, 105 WAVE1. Each entry tries every `every` frames (jittered) with chance by stage, quietly (volume of 255) and unpositioned. when: day / night / any. min_peace: only once that many undead are laid to rest.",
+  "ambience": [
+    {"maps": [39, 40, 41], "sfx": [218], "chance": [0, 0.25, 0.4, 0.55], "every": 420, "volume": 70, "when": "day"},
+    {"maps": [39, 40, 41, 7], "sfx": [30], "chance": [0, 0.3, 0.45, 0.6], "every": 300, "volume": 60, "when": "night"},
+    {"maps": [3, 4, 21], "sfx": [105], "chance": [0, 0.3, 0.45, 0.6], "every": 330, "volume": 80, "when": "any"},
+    {"maps": [3, 4, 7], "sfx": [218], "chance": [0, 0.2, 0.35, 0.5], "every": 420, "volume": 60, "when": "day"},
+    {"maps": [6], "sfx": [30, 218], "chance": [0, 0.3, 0.4, 0.5], "every": 450, "volume": 55, "when": "any", "min_peace": 10}
+  ],
+  "hush_note": "The undead's voices on the Cemetery map (ZOMBIE1-3, GHOUL2, FEMOAN1) go quiet one time in 4 / 3 / 2 by the peace steps above. The original plays no ambient moans there (8000 frames listened to on map 6 played nothing), so only the creatures' own cries thin out.",
+  "hush": {"maps": [6], "sfx": [117, 118, 119, 183, 184]},
+
+  "market_note": "PLAN-VIRTUES.md 5.12. The shops' prices live in their usecode, so the discount is paid at the till: while the Avatar talks with one of these merchants (Darion 5, Rhian 18, Mythran 33, including the engine's training), rebate_pct of every obsidian he hands over comes back to his pack, with a line in the log.",
+  "market": {"merchants": [5, 18, 33], "rebate_pct": [0, 5, 10, 15]},
+
+  "frontier_note": "PLAN-VIRTUES.md 5.16, with Leveling on: each heartland hatch that stays empty puts the XP its monster would have paid (its variant on that map) into a pool, kept in the save as a Virtues key. A kill on these maps (the Plateau, Daemon's Crag, the Fortress, coves, Carthax Lake, the lava tunnel, the Hall of the Mountain King, Argentrock, the Planes, the Shrine, the Pit of the Dead, the Ancient Necromancers) pays up to `share` of its own XP again from the pool to the party. The pool never holds more than `cap`.",
+  "frontier": {"maps": [8, 12, 14, 15, 16, 21, 24, 25, 26, 31, 37, 44, 45, 46, 47, 54, 57, 62], "share": 0.5, "cap": 3000},
+
+  "life_note": "PLAN-VIRTUES.md 5.18 and 5.11: creatures brought in by stage, spot by spot (the first count[stage] spots of each list), each when its spot comes into the fast area and not right beside the Avatar. Made like a monster egg's (fast-area only, gone when he walks away and back when he returns); slain, a spot stays empty for the visit; no XP. Torax and rats keep their own side, so they never pick a fight (they loiter, activity 0) but fight back. Children (708) play by day on Tenebrae's streets, by the lamp posts.",
+  "life": [
+    {"id": "torax herd", "shape": 120, "activity": 0, "when": "any", "count": [0, 0, 3, 5],
+     "spots": [[7, 12000, 18500, 0], [7, 13000, 19000, 0], [7, 12500, 18100, 0], [7, 12300, 19400, 0], [7, 13300, 18400, 0]]},
+    {"id": "rats", "shape": 806, "activity": 0, "when": "any", "count": [0, 2, 3, 5],
+     "spots": [[7, 14000, 20000, 0], [7, 14700, 20500, 0], [7, 15300, 20900, 0], [7, 13600, 20900, 0], [7, 15000, 21700, 0]]},
+    {"id": "children", "shape": 708, "activity": 0, "when": "day", "count": [0, 0, 6, 10],
+     "spots": [[39, 13027, 10307, 48], [41, 15619, 11907, 48], [40, 12963, 15363, 48], [39, 16483, 11363, 48], [41, 16195, 4259, 48],
+               [40, 13411, 2819, 48], [39, 11107, 10851, 48], [41, 15907, 15459, 48], [39, 17539, 14467, 48], [41, 17000, 9000, 48]]}
+  ]
+}

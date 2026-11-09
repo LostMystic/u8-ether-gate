@@ -1,0 +1,1789 @@
+{
+ "version": 1,
+ "notes": [
+  "Travel banter between two companions (PLAN-LEVELING.md 8; game/banter.h). The engine's own writing. Characters: docs/companion_personalities.md; all of it in one place: docs/banter_review.md (tools/banter_doc.py).",
+  "pairs: each unordered pair of companion ids once; mood is for the review only. exchanges play in file order, each once per save; repeat (the 'run out of things to say' joke) only when every exchange of every present pair is heard, one time in three a point fires.",
+  "A line is {\"<companion id>\": \"<text>\"}; {avatar} = the Avatar's name. Optional per exchange: when: {step_done: [...], step_not_done: [...]} (critical-path step ids)."
+ ],
+ "pairs": [
+  {
+   "pair": [
+    "morvain",
+    "kalvax"
+   ],
+   "mood": "prickly",
+   "exchanges": [
+    {
+     "id": "morvain_kalvax_1",
+     "lines": [
+      {
+       "kalvax": "Morvain, dost thou ever smile, or would it crack thy face?"
+      },
+      {
+       "morvain": "I smiled once. At a funeral. It was a very good funeral."
+      },
+      {
+       "kalvax": "Of course it was."
+      }
+     ]
+    },
+    {
+     "id": "morvain_kalvax_2",
+     "lines": [
+      {
+       "morvain": "Thou flinchest when I speak of burial, sorcerer."
+      },
+      {
+       "kalvax": "I do not flinch. I simply prefer to go out in a blaze."
+      },
+      {
+       "morvain": "Fire leaves nothing to bury. No stone, no name. Only ash on the wind."
+      },
+      {
+       "kalvax": "Then they will have to remember me some other way. Loudly."
+      }
+     ]
+    },
+    {
+     "id": "morvain_kalvax_3",
+     "lines": [
+      {
+       "kalvax": "Thy skeleton swung at a troll and lost its own arm."
+      },
+      {
+       "morvain": "It was a hundred years old. What didst thou do at a hundred years old?"
+      },
+      {
+       "kalvax": "I intend to be a god by then."
+      },
+      {
+       "morvain": "Then I will dig thee a very large hole."
+      }
+     ]
+    },
+    {
+     "id": "morvain_kalvax_4",
+     "lines": [
+      {
+       "morvain": "Thou didst stand very close to the Avatar in that last fight."
+      },
+      {
+       "kalvax": "To aim better."
+      },
+      {
+       "morvain": "Mm. I stand near the living when I am afraid too."
+      },
+      {
+       "kalvax": "Say that again and I will set thy hood alight."
+      }
+     ]
+    }
+   ],
+   "repeat": {
+    "id": "morvain_kalvax_repeat",
+    "lines": [
+     {
+      "kalvax": "Say something, gravedigger."
+     },
+     {
+      "morvain": "Something."
+     },
+     {
+      "kalvax": "Pyros give me strength."
+     }
+    ]
+   }
+  },
+  {
+   "pair": [
+    "morvain",
+    "brannoc"
+   ],
+   "mood": "friendly",
+   "exchanges": [
+    {
+     "id": "morvain_brannoc_1",
+     "lines": [
+      {
+       "brannoc": "Thou walkest like a man following a coffin."
+      },
+      {
+       "morvain": "I am. Usually someone else's. Today, thine. I am measuring."
+      },
+      {
+       "brannoc": "Measuring what?"
+      },
+      {
+       "morvain": "Thou wilt need a long hole. They stretch."
+      }
+     ]
+    },
+    {
+     "id": "morvain_brannoc_2",
+     "lines": [
+      {
+       "morvain": "Thou didst hold thy breath all through the catacombs, Brannoc."
+      },
+      {
+       "brannoc": "Low roofs. No wind. Feels like being buried."
+      },
+      {
+       "morvain": "It is very peaceful, being buried."
+      },
+      {
+       "brannoc": "Then thou canst have my turn."
+      }
+     ]
+    }
+   ],
+   "repeat": {
+    "id": "morvain_brannoc_repeat",
+    "lines": [
+     {
+      "brannoc": "Rain soon."
+     },
+     {
+      "morvain": "The ground will be soft. Good digging."
+     },
+     {
+      "brannoc": "That's not what I meant."
+     },
+     {
+      "morvain": "It is what I meant."
+     }
+    ]
+   }
+  },
+  {
+   "pair": [
+    "morvain",
+    "varn"
+   ],
+   "mood": "friendly",
+   "exchanges": [
+    {
+     "id": "morvain_varn_1",
+     "lines": [
+      {
+       "varn": "Thou servest Lithos and I serve Hydros. Our gods are seldom friends."
+      },
+      {
+       "morvain": "Our gods quarrel. Their servants need not."
+      },
+      {
+       "varn": "Well said. An oath to one is still an oath."
+      },
+      {
+       "morvain": "And a grave dug for anyone is still a grave dug well."
+      }
+     ]
+    },
+    {
+     "id": "morvain_varn_2",
+     "lines": [
+      {
+       "morvain": "Thou washest thy blade in every stream we pass, warden."
+      },
+      {
+       "varn": "A warden's habit. Blood should go back to the water."
+      },
+      {
+       "morvain": "I wash the dead before they go into the earth. It is much the same."
+      },
+      {
+       "varn": "Then we both send something home."
+      }
+     ]
+    }
+   ],
+   "repeat": {
+    "id": "morvain_varn_repeat",
+    "lines": [
+     {
+      "varn": "The water is high today."
+     },
+     {
+      "morvain": "The ground is low today."
+     },
+     {
+      "varn": "...That is not a conversation."
+     },
+     {
+      "morvain": "No. But it passed the time."
+     }
+    ]
+   }
+  },
+  {
+   "pair": [
+    "morvain",
+    "ilvaran"
+   ],
+   "mood": "friendly",
+   "exchanges": [
+    {
+     "id": "morvain_ilvaran_1",
+     "lines": [
+      {
+       "ilvaran": "Dost thou pray for the dead thou buriest, Morvain?"
+      },
+      {
+       "morvain": "I sing to them. Lithos does not care for prayers. He likes a good tune."
+      },
+      {
+       "ilvaran": "Then perhaps I will learn one. For the Zealans."
+      },
+      {
+       "morvain": "They are long past my hearing. But I will teach thee anyway."
+      }
+     ]
+    },
+    {
+     "id": "morvain_ilvaran_2",
+     "lines": [
+      {
+       "morvain": "Thou thankest every creature thou killest."
+      },
+      {
+       "ilvaran": "Someone should. They did not ask to be born angry."
+      },
+      {
+       "morvain": "Nor did I. I am thankful nobody killed me for it."
+      }
+     ]
+    }
+   ],
+   "repeat": {
+    "id": "morvain_ilvaran_repeat",
+    "lines": [
+     {
+      "ilvaran": "What a peaceful road."
+     },
+     {
+      "morvain": "Like a cemetery."
+     },
+     {
+      "ilvaran": "I did not mean it like that."
+     },
+     {
+      "morvain": "I did."
+     }
+    ]
+   }
+  },
+  {
+   "pair": [
+    "morvain",
+    "corvin"
+   ],
+   "mood": "teasing",
+   "exchanges": [
+    {
+     "id": "morvain_corvin_1",
+     "lines": [
+      {
+       "corvin": "So, Morvain. Hypothetically. Do the dead ever take rings with them?"
+      },
+      {
+       "morvain": "Hypothetically, yes. And hypothetically, I bury thieves too."
+      },
+      {
+       "corvin": "Just asking. For a friend."
+      },
+      {
+       "morvain": "Thy friend would make a fine short grave."
+      }
+     ]
+    },
+    {
+     "id": "morvain_corvin_2",
+     "lines": [
+      {
+       "morvain": "Thou gavest that beggar in Tenebrae a coin and thoughtest nobody saw."
+      },
+      {
+       "corvin": "Didn't happen. And if it did, it was a bad coin."
+      },
+      {
+       "morvain": "The dead see everything, Corvin."
+      },
+      {
+       "corvin": "Then the dead can keep their mouths shut. They're good at that."
+      }
+     ]
+    },
+    {
+     "id": "morvain_corvin_3",
+     "lines": [
+      {
+       "corvin": "Why dost thou always walk behind me?"
+      },
+      {
+       "morvain": "So I can see thy hands."
+      },
+      {
+       "corvin": "Fair. I would do the same."
+      }
+     ]
+    }
+   ],
+   "repeat": {
+    "id": "morvain_corvin_repeat",
+    "lines": [
+     {
+      "corvin": "Morvain. Morvain. Thou'rt very quiet."
+     },
+     {
+      "morvain": "So are the dead."
+     },
+     {
+      "corvin": "I knew thou'd say that."
+     }
+    ]
+   }
+  },
+  {
+   "pair": [
+    "morvain",
+    "wynna"
+   ],
+   "mood": "teasing",
+   "exchanges": [
+    {
+     "id": "morvain_wynna_1",
+     "lines": [
+      {
+       "wynna": "Morvain, what do the dead actually say? When thou listenest?"
+      },
+      {
+       "morvain": "Mostly that they are cold. And that I dig too slowly."
+      },
+      {
+       "wynna": "That's it? No secrets of the ages?"
+      },
+      {
+       "morvain": "Thou wouldst be surprised how much of the ages is complaining."
+      }
+     ]
+    },
+    {
+     "id": "morvain_wynna_2",
+     "lines": [
+      {
+       "morvain": "Thou countest the skulls in every catacomb we enter."
+      },
+      {
+       "wynna": "Eighty-one in the last hall! Well, eighty, one was a pot."
+      },
+      {
+       "morvain": "Count softer. Some of them were friends."
+      },
+      {
+       "wynna": "Oh. Sorry. Eighty, then. Quietly."
+      }
+     ]
+    }
+   ],
+   "repeat": {
+    "id": "morvain_wynna_repeat",
+    "lines": [
+     {
+      "wynna": "Ask me a question, Morvain."
+     },
+     {
+      "morvain": "Must I?"
+     },
+     {
+      "wynna": "That counts. Thank thee!"
+     }
+    ]
+   }
+  },
+  {
+   "pair": [
+    "morvain",
+    "nerissa"
+   ],
+   "mood": "friendly",
+   "exchanges": [
+    {
+     "id": "morvain_nerissa_1",
+     "lines": [
+      {
+       "nerissa": "Thou hearest the ground the way I hear the sea."
+      },
+      {
+       "morvain": "The ground mutters. Thy sea sings, I think."
+      },
+      {
+       "nerissa": "She weeps more than she sings."
+      },
+      {
+       "morvain": "Then we both keep sad company. It suits us."
+      }
+     ]
+    },
+    {
+     "id": "morvain_nerissa_2",
+     "lines": [
+      {
+       "morvain": "Thou didst pick up a shell back there, and kiss it."
+      },
+      {
+       "nerissa": "Something lived in it once. It deserves a kindness."
+      },
+      {
+       "morvain": "Thou wouldst have made a good gravekeeper."
+      },
+      {
+       "nerissa": "Perhaps I am one. The sea's."
+      }
+     ]
+    }
+   ],
+   "repeat": {
+    "id": "morvain_nerissa_repeat",
+    "lines": [
+     {
+      "morvain": "Quiet."
+     },
+     {
+      "nerissa": "Yes."
+     },
+     {
+      "morvain": "Good."
+     }
+    ]
+   }
+  },
+  {
+   "pair": [
+    "kalvax",
+    "brannoc"
+   ],
+   "mood": "teasing",
+   "exchanges": [
+    {
+     "id": "kalvax_brannoc_1",
+     "lines": [
+      {
+       "kalvax": "Brannoc, what dost thou want? Power? Gold? A throne?"
+      },
+      {
+       "brannoc": "Open ground and a good meal."
+      },
+      {
+       "kalvax": "That is the saddest thing I have ever heard."
+      },
+      {
+       "brannoc": "Thou hast not heard thyself snore."
+      }
+     ]
+    },
+    {
+     "id": "kalvax_brannoc_2",
+     "lines": [
+      {
+       "brannoc": "Thou didst cast three bolts at a ghoul that was already falling."
+      },
+      {
+       "kalvax": "I wanted to be sure."
+      },
+      {
+       "brannoc": "Thou didst want everyone to watch."
+      },
+      {
+       "kalvax": "...Both things can be true."
+      }
+     ]
+    }
+   ],
+   "repeat": {
+    "id": "kalvax_brannoc_repeat",
+    "lines": [
+     {
+      "kalvax": "Talk, axe-man. I am bored."
+     },
+     {
+      "brannoc": "Wind's from the west."
+     },
+     {
+      "kalvax": "Talk about something else."
+     },
+     {
+      "brannoc": "Wind's from the west, still."
+     }
+    ]
+   }
+  },
+  {
+   "pair": [
+    "kalvax",
+    "varn"
+   ],
+   "mood": "prickly",
+   "exchanges": [
+    {
+     "id": "kalvax_varn_1",
+     "lines": [
+      {
+       "varn": "Thou servest a Titan who would burn this land to its roots."
+      },
+      {
+       "kalvax": "And thou servest one who would drown it. At least mine is quick."
+      },
+      {
+       "varn": "Hydros feeds the land. Pyros only eats it."
+      },
+      {
+       "kalvax": "Fire clears the dead wood, warden. Even thou art a little dead wood."
+      }
+     ]
+    },
+    {
+     "id": "kalvax_varn_2",
+     "lines": [
+      {
+       "kalvax": "Thou keepest walking between me and every puddle, Varn."
+      },
+      {
+       "varn": "Thou keepest stepping round them like a cat."
+      },
+      {
+       "kalvax": "I do not like getting my boots wet. That is all."
+      },
+      {
+       "varn": "The water will not hurt thee, sorcerer. Not unless thou fall in."
+      },
+      {
+       "kalvax": "Thank thee. Very comforting."
+      }
+     ]
+    },
+    {
+     "id": "kalvax_varn_3",
+     "lines": [
+      {
+       "varn": "Thou didst laugh when that creature burned."
+      },
+      {
+       "kalvax": "It was trying to eat me. I am allowed to laugh."
+      },
+      {
+       "varn": "A warden does not laugh at a death."
+      },
+      {
+       "kalvax": "Then it is lucky I am not a warden. One of us should enjoy his work."
+      }
+     ]
+    }
+   ],
+   "repeat": {
+    "id": "kalvax_varn_repeat",
+    "lines": [
+     {
+      "kalvax": "Water, water, everywhere."
+     },
+     {
+      "varn": "Fire, fire, nowhere."
+     },
+     {
+      "kalvax": "Thou practised that."
+     }
+    ]
+   }
+  },
+  {
+   "pair": [
+    "kalvax",
+    "ilvaran"
+   ],
+   "mood": "prickly",
+   "exchanges": [
+    {
+     "id": "kalvax_ilvaran_1",
+     "lines": [
+      {
+       "ilvaran": "May I ask thee something, Kalvax?"
+      },
+      {
+       "kalvax": "If it is about my soul, no."
+      },
+      {
+       "ilvaran": "It was about thy hands. They shake after thou castest."
+      },
+      {
+       "kalvax": "They are cold. Fire leaves them cold. Mind thine own hands, pilgrim."
+      }
+     ]
+    },
+    {
+     "id": "kalvax_ilvaran_2",
+     "lines": [
+      {
+       "kalvax": "Thou didst pray over that ghoul. It was a ghoul."
+      },
+      {
+       "ilvaran": "It was someone, once."
+      },
+      {
+       "kalvax": "Now it is ash. I made sure."
+      },
+      {
+       "ilvaran": "Then I will pray for the ash too. It costs me nothing."
+      },
+      {
+       "kalvax": "It costs me my patience."
+      }
+     ]
+    },
+    {
+     "id": "kalvax_ilvaran_3",
+     "lines": [
+      {
+       "kalvax": "Thy gods left, Ilvaran. Mine is still burning. Who is the fool?"
+      },
+      {
+       "ilvaran": "Perhaps both of us. I hope they are listening. Thou hopest he is not."
+      },
+      {
+       "kalvax": "...I said no talk about souls."
+      },
+      {
+       "ilvaran": "Thou didst. I am sorry."
+      }
+     ]
+    }
+   ],
+   "repeat": {
+    "id": "kalvax_ilvaran_repeat",
+    "lines": [
+     {
+      "ilvaran": "Peace be with thee, Kalvax."
+     },
+     {
+      "kalvax": "It never is."
+     },
+     {
+      "ilvaran": "I will keep saying it."
+     }
+    ]
+   }
+  },
+  {
+   "pair": [
+    "kalvax",
+    "corvin"
+   ],
+   "mood": "friendly",
+   "exchanges": [
+    {
+     "id": "kalvax_corvin_1",
+     "lines": [
+      {
+       "corvin": "So what's thy plan, Kalvax? After all this?"
+      },
+      {
+       "kalvax": "A tower. Disciples. My old master licking ash off my floor."
+      },
+      {
+       "corvin": "Modest. I just want a house with a lock nobody can pick."
+      },
+      {
+       "kalvax": "Thou couldst pick it."
+      },
+      {
+       "corvin": "Aye, that's the beauty of it."
+      }
+     ]
+    },
+    {
+     "id": "kalvax_corvin_2",
+     "lines": [
+      {
+       "kalvax": "Thou art the only one here who understands wanting more, thief."
+      },
+      {
+       "corvin": "I understand wanting more. I also understand getting caught."
+      },
+      {
+       "kalvax": "I do not get caught. I get exiled."
+      },
+      {
+       "corvin": "Same thing with a nicer view."
+      }
+     ]
+    }
+   ],
+   "repeat": {
+    "id": "kalvax_corvin_repeat",
+    "lines": [
+     {
+      "corvin": "Burn anything good lately?"
+     },
+     {
+      "kalvax": "Thee, soon."
+     },
+     {
+      "corvin": "Lovely chat."
+     }
+    ]
+   }
+  },
+  {
+   "pair": [
+    "kalvax",
+    "wynna"
+   ],
+   "mood": "teasing",
+   "exchanges": [
+    {
+     "id": "kalvax_wynna_1",
+     "lines": [
+      {
+       "wynna": "Kalvax, how hot is a fire bolt? Exactly? In numbers?"
+      },
+      {
+       "kalvax": "Hot enough."
+      },
+      {
+       "wynna": "That's not a number!"
+      },
+      {
+       "kalvax": "It is a sorcerer's number."
+      }
+     ]
+    },
+    {
+     "id": "kalvax_wynna_2",
+     "lines": [
+      {
+       "kalvax": "Thy lightning was showy back there. Clumsy, but showy."
+      },
+      {
+       "wynna": "Thy fire missed twice."
+      },
+      {
+       "kalvax": "It was a warning shot. Twice."
+      },
+      {
+       "wynna": "Mythran says that, too, when he misses."
+      }
+     ]
+    },
+    {
+     "id": "kalvax_wynna_3",
+     "lines": [
+      {
+       "wynna": "Kalvax, why dost thou never ask the Avatar about his world?"
+      },
+      {
+       "kalvax": "Because I will rule this one first, and then ask."
+      },
+      {
+       "wynna": "That's backwards."
+      },
+      {
+       "kalvax": "It is ambitious. Thou wouldst not understand."
+      },
+      {
+       "wynna": "I understand perfectly. It's backwards."
+      }
+     ]
+    }
+   ],
+   "repeat": {
+    "id": "kalvax_wynna_repeat",
+    "lines": [
+     {
+      "wynna": "Pyros, Pyros, Pyros."
+     },
+     {
+      "kalvax": "I did not say anything."
+     },
+     {
+      "wynna": "Thou wast about to."
+     }
+    ]
+   }
+  },
+  {
+   "pair": [
+    "kalvax",
+    "nerissa"
+   ],
+   "mood": "wary",
+   "exchanges": [
+    {
+     "id": "kalvax_nerissa_1",
+     "lines": [
+      {
+       "kalvax": "Stop looking at me like that, sea-girl."
+      },
+      {
+       "nerissa": "Like what?"
+      },
+      {
+       "kalvax": "Like thou knowest how I end."
+      },
+      {
+       "nerissa": "I do not. The sea says nothing of thee. I think thou art too warm for her."
+      },
+      {
+       "kalvax": "...Good."
+      }
+     ]
+    },
+    {
+     "id": "kalvax_nerissa_2",
+     "lines": [
+      {
+       "nerissa": "Thou walkest far from the shore whenever we are near the water."
+      },
+      {
+       "kalvax": "The view is better from up here."
+      },
+      {
+       "nerissa": "She would not take thee, Kalvax. She takes only what falls."
+      },
+      {
+       "kalvax": "Then I will not fall. Talk of something else."
+      }
+     ]
+    }
+   ],
+   "repeat": {
+    "id": "kalvax_nerissa_repeat",
+    "lines": [
+     {
+      "kalvax": "Any prophecies today?"
+     },
+     {
+      "nerissa": "Rain."
+     },
+     {
+      "kalvax": "There is always rain."
+     },
+     {
+      "nerissa": "Then I am always right."
+     }
+    ]
+   }
+  },
+  {
+   "pair": [
+    "brannoc",
+    "varn"
+   ],
+   "mood": "friendly",
+   "exchanges": [
+    {
+     "id": "brannoc_varn_1",
+     "lines": [
+      {
+       "varn": "Thou fightest well, Brannoc. Thou shouldst have been a warden."
+      },
+      {
+       "brannoc": "Too many prayers. I'd forget the words."
+      },
+      {
+       "varn": "The water does not mind the words. Only the heart."
+      },
+      {
+       "brannoc": "Then maybe. When I'm old. And slow."
+      }
+     ]
+    },
+    {
+     "id": "brannoc_varn_2",
+     "lines": [
+      {
+       "brannoc": "Thou dost keep thy shield up even walking. Waiting for something?"
+      },
+      {
+       "varn": "Always. A warden is never off his watch."
+      },
+      {
+       "brannoc": "Tiring, that."
+      },
+      {
+       "varn": "Yes. But someone must stand still while the rest of thee run."
+      }
+     ]
+    }
+   ],
+   "repeat": {
+    "id": "brannoc_varn_repeat",
+    "lines": [
+     {
+      "brannoc": "Wind."
+     },
+     {
+      "varn": "Water."
+     },
+     {
+      "brannoc": "Glad we sorted that."
+     }
+    ]
+   }
+  },
+  {
+   "pair": [
+    "brannoc",
+    "ilvaran"
+   ],
+   "mood": "friendly",
+   "exchanges": [
+    {
+     "id": "brannoc_ilvaran_1",
+     "lines": [
+      {
+       "ilvaran": "Thou hearest Stratos better than any theurgist I have known."
+      },
+      {
+       "brannoc": "I don't hear her. I just smell the rain."
+      },
+      {
+       "ilvaran": "That is how she speaks to most of us. Few listen."
+      },
+      {
+       "brannoc": "Well, I'm listening now. She says hurry up."
+      }
+     ]
+    },
+    {
+     "id": "brannoc_ilvaran_2",
+     "lines": [
+      {
+       "brannoc": "Thou walkest slow, pilgrim. Every stone, thou stoppest."
+      },
+      {
+       "ilvaran": "Someone walked here before us. I like to say hello."
+      },
+      {
+       "brannoc": "I'd like to get there before dark."
+      },
+      {
+       "ilvaran": "We will. And we will have said hello."
+      }
+     ]
+    }
+   ],
+   "repeat": {
+    "id": "brannoc_ilvaran_repeat",
+    "lines": [
+     {
+      "ilvaran": "A blessed day."
+     },
+     {
+      "brannoc": "Windy."
+     },
+     {
+      "ilvaran": "Blessedly windy."
+     }
+    ]
+   }
+  },
+  {
+   "pair": [
+    "brannoc",
+    "corvin"
+   ],
+   "mood": "teasing",
+   "exchanges": [
+    {
+     "id": "brannoc_corvin_1",
+     "lines": [
+      {
+       "corvin": "Brannoc, mate, thy purse is hanging out."
+      },
+      {
+       "brannoc": "I know. I'm watching thee watch it."
+      },
+      {
+       "corvin": "...Respect."
+      }
+     ]
+    },
+    {
+     "id": "brannoc_corvin_2",
+     "lines": [
+      {
+       "brannoc": "Thou didst back off in that last fight, Crow. Quick, too."
+      },
+      {
+       "corvin": "Strategic. I go round, they don't see me coming."
+      },
+      {
+       "brannoc": "They didn't see thee at all."
+      },
+      {
+       "corvin": "Exactly! Working as intended."
+      }
+     ]
+    }
+   ],
+   "repeat": {
+    "id": "brannoc_corvin_repeat",
+    "lines": [
+     {
+      "corvin": "Nice axe."
+     },
+     {
+      "brannoc": "Thou saidst that yesterday."
+     },
+     {
+      "corvin": "Still nice."
+     }
+    ]
+   }
+  },
+  {
+   "pair": [
+    "brannoc",
+    "wynna"
+   ],
+   "mood": "teasing",
+   "exchanges": [
+    {
+     "id": "brannoc_wynna_1",
+     "lines": [
+      {
+       "wynna": "Brannoc, how does thy knee know about rain? Is it magic? Can I touch it?"
+      },
+      {
+       "brannoc": "No."
+      },
+      {
+       "wynna": "Is that no, it isn't magic, or no, I can't touch it?"
+      },
+      {
+       "brannoc": "Yes."
+      }
+     ]
+    },
+    {
+     "id": "brannoc_wynna_2",
+     "lines": [
+      {
+       "brannoc": "Thou didst run the whole way up that hill, girl. Not even out of breath."
+      },
+      {
+       "wynna": "I talk while I run. It trains the lungs."
+      },
+      {
+       "brannoc": "That explains a lot."
+      },
+      {
+       "wynna": "Race thee to that rock?"
+      },
+      {
+       "brannoc": "...Aye. Go."
+      }
+     ]
+    }
+   ],
+   "repeat": {
+    "id": "brannoc_wynna_repeat",
+    "lines": [
+     {
+      "wynna": "Brannoc, guess what I'm thinking."
+     },
+     {
+      "brannoc": "Rain."
+     },
+     {
+      "wynna": "No! ...Well, now I am."
+     }
+    ]
+   }
+  },
+  {
+   "pair": [
+    "brannoc",
+    "nerissa"
+   ],
+   "mood": "friendly",
+   "exchanges": [
+    {
+     "id": "brannoc_nerissa_1",
+     "lines": [
+      {
+       "nerissa": "Storm by dark."
+      },
+      {
+       "brannoc": "Aye. Coming over the hills. Thou didst smell it too?"
+      },
+      {
+       "nerissa": "I heard it, in the water underground."
+      },
+      {
+       "brannoc": "Huh. My knee and thy water. Between us we'd make a fine stormwatch."
+      }
+     ]
+    },
+    {
+     "id": "brannoc_nerissa_2",
+     "lines": [
+      {
+       "brannoc": "Thou dost not like towns either, dost thou?"
+      },
+      {
+       "nerissa": "Too many voices. I cannot hear her."
+      },
+      {
+       "brannoc": "Too many walls. I cannot breathe."
+      },
+      {
+       "nerissa": "Then let us walk faster, out of here."
+      }
+     ]
+    }
+   ],
+   "repeat": {
+    "id": "brannoc_nerissa_repeat",
+    "lines": [
+     {
+      "brannoc": "Rain soon."
+     },
+     {
+      "nerissa": "Rain soon."
+     },
+     {
+      "brannoc": "Glad we agree."
+     }
+    ]
+   }
+  },
+  {
+   "pair": [
+    "varn",
+    "ilvaran"
+   ],
+   "mood": "friendly",
+   "exchanges": [
+    {
+     "id": "varn_ilvaran_1",
+     "lines": [
+      {
+       "ilvaran": "Thou prayest as thou walkest, Varn. What dost thou ask for?"
+      },
+      {
+       "varn": "Not to break my oath today."
+      },
+      {
+       "ilvaran": "Only today?"
+      },
+      {
+       "varn": "Tomorrow I will ask again. One day at a time is how oaths are kept."
+      }
+     ]
+    },
+    {
+     "id": "varn_ilvaran_2",
+     "lines": [
+      {
+       "varn": "Thy gods are gone, pilgrim, and thou kneelest still. Why?"
+      },
+      {
+       "ilvaran": "Because they might not be gone. And if they are, I would rather be found kneeling."
+      },
+      {
+       "varn": "That is how I feel of Hydros some days."
+      },
+      {
+       "ilvaran": "Then we are not so different, thou and I."
+      }
+     ]
+    }
+   ],
+   "repeat": {
+    "id": "varn_ilvaran_repeat",
+    "lines": [
+     {
+      "varn": "Shall we pray?"
+     },
+     {
+      "ilvaran": "We prayed an hour ago."
+     },
+     {
+      "varn": "Shall we pray again?"
+     },
+     {
+      "ilvaran": "...Yes, all right."
+     }
+    ]
+   }
+  },
+  {
+   "pair": [
+    "varn",
+    "corvin"
+   ],
+   "mood": "wary",
+   "exchanges": [
+    {
+     "id": "varn_corvin_1",
+     "lines": [
+      {
+       "varn": "Thy hand was near that merchant's belt, Corvin."
+      },
+      {
+       "corvin": "Was it? I was stretching."
+      },
+      {
+       "varn": "Stretch the other way."
+      }
+     ]
+    },
+    {
+     "id": "varn_corvin_2",
+     "lines": [
+      {
+       "corvin": "Warden, dost thou ever do anything wrong? Ever? Once?"
+      },
+      {
+       "varn": "Yes. Every day I fall short of my oath."
+      },
+      {
+       "corvin": "That's not what I meant. I meant fun wrong."
+      },
+      {
+       "varn": "I know what thou didst mean."
+      }
+     ]
+    },
+    {
+     "id": "varn_corvin_3",
+     "lines": [
+      {
+       "varn": "Thou didst turn thy face away at the dock, when we passed the block."
+      },
+      {
+       "corvin": "Bad smell. Fish."
+      },
+      {
+       "varn": "It was not the fish."
+      },
+      {
+       "corvin": "...Drop it, warden. Please."
+      }
+     ]
+    }
+   ],
+   "repeat": {
+    "id": "varn_corvin_repeat",
+    "lines": [
+     {
+      "corvin": "Still watching me?"
+     },
+     {
+      "varn": "Yes."
+     },
+     {
+      "corvin": "Good. I'd hate to be ignored."
+     }
+    ]
+   }
+  },
+  {
+   "pair": [
+    "varn",
+    "wynna"
+   ],
+   "mood": "teasing",
+   "exchanges": [
+    {
+     "id": "varn_wynna_1",
+     "lines": [
+      {
+       "wynna": "Varn, dost thou ever laugh? I've been counting. Zero times."
+      },
+      {
+       "varn": "I laughed in my youth."
+      },
+      {
+       "wynna": "At what?"
+      },
+      {
+       "varn": "I no longer remember. That is probably why I stopped."
+      }
+     ]
+    },
+    {
+     "id": "varn_wynna_2",
+     "lines": [
+      {
+       "varn": "Thou shouldst not run ahead, child. The road has teeth."
+      },
+      {
+       "wynna": "I'm not a child! I'm twenty-three. Ish."
+      },
+      {
+       "varn": "Then run ahead carefully, woman of twenty-three-ish."
+      },
+      {
+       "wynna": "Ha! That was nearly a joke!"
+      }
+     ]
+    }
+   ],
+   "repeat": {
+    "id": "varn_wynna_repeat",
+    "lines": [
+     {
+      "wynna": "Zero laughs today, Varn."
+     },
+     {
+      "varn": "The day is not over."
+     },
+     {
+      "wynna": "Promise?"
+     },
+     {
+      "varn": "No."
+     }
+    ]
+   }
+  },
+  {
+   "pair": [
+    "varn",
+    "nerissa"
+   ],
+   "mood": "friendly",
+   "exchanges": [
+    {
+     "id": "varn_nerissa_1",
+     "lines": [
+      {
+       "varn": "Thou hearest her, Nerissa. Truly hearest her."
+      },
+      {
+       "nerissa": "Only moods. Thou servest her. That is harder."
+      },
+      {
+       "varn": "Serving is easy. Hearing is what I lack."
+      },
+      {
+       "nerissa": "I will tell thee what she says, when she says something kind."
+      }
+     ]
+    },
+    {
+     "id": "varn_nerissa_2",
+     "lines": [
+      {
+       "nerissa": "Thou dost stand between me and every foe. Every time."
+      },
+      {
+       "varn": "A warden guards the tide's own. I count thee among them."
+      },
+      {
+       "nerissa": "I can step back by myself, Varn."
+      },
+      {
+       "varn": "I know. Let me do it anyway."
+      }
+     ]
+    },
+    {
+     "id": "varn_nerissa_3",
+     "lines": [
+      {
+       "varn": "The rains have been too heavy. Does she say why?"
+      },
+      {
+       "nerissa": "She dreams badly. Something holds her down."
+      },
+      {
+       "varn": "I feel it too, at the lake. Like a breath held too long."
+      },
+      {
+       "nerissa": "Then we feel the same thing. That is some comfort."
+      }
+     ]
+    }
+   ],
+   "repeat": {
+    "id": "varn_nerissa_repeat",
+    "lines": [
+     {
+      "nerissa": "The water is calm."
+     },
+     {
+      "varn": "Good."
+     },
+     {
+      "nerissa": "Thou always sayest that."
+     },
+     {
+      "varn": "It is always good."
+     }
+    ]
+   }
+  },
+  {
+   "pair": [
+    "ilvaran",
+    "corvin"
+   ],
+   "mood": "teasing",
+   "exchanges": [
+    {
+     "id": "ilvaran_corvin_1",
+     "lines": [
+      {
+       "corvin": "Ilvaran, stop looking at me like I'm a stray dog thou wantest to feed."
+      },
+      {
+       "ilvaran": "Art thou hungry?"
+      },
+      {
+       "corvin": "...A little. That's not the point."
+      },
+      {
+       "ilvaran": "Here. Bread. It is the point."
+      }
+     ]
+    },
+    {
+     "id": "ilvaran_corvin_2",
+     "lines": [
+      {
+       "ilvaran": "Thou art kinder than thou wishest to seem, Corvin."
+      },
+      {
+       "corvin": "Lies. Slander. I'm a terrible person."
+      },
+      {
+       "ilvaran": "I saw thee carry that child's bucket in Tenebrae."
+      },
+      {
+       "corvin": "She was slow. I was in a hurry. That's all."
+      }
+     ]
+    }
+   ],
+   "repeat": {
+    "id": "ilvaran_corvin_repeat",
+    "lines": [
+     {
+      "ilvaran": "Bless thee, Corvin."
+     },
+     {
+      "corvin": "Stop that."
+     },
+     {
+      "ilvaran": "Bless thee anyway."
+     }
+    ]
+   }
+  },
+  {
+   "pair": [
+    "ilvaran",
+    "wynna"
+   ],
+   "mood": "friendly",
+   "exchanges": [
+    {
+     "id": "ilvaran_wynna_1",
+     "lines": [
+      {
+       "wynna": "Ilvaran, what did the Zealans eat? Nobody ever says."
+      },
+      {
+       "ilvaran": "I do not know. Bread, I hope. Bread is holy everywhere."
+      },
+      {
+       "wynna": "I'll find out. There must be a book."
+      },
+      {
+       "ilvaran": "If there is, read it to me. Slowly."
+      }
+     ]
+    },
+    {
+     "id": "ilvaran_wynna_2",
+     "lines": [
+      {
+       "ilvaran": "Thou laughest at danger, Wynna. Even when thou art hurt."
+      },
+      {
+       "wynna": "If I stop laughing I'll have to think about it."
+      },
+      {
+       "ilvaran": "Then laugh. I will do the thinking for us both."
+      }
+     ]
+    }
+   ],
+   "repeat": {
+    "id": "ilvaran_wynna_repeat",
+    "lines": [
+     {
+      "wynna": "Ilvaran, tell me something old."
+     },
+     {
+      "ilvaran": "This stone."
+     },
+     {
+      "wynna": "That's cheating."
+     }
+    ]
+   }
+  },
+  {
+   "pair": [
+    "ilvaran",
+    "nerissa"
+   ],
+   "mood": "friendly",
+   "exchanges": [
+    {
+     "id": "ilvaran_nerissa_1",
+     "lines": [
+      {
+       "nerissa": "The tide knows thy name, Ilvaran. I hear it sometimes, when I sleep."
+      },
+      {
+       "ilvaran": "Then if I fall, I know who will call me back."
+      },
+      {
+       "nerissa": "I would rather not have to."
+      },
+      {
+       "ilvaran": "So would I. Let us both be careful."
+      }
+     ]
+    },
+    {
+     "id": "ilvaran_nerissa_2",
+     "lines": [
+      {
+       "ilvaran": "Thou art sad today, Nerissa."
+      },
+      {
+       "nerissa": "The sea is sad. I only carry it."
+      },
+      {
+       "ilvaran": "Then let me carry some. I have room."
+      },
+      {
+       "nerissa": "...Thank thee. A little, then."
+      }
+     ]
+    }
+   ],
+   "repeat": {
+    "id": "ilvaran_nerissa_repeat",
+    "lines": [
+     {
+      "ilvaran": "Peace."
+     },
+     {
+      "nerissa": "Peace."
+     },
+     {
+      "ilvaran": "That was nice."
+     }
+    ]
+   }
+  },
+  {
+   "pair": [
+    "corvin",
+    "wynna"
+   ],
+   "mood": "teasing",
+   "exchanges": [
+    {
+     "id": "corvin_wynna_1",
+     "lines": [
+      {
+       "wynna": "Corvin, didst thou take a book from that house back there?"
+      },
+      {
+       "corvin": "Borrowed. Same as thy library book."
+      },
+      {
+       "wynna": "Mine was for scholarship!"
+      },
+      {
+       "corvin": "Mine's for the pictures. Also scholarship."
+      }
+     ]
+    },
+    {
+     "id": "corvin_wynna_2",
+     "lines": [
+      {
+       "corvin": "Wynna, thou'rt a terrible lookout. Thou wavest at the guards."
+      },
+      {
+       "wynna": "They looked lonely!"
+      },
+      {
+       "corvin": "They looked armed."
+      },
+      {
+       "wynna": "Lonely and armed. The worst combination."
+      }
+     ]
+    },
+    {
+     "id": "corvin_wynna_3",
+     "lines": [
+      {
+       "wynna": "Corvin, teach me to pick a lock. Please?"
+      },
+      {
+       "corvin": "Thou wouldst talk to the lock and tell it everything."
+      },
+      {
+       "wynna": "Maybe it would open out of sympathy!"
+      },
+      {
+       "corvin": "Do not make me laugh in the middle of a heist."
+      }
+     ]
+    }
+   ],
+   "repeat": {
+    "id": "corvin_wynna_repeat",
+    "lines": [
+     {
+      "wynna": "What hast thou stolen today?"
+     },
+     {
+      "corvin": "Nothing."
+     },
+     {
+      "wynna": "Liar."
+     },
+     {
+      "corvin": "Nothing thou hast noticed."
+     }
+    ]
+   }
+  },
+  {
+   "pair": [
+    "corvin",
+    "nerissa"
+   ],
+   "mood": "wary",
+   "exchanges": [
+    {
+     "id": "corvin_nerissa_1",
+     "lines": [
+      {
+       "corvin": "Nerissa. Thou keepest looking at my hands."
+      },
+      {
+       "nerissa": "They stopped moving. When thou standest near me, they stop."
+      },
+      {
+       "corvin": "Do they? Huh. That's... unsettling."
+      },
+      {
+       "nerissa": "I think they are resting."
+      }
+     ]
+    },
+    {
+     "id": "corvin_nerissa_2",
+     "lines": [
+      {
+       "nerissa": "Thou leavest coins on the dock steps when no one is looking."
+      },
+      {
+       "corvin": "Who told thee that?"
+      },
+      {
+       "nerissa": "The water. Coins fall in, sometimes."
+      },
+      {
+       "corvin": "Clumsy of me. Don't tell anyone."
+      }
+     ]
+    }
+   ],
+   "repeat": {
+    "id": "corvin_nerissa_repeat",
+    "lines": [
+     {
+      "corvin": "Seen anything about me lately?"
+     },
+     {
+      "nerissa": "Thou wilt trip."
+     },
+     {
+      "corvin": "When?"
+     },
+     {
+      "nerissa": "Soon."
+     }
+    ]
+   }
+  },
+  {
+   "pair": [
+    "wynna",
+    "nerissa"
+   ],
+   "mood": "friendly",
+   "exchanges": [
+    {
+     "id": "wynna_nerissa_1",
+     "lines": [
+      {
+       "wynna": "Nerissa, what does Hydros sound like? Exactly?"
+      },
+      {
+       "nerissa": "Like someone humming in the next room."
+      },
+      {
+       "wynna": "What is she humming?"
+      },
+      {
+       "nerissa": "I have never known. I hope one day she sings the words."
+      }
+     ]
+    },
+    {
+     "id": "wynna_nerissa_2",
+     "lines": [
+      {
+       "nerissa": "Thou talkest so much, Wynna."
+      },
+      {
+       "wynna": "Sorry! I'll stop. Mostly."
+      },
+      {
+       "nerissa": "No. Don't. It is like rain on a roof. I like it."
+      },
+      {
+       "wynna": "Oh. Then I'll keep raining."
+      }
+     ]
+    }
+   ],
+   "repeat": {
+    "id": "wynna_nerissa_repeat",
+    "lines": [
+     {
+      "wynna": "Nerissa, say something!"
+     },
+     {
+      "nerissa": "Something."
+     },
+     {
+      "wynna": "Morvain taught thee that, didn't he?"
+     }
+    ]
+   }
+  }
+ ]
+}

@@ -1,0 +1,15 @@
+{
+ "notes": [
+  "Engine-made actor shapes (engine/NOTES.md, Custom shapes). Each shape file is in the U8 shape format and is added at its number (2048 and up, past the original 0..2047), with the ANIM.DAT actions of anim_from and the TYPEFLAG.DAT record of typeflags_from.",
+  "2060-2064: the bodies of the new creatures (data/creatures.json, PLAN-CREATURES.md): a copy of an original shape's frames (frames_from), ANIM.DAT actions and TYPEFLAG record, at their own numbers so they have no usecode class and their own monster row. The engine draws them from effect shapes instead (game/creatures.cpp).",
+  "nerissa.shp: Nerissa's own figure, every frame painted by pagan_skin (src/editor/skin_paint.cpp) over the Avatar's (shape 1) with the same sizes and anchors. Rebuild: build/bin/pagan_skin GAME_DIR build 2048 data/shapes/nerissa.shp"
+ ],
+ "shapes": [
+  {"number": 2048, "name": "Nerissa", "file": "nerissa.shp", "anim_from": 1, "typeflags_from": 1},
+  {"number": 2060, "name": "Lurker's pet body", "frames_from": 81, "anim_from": 81, "typeflags_from": 81},
+  {"number": 2061, "name": "Wraith body", "frames_from": 411, "anim_from": 411, "typeflags_from": 411},
+  {"number": 2062, "name": "Lava wyrm body", "frames_from": 808, "anim_from": 808, "typeflags_from": 808},
+  {"number": 2063, "name": "Storm eye body", "frames_from": 377, "anim_from": 377, "typeflags_from": 377},
+  {"number": 2064, "name": "Flame of Pyros body", "frames_from": 808, "anim_from": 808, "typeflags_from": 808}
+ ]
+}

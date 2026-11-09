@@ -1,0 +1,131 @@
+{
+  "note": "Known as the Avatar (game/avatar_title.h; the engine's own design, the user's request 2026-11-08). Once Devon has proclaimed the Avatar (the Virtues mark known_avatar, data/dialog/devon.json 'celebrate') and while the Virtues option is on, the words the original scripts use for the Avatar are rewritten as each script creates its strings. Rules are per usecode class (the code that makes the string), tried in order, each replacing every whole-word occurrence; a phrase starting with a small letter also matches capitalised. Phrase rules come before a class's word rule for the grammar. Left alone on purpose: the Avatar's own answers ('I am a stranger here.'), lines about strangers in general ('every stranger they meet', 'nosy strangers', 'Strangers are a distraction'), the undead 'stranger' (PESANT3), Mythran's 'stranger to this land', Gwillim's story, Mordea's scene (DAEMSCEN), Bane's first words at the Enclave (BANE2), and the child's refusal (CHILD: replaced by a scene in data/dialog/children.json). name_in_speech: NPC lines say 'Avatar' where the script put the Avatar's name.",
+  "mark": "known_avatar",
+  "title": "Avatar",
+  "name_in_speech": true,
+  "classes": {
+    "PESANT1": [
+      {"find": "I am sorry, but I never speak with strangers.", "replace": "Oh! You are the Avatar. Forgive me, I am too shy to say a word to someone so famous."}
+    ],
+    "PESANT3": [
+      {"find": "Thank you kindly, stranger.", "replace": "Thank you kindly, Avatar."}
+    ],
+    "SALKIND": [
+      {"find": "Greetings stranger.", "replace": "Greetings, Avatar."},
+      {"find": "we are just a visitor to this city, eh?", "replace": "even the Avatar does not know everything, eh?"},
+      {"find": "stranger", "replace": "Avatar"}
+    ],
+    "GUARD1": [
+      {"find": "What be yer name, stranger?", "replace": "Ye'd be the Avatar, then. What be yer given name?"},
+      {"find": "Halt, stranger!", "replace": "Halt, Avatar!"}
+    ],
+    "DARION": [
+      {"find": "Stranger, are you lost?", "replace": "Avatar, are you lost?"}
+    ],
+    "TARNA": [
+      {"find": "Indeed, you are a stranger not to know of", "replace": "Indeed, Avatar, you are new to Pagan not to know of"},
+      {"find": "Halt! I have never seen you before, stranger. Identify yourself and your business in Tenebrae.", "replace": "Halt! So you are the Avatar the heralds cry about. Even so, state your business in Tenebrae."},
+      {"find": "stranger", "replace": "Avatar"}
+    ],
+    "ORLOK": [
+      {"find": "Greetin's, stranger.", "replace": "Greetin's, Avatar!"},
+      {"find": "Need something, stranger...?", "replace": "Need something, Avatar...?"},
+      {"find": "I'll not ask again, stranger.", "replace": "I'll not ask again, Avatar."},
+      {"find": "stranger", "replace": "Avatar", "exact": true}
+    ],
+    "GUARD2": [
+      {"find": "Find shelter, stranger.", "replace": "Find shelter, Avatar."},
+      {"find": "want, stranger?", "replace": "want, Avatar?"}
+    ],
+    "GUARD3": [
+      {"find": "want, stranger?", "replace": "want, Avatar?"}
+    ],
+    "GUARD4": [
+      {"find": "want, stranger?", "replace": "want, Avatar?"}
+    ],
+    "GUARD5": [
+      {"find": "want, stranger?", "replace": "want, Avatar?"}
+    ],
+    "GUARD6": [
+      {"find": "want, stranger?", "replace": "want, Avatar?"}
+    ],
+    "GUARD7": [
+      {"find": "want, stranger?", "replace": "want, Avatar?"}
+    ],
+    "GUARD8": [
+      {"find": "find safety, stranger,", "replace": "find safety, Avatar,"},
+      {"find": "quakes, stranger,", "replace": "quakes, Avatar,"},
+      {"find": "want, stranger?", "replace": "want, Avatar?"}
+    ],
+    "GUARD9": [
+      {"find": "hide, stranger.", "replace": "hide, Avatar."},
+      {"find": "want, stranger?", "replace": "want, Avatar?"}
+    ],
+    "GUARD_EW": [
+      {"find": "Hold, stranger!", "replace": "Hold, Avatar!"},
+      {"find": "Aye, stranger?", "replace": "Aye, Avatar?"}
+    ],
+    "BENTIC": [
+      {"find": "Greetings, stranger.", "replace": "Greetings, Avatar."}
+    ],
+    "ARAMINA": [
+      {"find": "stranger", "replace": "Avatar"}
+    ],
+    "CORINTH": [
+      {"find": "Hello, stranger.", "replace": "Hello, Avatar."}
+    ],
+    "KILANDRA": [
+      {"find": "fer ye' stranger...?", "replace": "fer ye, Avatar...?"},
+      {"find": "today, stranger?", "replace": "today, Avatar?"}
+    ],
+    "RHIAN": [
+      {"find": "stranger", "replace": "Avatar"}
+    ],
+    "SHAANA": [
+      {"find": "stranger", "replace": "Avatar"}
+    ],
+    "VIVIDOS": [
+      {"find": "Ah, a stranger.", "replace": "Ah, the Avatar."}
+    ],
+    "CYRRUS": [
+      {"find": "stranger", "replace": "Avatar"}
+    ],
+    "STELLOS": [
+      {"find": "Welcome, stranger.", "replace": "Welcome, Avatar."}
+    ],
+    "XAVIER": [
+      {"find": "stranger", "replace": "Avatar"}
+    ],
+    "VARDION": [
+      {"find": "You are a stranger indeed, but regardless,", "replace": "Avatar or no, you are new to this island, but regardless,"},
+      {"find": "inhospitable, stranger.", "replace": "inhospitable, Avatar."}
+    ],
+    "VARDION2": [
+      {"find": "You are a stranger, whereas I lead these people", "replace": "You are the Avatar of Tenebrae, whereas I lead these people"},
+      {"find": "Answer me, stranger.", "replace": "Answer me, Avatar."}
+    ],
+    "BANE": [
+      {"find": "You are the stranger here.", "replace": "Whatever they sing of you in Tenebrae, Avatar, here you are the outsider."}
+    ],
+    "GORGROND": [
+      {"find": "stranger", "replace": "Avatar"}
+    ],
+    "BEREN": [
+      {"find": "Greetings stranger.", "replace": "Greetings, Avatar."},
+      {"find": "Ah, the stranger returns.", "replace": "Ah, the Avatar returns."},
+      {"find": "kindness here, stranger.", "replace": "kindness here, Avatar."},
+      {"find": "Fine then. I shall call you... stranger.", "replace": "Fine then. I shall call you what all of Tenebrae calls you... Avatar."},
+      {"find": "accept it, stranger.", "replace": "accept it, Avatar."},
+      {"find": "stranger?", "replace": "Avatar?", "exact": true},
+      {"find": "stranger", "replace": "Avatar", "exact": true}
+    ],
+    "MYTHRAN": [
+      {"find": "You may ask indeed, stranger.", "replace": "You may ask indeed, Avatar."},
+      {"find": "Ah, greetings, traveler.", "replace": "Ah, greetings, Avatar."}
+    ],
+    "SORCERER": [
+      {"find": "Greetings, stranger.", "replace": "Greetings, Avatar."},
+      {"find": "need, stranger.", "replace": "need, Avatar."}
+    ]
+  }
+}

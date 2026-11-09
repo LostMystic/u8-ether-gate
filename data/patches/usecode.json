@@ -1,0 +1,250 @@
+{
+ "_comment": "Same-length byte patches of the original usecode (EUSECODE.FLX v2.10), applied in memory while 'Original bug fixes' is On; the file itself is never changed. 'at' is the code address as the class disassembly shows it; 'expect' must match or the patch is refused. See NOTES.md 'Original bug fixes'.",
+ "patches": [
+  {
+   "id": "resurrection_book_grimoire",
+   "bug": "Resurrection book shows the Intervention text",
+   "class": 288,
+   "at": "16B2",
+   "expect": "57 00 02 77 05 74 1B",
+   "replace": "57 00 02 77 05 26 1D",
+   "why": "GRIMOIRE use: quality 102 is tested twice; the first test opens the Intervention text (SGBOOK 1399:1B74), so the Resurrection text (1399:1D26) after it is never reached. The first quality-102 branch now opens 1399:1D26."
+  },
+  {
+   "id": "resurrection_book_basebook",
+   "bug": "Resurrection book shows the Intervention text",
+   "class": 613,
+   "at": "1862",
+   "expect": "57 00 02 77 05 74 1B",
+   "replace": "57 00 02 77 05 26 1D",
+   "why": "BASEBOOK use: the same double quality-102 test as GRIMOIRE; the first one now opens the Resurrection text."
+  },
+  {
+   "id": "lithos_plane_code",
+   "bug": "Absorbing Lithos before talking to him freezes the game",
+   "class": 442,
+   "at": "0D84",
+   "append": "4B F0 0F 04 0F 00 6E FC 5E 0A 00 24 51 03 00 52 DE FE 0A 01 6F 00 0F 04 9D 00 6E FA 5E 0A 2F 36 51 A0 F6 59 0A 01 0D 06 00 48 6D 6D 2E 2E 2E 00 6B 6F FC 0F 08 49 00 65 04 6E F6 5E 54 01 01 12 53 52 AC FE",
+   "why": "BROCK (the blackrock pieces): Lithos may be absorbed only while he has risen (frame not 0, as before) and only on the Plane of Earth (map 47, where the ENDLITH egg raises him), the same rule the Hydros branch has for the Plane of Water (map 45); elsewhere the Avatar says 'Hmm...' and nothing happens. In the Hall of the Mountain King Lithos stands sunk at frame 15, which passed the old frame test."
+  },
+  {
+   "id": "lithos_plane_jump",
+   "bug": "Absorbing Lithos before talking to him freezes the game",
+   "class": 442,
+   "at": "0435",
+   "expect": "4B F0 0F 04 0F 00 6E FC 5E 0A 00 24",
+   "replace": "52 4C 09 5E 12 5E 12 5E 12 0A 00 12",
+   "why": "The Lithos frame test jumps to the new code (lithos_plane_code); the rest of the old test is never reached."
+  },
+  {
+   "id": "stratos_plane_code",
+   "bug": "Breath of Air used on Stratos early: dead end in the Ethereal Void",
+   "class": 442,
+   "at": "0DC8",
+   "append": "3F EA 0A 00 24 51 03 00 52 A1 FE 0A 01 6F 00 0F 04 9D 00 6E FA 5E 0A 2E 36 51 70 FB 59 0A 01 0D 06 00 48 6D 6D 2E 2E 2E 00 6B 6F FC 0F 08 49 00 65 04 6E F6 5E 54 01 01 12 53 52 6F FE",
+   "why": "BROCK: Stratos may be absorbed with the Breath of Air only on the Plane of Air (map 46, the ENDSTRAT egg's place), like Hydros on the Plane of Water; the present-day Stratos on Argentrock (map 37) only gets 'Hmm...'."
+  },
+  {
+   "id": "stratos_plane_jump",
+   "bug": "Breath of Air used on Stratos early: dead end in the Ethereal Void",
+   "class": 442,
+   "at": "0949",
+   "expect": "3F EA 0A 00 24",
+   "replace": "52 7C 04 5E 12",
+   "why": "The Stratos target test jumps to the new code (stratos_plane_code)."
+  },
+  {
+   "id": "gate_guard_turn_code",
+   "bug": "Tenebrae gate guard keeps spinning while walking to you",
+   "class": 1028,
+   "at": "1199",
+   "append": "0B 04 02 40 06 4C 02 11 81 05 51 10 6E FC 0B 0A 02 40 06 4C 02 11 81 05 51 10 6E FC 0B F0 00 40 06 4C 02 11 81 05 51 10 6E FC 52 19 F0",
+   "why": "GUARD1 challenge (use event, 'Halt, stranger!'): besides his patrol (type 0x205) and pathfinding (0x204), also end his turn-on-the-spot process (type 0x20A, METHOD 1404:091C, started by the patrol at each marker) and his current animation (0xF0), each with FREE 1409:1051 as the original kill calls do; then back to 0x01DF. Without this a turn that was under way when he calls out goes on while he walks to the Avatar (specs/world/bugfixes.md 10)."
+  },
+  {
+   "id": "gate_guard_turn_jump",
+   "bug": "Tenebrae gate guard keeps spinning while walking to you",
+   "class": 1028,
+   "at": "01D1",
+   "expect": "0B 04 02 40 06 4C 02 11 81 05 51 10 6E FC",
+   "replace": "52 C5 0F 5E 12 5E 12 5E 12 5E 12 0A 00 12",
+   "why": "The challenge's kill of type 0x204 jumps to gate_guard_turn_code, which does it and the two new kills; the padding after the jump is never reached."
+  },
+  {
+   "id": "pyros_plane_code",
+   "bug": "Blackrock pieces absorb a Titan anywhere (Pyros: the Tongue of Flame)",
+   "class": 442,
+   "at": "0E05",
+   "append": "4B F2 0F 04 0F 00 6E FC 5E 0A 00 24 51 03 00 52 5D FE 0A 01 6F 00 0F 04 9D 00 6E FA 5E 0A 2C 36 51 0C F4 59 0A 01 0D 06 00 48 6D 6D 2E 2E 2E 00 6B 6F FC 0F 08 49 00 65 04 6E F6 5E 54 01 01 12 53 52 2B FE",
+   "why": "BROCK Pyros branch: as for Hydros, only on the Plane of Fire (map 44, the ENDPYRO egg's place); otherwise 'Hmm...'. (specs/world/bugfixes.md 1.4)"
+  },
+  {
+   "id": "pyros_plane_jump",
+   "bug": "Blackrock pieces absorb a Titan anywhere (Pyros: the Tongue of Flame)",
+   "class": 442,
+   "at": "0222",
+   "expect": "4B F2 0F 04 0F 00 6E FC 5E 0A 00 24",
+   "replace": "52 E0 0B 5E 12 5E 12 5E 12 0A 00 12",
+   "why": "The Pyros frame test jumps to pyros_plane_code."
+  },
+  {
+   "id": "vividos_search_code",
+   "bug": "Vividos' reagents mixed with others block the quest",
+   "class": 1045,
+   "at": "9F99",
+   "append": "74 24 74 26 74 2B 74 3D 0A 14 74 25 74 60 74 26 74 5B 0A 0C 74 25 74 60 74 5D 0A 0A 74 25 74 60 74 3D 74 40 0B 8B 01 74 25 3F FE 0B FF FF 70 F2 18 05 52 22 BE",
+   "why": "VIVIDOS 0x5DB2: the backpack search for his reagents takes any executioner's hood (shape 395 frames 10-12, which all look the same and merge together) instead of frame 10 only, plus the dead man's elbow (frame 20) as before. (specs/world/bugfixes.md 3.4)"
+  },
+  {
+   "id": "vividos_search_jump",
+   "bug": "Vividos' reagents mixed with others block the quest",
+   "class": 1045,
+   "at": "5DC8",
+   "expect": "74 24 74 26",
+   "replace": "52 CE 41 12",
+   "why": "The old search script (frame 10 or 20) jumps to vividos_search_code, which comes back to the loop at 0x5DF0."
+  },
+  {
+   "id": "vividos_hood_test",
+   "bug": "Vividos' reagents mixed with others block the quest",
+   "class": 1045,
+   "at": "5DFC",
+   "expect": "0A 0A 24",
+   "replace": "0A 0D 28",
+   "why": "In the loop, 'frame == 10' becomes 'frame < 13': among the items found (frames 10-12 and 20) that is a hood."
+  },
+  {
+   "id": "vividos_consume_code",
+   "bug": "Vividos' reagents mixed with others block the quest",
+   "class": 1045,
+   "at": "9FCE",
+   "append": "4B EC 0F 04 0F 00 6E FC 5E 0A 0A 2E 4B EC 0F 04 0F 00 6E FC 5E 0A 0C 2A 32 52 D4 DE",
+   "why": "VIVIDOS 0x7E9B: when he takes the reagents, any hood (frames 10-12) counts, not frame 10 only (the elbow test, frame 20, follows unchanged)."
+  },
+  {
+   "id": "vividos_consume_jump",
+   "bug": "Vividos' reagents mixed with others block the quest",
+   "class": 1045,
+   "at": "7EB2",
+   "expect": "4B EC 0F 04 0F 00 6E FC 5E 0A 0A 24",
+   "replace": "52 19 21 5E 12 5E 12 5E 12 0A 00 12",
+   "why": "The 'frame == 10' test of the consume loop jumps to vividos_consume_code."
+  },
+  {
+   "id": "necro_recipes_code",
+   "bug": "Ancient Necromancers: the test can be skipped (their spells work untaught)",
+   "class": 232,
+   "at": "05E2",
+   "append": "3F FC 0A 01 24 51 0A 00 4E C9 00 01 51 68 00 52 5A 00 3F FC 0A 02 24 51 0A 00 4E CA 00 01 51 56 00 52 48 00 3F FC 0A 03 24 51 0A 00 4E CB 00 01 51 44 00 52 36 00 3F FC 0A 07 24 51 0A 00 4E CC 00 01 51 32 00 52 24 00 3F FC 0A 06 24 51 0A 00 4E CD 00 01 51 20 00 52 12 00 3F FC 0A 05 24 51 0A 00 4E CE 00 01 51 0E 00 52 00 00 3F FA 0A 00 2C 51 44 FF 52 09 FE 0A 00 01 FA 52 3A FF",
+   "why": "KEYONEC (the Key of the Scion on a bag): a recipe whose Ancient Necromancer has not taught it yet (Mask of Death G[201], Rock Flesh G[202], Summon Dead G[203], Grant Peace G[204], Withstand Death G[205], Create Golem G[206]) is treated like no recipe ('Something's not right.'). Death Speak, Open Ground and Call Quake are taught elsewhere and stay free. (specs/world/bugfixes.md 2.4)"
+  },
+  {
+   "id": "necro_recipes_jump",
+   "bug": "Ancient Necromancers: the test can be skipped (their spells work untaught)",
+   "class": 232,
+   "at": "045A",
+   "expect": "3F FA 0A 00 2C 51 38 01",
+   "replace": "52 85 01 5E 12 0A 00 12",
+   "why": "The 'a recipe matched' test jumps to necro_recipes_code."
+  },
+  {
+   "id": "scion_bag_spells_code",
+   "bug": "The Key of the Scion makes no bag spells (improvement)",
+   "class": 232,
+   "at": "0660",
+   "append": "5A 22 3F 0A 01 F8 0A 00 01 FA 52 53 FB",
+   "why": "KEYONEC: a new entry into the bag spell-making code for a bag already picked: it takes the bag as its argument into the local the use event's target cursor fills (-8), clears the 'spell made' flag (-6) and jumps to the use event's bag test (0x01C0), so everything after it (the reagent count, the recipes, the teaching gates of necro_recipes_*, the tokens, 'Something's not right.') is the original code. Called by scion_bag_spells_ring_code. Not a bug of the original (frame 3 only ever opened doors and chests: magic.md 4.1); made at the player's wish so the Key of the Scion works on a bag like the Keys of the Caretaker and the Necromancer."
+  },
+  {
+   "id": "scion_bag_spells_ring_code",
+   "bug": "The Key of the Scion makes no bag spells (improvement)",
+   "class": 79,
+   "at": "05F9",
+   "append": "4B FE 0F 04 0D 00 6E FC 5E 0B 7D 02 24 40 06 0F 04 0D 00 6E FC 5E 0B E8 00 24 32 51 17 00 59 3F FE 40 06 57 02 02 E8 00 60 06 6E FE 5E 54 01 01 12 53 52 7E FF 4B FE 0F 04 0D 00 6E FC 5E 52 43 FB",
+   "why": "KEYRING 0x0119 (the door-and-chest code the Key of the Scion, KEYONEC frame 3, runs): when its target is a bag (shape 637) and the key is a KEYONEC (shape 232), it spawns KEYONEC's bag entry (scion_bag_spells_code) with the key and the bag, waits for it and ends; any other target goes on as before (the replaced shape read, then back to 0x017D)."
+  },
+  {
+   "id": "scion_bag_spells_ring_jump",
+   "bug": "The Key of the Scion makes no bag spells (improvement)",
+   "class": 79,
+   "at": "0174",
+   "expect": "4B FE 0F 04 0D 00 6E FC 5E",
+   "replace": "52 82 04 5E 12 5E 12 5E 12",
+   "why": "KEYRING, right after its reach check: the target's shape read jumps to scion_bag_spells_ring_code."
+  },
+  {
+   "id": "gwillim_topics_code",
+   "bug": "Gwillim only says 'Farewell' on later visits",
+   "class": 1038,
+   "at": "5BCC",
+   "append": "43 FA 0D 12 00 49 27 6D 20 66 69 6E 65 2C 20 74 68 61 6E 6B 73 2E 20 00 0E 02 01 17 63 FA 01 FA 43 FA 0D 12 00 48 65 6C 6C 6F 2C 20 6D 79 20 66 72 69 65 6E 64 2E 20 00 52 54 BD",
+   "why": "GWILLIM: the later-visit greeting 'Hello, my friend.' now also adds \"I'm fine, thanks. \" to the answers, as the first-visit 'Greetings' branch does (0x188F), so his topics (Corinth, the valley, visitors, his son, the Theurgists, Her Ladyship) are reachable again. (specs/world/bugfixes.md 7.4)"
+  },
+  {
+   "id": "gwillim_topics_jump",
+   "bug": "Gwillim only says 'Farewell' on later visits",
+   "class": 1038,
+   "at": "1943",
+   "expect": "43 FA 0D 12 00 48 65 6C 6C 6F 2C 20 6D 79 20 66 72 69 65 6E 64 2E 20 00",
+   "replace": "52 86 42 5E 12 5E 12 5E 12 5E 12 5E 12 5E 12 5E 12 5E 12 5E 12 5E 12 12",
+   "why": "After his 'Well, it is quite good to see you' line, the removal of 'Hello, my friend.' jumps to gwillim_topics_code and back to 0x195B."
+  },
+  {
+   "id": "recall_v212_map24",
+   "bug": "v2.12: the recall item works everywhere except the Obsidian Fortress",
+   "option": "v212",
+   "class": 833,
+   "at": "00D3",
+   "expect": "0A 18",
+   "replace": "0A 0E",
+   "why": "RECALL use: the list of maps where the item only plays sound 0x7C is 14, 24, 25, 12, 44, 47, 45, 46, 62, 43 (npc_get_map of the Avatar compared with each). v2.12 blocks only the Obsidian Fortress; this test of map 24 (the lava river tunnel) now tests 14 again. The endgame maps 43-47 stay blocked (specs/world/v212_features.md 5.3). Active with the 'v2.12 changes' option, not 'Original bug fixes'."
+  },
+  {
+   "id": "recall_v212_map25",
+   "bug": "v2.12: the recall item works everywhere except the Obsidian Fortress",
+   "option": "v212",
+   "class": 833,
+   "at": "00E2",
+   "expect": "0A 19",
+   "replace": "0A 0E",
+   "why": "RECALL use: the list of maps where the item only plays sound 0x7C is 14, 24, 25, 12, 44, 47, 45, 46, 62, 43 (npc_get_map of the Avatar compared with each). v2.12 blocks only the Obsidian Fortress; this test of map 25 (the lava river tunnel, second state) now tests 14 again. The endgame maps 43-47 stay blocked (specs/world/v212_features.md 5.3). Active with the 'v2.12 changes' option, not 'Original bug fixes'."
+  },
+  {
+   "id": "recall_v212_map12",
+   "bug": "v2.12: the recall item works everywhere except the Obsidian Fortress",
+   "option": "v212",
+   "class": 833,
+   "at": "00F1",
+   "expect": "0A 0C",
+   "replace": "0A 0E",
+   "why": "RECALL use: the list of maps where the item only plays sound 0x7C is 14, 24, 25, 12, 44, 47, 45, 46, 62, 43 (npc_get_map of the Avatar compared with each). v2.12 blocks only the Obsidian Fortress; this test of map 12 (Daemon's Crag) now tests 14 again. The endgame maps 43-47 stay blocked (specs/world/v212_features.md 5.3). Active with the 'v2.12 changes' option, not 'Original bug fixes'."
+  },
+  {
+   "id": "recall_v212_map62",
+   "bug": "v2.12: the recall item works everywhere except the Obsidian Fortress",
+   "option": "v212",
+   "class": 833,
+   "at": "013C",
+   "expect": "0A 3E",
+   "replace": "0A 0E",
+   "why": "RECALL use: the list of maps where the item only plays sound 0x7C is 14, 24, 25, 12, 44, 47, 45, 46, 62, 43 (npc_get_map of the Avatar compared with each). v2.12 blocks only the Obsidian Fortress; this test of map 62 (the Ancient Necromancers' catacombs) now tests 14 again. The endgame maps 43-47 stay blocked (specs/world/v212_features.md 5.3). Active with the 'v2.12 changes' option, not 'Original bug fixes'."
+  },
+  {
+   "id": "first_test_retry_code",
+   "bug": "The sorcerers' first test cannot be retried after a partial pass",
+   "class": 1418,
+   "at": "444E",
+   "append": "0A 01 4F 93 00 01 0A 00 4F 94 00 02 0A 00 4F 96 00 01 0A 00 4F 97 00 01 0A 00 4F 98 00 01 52 ED FC",
+   "why": "DAEMSCEN 0x414C (the first test's watcher): where it starts the test (G[147:1] = 1) it now also clears the count G[148:2] and the three spells' marks G[150:1], G[151:1], G[152:1] (Flash, Flame Bolt, Endure Heat). PENT counts a spell only while its mark is 0 and nothing else ever clears them, so after a forfeit or a walk out of the house with one or two spells done the test could never reach 3 again (specs/world/bugfixes.md 16). A save stuck that way is cured the next time the test is started."
+  },
+  {
+   "id": "first_test_retry_jump",
+   "bug": "The sorcerers' first test cannot be retried after a partial pass",
+   "class": 1418,
+   "at": "4156",
+   "expect": "0A 01 4F 93 00 01",
+   "replace": "52 F5 02 5E 12 53",
+   "why": "The watcher's 'G[147:1] = 1' jumps to first_test_retry_code, which does it and the clearing, then comes back to 0x415C."
+  }
+ ]
+}

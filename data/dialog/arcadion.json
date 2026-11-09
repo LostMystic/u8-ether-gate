@@ -1,0 +1,45 @@
+{
+ "id": "arcadion",
+ "name": "Arcadion",
+ "npc": 57,
+ "about": "Arcadion (class 1081), the daemon Sorcerer of the Obsidian Fortress who serves Malchir; free talk from the second meeting (G[232:1]) until the four symbols are returned (G[144:1]). INT-gated topic (PLAN-LEVELING.md 5; game/npc_dialog.h 'avatar_int'): shown only when the Avatar's INT is at least the number, behind New Dialogue.",
+ "menu": {
+  "max_entries": 1,
+  "first_menu": true,
+  "exits_only_menu": true,
+  "back": "Back.",
+  "leave": "Something else."
+ },
+ "topics": [
+  {
+   "id": "unbound",
+   "slot": "mind",
+   "label": "Why would the one unbound daemon study the art that binds daemons?",
+   "when": {
+    "cond": [
+     {
+      "global": [
+       232,
+       1
+      ],
+      "eq": 1
+     },
+     {
+      "global": [
+       144,
+       1
+      ],
+      "eq": 0
+     }
+    ],
+    "avatar_int": 25
+   },
+   "say": [
+    "A curious sort, aren't you? Most who stand in this room ask how to leave it.",
+    "Consider, mortal: every daemon you will ever meet is held by a name it did not choose. I am the only one who is not. Do you suppose that is an accident?",
+    "One learns the lock best by studying it from the inside. And one keeps one's freedom by knowing exactly how others would take it away.",
+    "Master Malchir believes he is teaching me. Let him. One does not live very long when one has displeased a Master Sorcerer. Nor, I think, when one has stopped learning."
+   ]
+  }
+ ]
+}

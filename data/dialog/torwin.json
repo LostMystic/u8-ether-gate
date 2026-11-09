@@ -1,0 +1,38 @@
+{
+ "id": "torwin",
+ "name": "Torwin",
+ "npc": 26,
+ "about": "Torwin (class 1050), the newest and fastest initiate of the Order of Enlightenment on Argentrock; gone after Windy Point. The topic shows until Cyrrus says where he went (G[116:1]). INT-gated topic (PLAN-LEVELING.md 5; game/npc_dialog.h 'avatar_int'): shown only when the Avatar's INT is at least the number, behind New Dialogue.",
+ "menu": {
+  "max_entries": 1,
+  "first_menu": true,
+  "exits_only_menu": true,
+  "back": "Back.",
+  "leave": "Something else."
+ },
+ "topics": [
+  {
+   "id": "two_lines",
+   "slot": "mind",
+   "label": "If a focus is a line to Stratos, is the limit the line or the hand?",
+   "when": {
+    "cond": [
+     {
+      "global": [
+       116,
+       1
+      ],
+      "eq": 0
+     }
+    ],
+    "avatar_int": 22
+   },
+   "say": [
+    "Well. Finally someone asks a question worth my time. Do not let it go to your head.",
+    "The hand, obviously. A focus is only a line. Lines can be doubled. Two lines, twice the flow. Any fool could see it, if they bothered to look.",
+    "The elders say a healer who reaches too deep destroys himself. The elders say a great many things. They have never reached at all.",
+    "...Why do you want to know? Never mind. Go and heal a hangnail or something."
+   ]
+  }
+ ]
+}
