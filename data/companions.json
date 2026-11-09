@@ -347,6 +347,8 @@
    },
    "leveling": {"class": "caster", "str": 10, "dex": 10, "int": 14},
    "art": {
+    "portrait": "portraits/morvain_bar.png",
+    "paperdoll_head": {"file": "portraits/morvain_doll_head.png", "dx": 0, "dy": 0},
     "shape": 187,
     "note": "Malchir's hooded robe (full walk/run/attack/hit/die/cast 27-31); red trim turned moss green",
     "recolour": [
@@ -776,6 +778,8 @@
    },
    "leveling": {"class": "caster", "str": 10, "dex": 11, "int": 14},
    "art": {
+    "portrait": "portraits/kalvax_bar.png",
+    "paperdoll_head": {"file": "portraits/kalvax_doll_head.png", "dx": 0, "dy": 0},
     "shape": 191,
     "note": "Vardion's sorcerer coat (cast 27-31); the red coat burned to amber",
     "recolour": [
@@ -1248,6 +1252,8 @@
    },
    "leveling": {"class": "fighter", "str": 14, "dex": 13, "int": 9},
    "art": {
+    "portrait": "portraits/brannoc_bar.png",
+    "paperdoll_head": {"file": "portraits/brannoc_doll_head.png", "dx": 0, "dy": 0},
     "shape": 401,
     "note": "Darion's plate armour (walk/run/attack with a hit frame/hit/die; Korick 431's attack never reaches); the plate tinted storm blue, the leather dark",
     "recolour": [
@@ -1608,6 +1614,8 @@
    },
    "leveling": {"class": "hybrid", "str": 14, "dex": 10, "int": 11},
    "art": {
+    "portrait": "portraits/varn_bar.png",
+    "paperdoll_head": {"file": "portraits/varn_doll_head.png", "dx": 0, "dy": 0},
     "shape": 574,
     "note": "the Tempest's guard in armour (walk/run/attack/hit/die, cast 27-29); the blue tabard turned sea green",
     "recolour": [
@@ -1977,6 +1985,8 @@
    },
    "leveling": {"class": "caster", "str": 9, "dex": 10, "int": 14, "mana": 30},
    "art": {
+    "portrait": "portraits/ilvaran_bar.png",
+    "paperdoll_head": {"file": "portraits/ilvaran_doll_head.png", "dx": 0, "dy": 0},
     "shape": 188,
     "note": "Stellos' theurgist robe (cast 27-31); the blue robe turned to Zealan gold",
     "recolour": [
@@ -2381,6 +2391,8 @@
    },
    "leveling": {"class": "hybrid", "str": 11, "dex": 14, "int": 10},
    "art": {
+    "portrait": "portraits/corvin_bar.png",
+    "paperdoll_head": {"file": "portraits/corvin_doll_head.png", "dx": 0, "dy": 0},
     "shape": 403,
     "note": "Orlok's dockside coat (walk/run/attack/hit/die); the blue coat dyed crow black-green, the vest rust; its attack animation has no hit frame, so the companion AI resolves his blows (half way through the swing when adjacent)",
     "recolour": [
@@ -2807,6 +2819,8 @@
    },
    "leveling": {"class": "caster", "str": 9, "dex": 11, "int": 14},
    "art": {
+    "portrait": "portraits/wynna_bar.png",
+    "paperdoll_head": {"file": "portraits/wynna_doll_head.png", "dx": 0, "dy": 0},
     "shape": 189,
     "note": "Mordea's gown (cast 27-29); the white dress tinted lavender",
     "recolour": [

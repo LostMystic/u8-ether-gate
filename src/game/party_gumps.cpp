@@ -204,15 +204,19 @@ ShapeFrame scale2x(const ShapeFrame& f) {
 
 const ShapeFrame* Party::doll_picture(uint16_t actor) const {
     int i = index_of(actor);
-    if (i < 0 || !defs[size_t(i)].own_doll) return nullptr;
+    if (i < 0) return nullptr;
+    // Own figure (Nerissa), or the Avatar's paperdoll body in the companion's colours with a
+    // painted head (art.paperdoll_head) over his.
+    const bool own_fig = defs[size_t(i)].own_doll;
+    if (!own_fig && defs[size_t(i)].doll_head.empty()) return nullptr;
     auto it = doll_pictures_.find(i);
     if (it != doll_pictures_.end()) return it->second.get();
     const GameData& d = w_.data();
     const ShapeFrame* g = d.gumps.frame(1, 0);
-    const AnimSequence* stand = d.anim.get(defs[size_t(i)].shape, 2);
+    const AnimSequence* stand = own_fig ? d.anim.get(defs[size_t(i)].shape, 2) : nullptr;
     // Facing east (towards the screen's lower right), as the Avatar's paperdoll body does.
     const ShapeFrame* body = stand ? d.shapes.frame(defs[size_t(i)].shape, stand->at(2, 0).frame) : nullptr;
-    if (!g || !body || g->w < 80 || g->h < 104) return nullptr;
+    if (!g || (own_fig && !body) || g->w < 80 || g->h < 104) return nullptr;
     auto pic = std::make_unique<ShapeFrame>(*g);
     // The body panel (gump pixels x 15..71, y 15..100; measured on gump 1): stone texture again.
     // The panel's own stone is palette 22 with a sprinkle of 21; the left bevel is taken from a
@@ -225,12 +229,26 @@ const ShapeFrame* Party::doll_picture(uint16_t actor) const {
         h ^= h >> 13; h *= 0x5bd1e995u; h ^= h >> 15;
         return (h % 100) < 18 ? 21 : 22;
     };
+    std::vector<uint8_t> fig(pic->pixels.size(), 0);  // the figure's own pixels
+    const uint8_t* rm = doll_remap(actor);
+    if (!own_fig) {
+        // The Avatar's body stays: its pixels are everything in the panel but the stone (21, 22)
+        // and the left bevel; the whole picture takes the companion's colours, as the plain
+        // recoloured paperdoll is drawn.
+        for (int y = 15; y <= 100; ++y)
+            for (int x = 20; x <= 71; ++x) {
+                uint8_t c = g->pixels[size_t(y) * g->w + x];
+                if (c != 21 && c != 22 && c != ShapeFrame::kTransparent) fig[size_t(y) * pic->w + x] = 1;
+            }
+        if (rm)
+            for (uint8_t& c : pic->pixels)
+                if (c != ShapeFrame::kTransparent) c = rm[c];
+    }
+    if (own_fig) {
     for (int y = 15; y <= 100; ++y)
         for (int x = 15; x <= 71; ++x) px(x, y) = stone(x, y);
-    std::vector<uint8_t> fig(pic->pixels.size(), 0);  // the figure's own pixels
     // The figure: doubled with Scale2x, then fitted to the panel's height (nearest sampling).
     ShapeFrame big = scale2x(*body);
-    const uint8_t* rm = doll_remap(actor);
     const int top = 17, bottom = 99, left = 20, right = 71;
     float k = std::min(1.0f, std::min(float(bottom - top + 1) / big.h, float(right - left + 1) / big.w));
     int ow = int(big.w * k), oh = int(big.h * k);
@@ -247,6 +265,7 @@ const ShapeFrame* Party::doll_picture(uint16_t actor) const {
                 fig[size_t(ty) * pic->w + tx] = 1;
             }
         }
+    }
     // A painted head (art.paperdoll_head): over the figure's head, centred on its face.
     const ShapeFrame* hd = defs[size_t(i)].doll_head.empty() ? nullptr : picture(defs[size_t(i)].doll_head);
     if (hd) {
@@ -256,9 +275,17 @@ const ShapeFrame* Party::doll_picture(uint16_t actor) const {
             for (int x = 15; x <= 71; ++x) {
                 if (!fig[size_t(y) * pic->w + x]) continue;
                 if (fig_top < 0) fig_top = y;
-                uint8_t c = px(x, y);
-                if (c >= 200 && c <= 210) { fx += x; ++fn; }  // her skin ramp (the face)
+                uint8_t c = own_fig ? px(x, y) : g->pixels[size_t(y) * g->w + x];  // before the recolour
+                if (c >= 200 && c <= 210) { fx += x; ++fn; }  // the skin ramp (the face)
             }
+        if (!own_fig) {
+            // The Avatar's paperdoll body: his head (hair top to chin, about 11 x 15) is centred at
+            // x 49 with its top at y 21 of gump 1 (measured; his raised arm is skin too, so the
+            // skin search below would land on his fist).
+            fig_top = 20;
+            fx = 49;
+            fn = 1;
+        }
         if (fig_top >= 0 && fn > 0) {
             int hx = int(fx / fn) - hd->w / 2 + defs[size_t(i)].doll_head_dx;
             int hy = fig_top + defs[size_t(i)].doll_head_dy;
@@ -267,8 +294,20 @@ const ShapeFrame* Party::doll_picture(uint16_t actor) const {
                 int u = x - hx, v = y - hy;
                 return u >= 0 && v >= 0 && u < hd->w && v < hd->h && hd->pixels[size_t(v) * hd->w + u] != ShapeFrame::kTransparent;
             };
-            // The old head goes: figure pixels in the head's rows, beside the new head, back to stone.
-            for (int y = hy - 1; y < hy + hd->h * 3 / 4; ++y)
+            if (!own_fig) {
+                doll_head_at_[i] = {hx, hy};  // drawn again over the equipment (gumps.cpp)
+                // His own head (x 43..56, y 20..33, clear of the raised arm) where the new one
+                // does not cover it: back to stone, so no blond hair peeks out beside a hood.
+                for (int y = 20; y <= 33; ++y)
+                    for (int x = 43; x <= 56; ++x)
+                        if (inside(x, y) && fig[size_t(y) * pic->w + x] && !head_at(x, y)) {
+                            px(x, y) = stone(x, y);
+                            fig[size_t(y) * pic->w + x] = 0;
+                        }
+            }
+            // The old head goes: figure pixels in the head's rows, beside the new head, back to stone
+            // (her own figure's head; the Avatar's body keeps its shoulders, his head is under the new one).
+            for (int y = hy - 1; own_fig && y < hy + hd->h * 3 / 4; ++y)
                 for (int x = hx - 5; x < hx + hd->w + 5; ++x)
                     if (inside(x, y) && fig[size_t(y) * pic->w + x] && !head_at(x, y)) {
                         px(x, y) = stone(x, y);
@@ -303,6 +342,16 @@ const ShapeFrame* Party::picture(const std::string& file) const {
     const ShapeFrame* out = f.get();
     pictures_[file] = std::move(f);
     return out;
+}
+
+const ShapeFrame* Party::doll_head_over(uint16_t actor, int& x, int& y) const {
+    int i = index_of(actor);
+    if (i < 0 || !doll_picture(actor)) return nullptr;
+    auto it = doll_head_at_.find(i);
+    if (it == doll_head_at_.end()) return nullptr;
+    x = it->second.first;
+    y = it->second.second;
+    return picture(defs[size_t(i)].doll_head);
 }
 
 const ShapeFrame* Party::bar_portrait(uint16_t actor) const {

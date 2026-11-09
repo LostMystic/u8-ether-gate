@@ -1040,13 +1040,16 @@ void test_nerissa(const GameData& d) {
     u.frames(3);
     u.shot_crop("nerissa_party_bar", 60, 20, 120, 40);
     u.shot_crop("nerissa_portrait_partybar", 60, 20, 120, 40);
-    // Her painted portrait (data/portraits/nerissa_bar.png) is what her box shows; the Avatar
-    // and the others keep their cropped figures.
+    // Her painted portrait (data/portraits/nerissa_bar.png) is what her box shows; every other
+    // companion has one too (data/portraits/<id>_bar.png); the Avatar keeps his cropped figure.
     {
         const ShapeFrame* pf = u.p().bar_portrait(n->id);
         CHECK(pf && pf->w == 24 && pf->h == 25);
         CHECK(u.p().bar_portrait(1) == nullptr);
-        CHECK(u.p().bar_portrait(u.cid("wynna")) == nullptr && u.p().bar_portrait(u.cid("corvin")) == nullptr);
+        for (const char* c : {"morvain", "kalvax", "brannoc", "varn", "ilvaran", "corvin", "wynna"}) {
+            const ShapeFrame* cp = u.p().bar_portrait(u.cid(c));
+            CHECK(cp && cp->w == 24 && cp->h == 25);
+        }
         if (pf) {
             int opaque = 0, plain = 0;
             for (uint8_t c : pf->pixels) {
@@ -1070,7 +1073,41 @@ void test_nerissa(const GameData& d) {
     u.frames(5);
     CHECK(u.p().doll_picture(n->id) != nullptr);
     CHECK(u.p().doll_picture(1) == nullptr);
-    CHECK(u.p().doll_picture(u.cid("wynna")) == nullptr);  // the others keep the recoloured body
+    // The others: the Avatar's paperdoll body in their colours, their painted head (14 x 18) over
+    // his, every pixel of it, inside the body panel and no wider than his head and shoulders.
+    for (const char* c : {"morvain", "kalvax", "brannoc", "varn", "ilvaran", "corvin", "wynna"}) {
+        uint16_t id = u.cid(c);
+        const ShapeFrame* dp = u.p().doll_picture(id);
+        const ShapeFrame* hd = u.p().picture(std::string("portraits/") + c + "_doll_head.png");
+        CHECK(dp != nullptr && hd != nullptr && hd->w == 14 && hd->h == 18);
+        if (!dp || !hd) continue;
+        int total = 0, best = 0, bx = 0, by = 0;
+        for (uint8_t px : hd->pixels) total += px != ShapeFrame::kTransparent;
+        for (int oy = 0; oy + hd->h <= std::min(60, dp->h); ++oy)
+            for (int ox = 0; ox + hd->w <= std::min(80, dp->w); ++ox) {
+                int m = 0;
+                for (int yy = 0; yy < hd->h; ++yy)
+                    for (int xx = 0; xx < hd->w; ++xx) {
+                        uint8_t px = hd->pixels[size_t(yy) * hd->w + xx];
+                        m += px != ShapeFrame::kTransparent && dp->pixels[size_t(oy + yy) * dp->w + ox + xx] == px;
+                    }
+                if (m > best) { best = m; bx = ox; by = oy; }
+            }
+        std::printf("  %s's paperdoll head: %d of %d pixels at %d,%d\n", c, best, total, bx, by);
+        CHECK(total > 100 && best == total && bx >= 15 && bx + hd->w <= 72 && by >= 13 && by < 40);
+        int ci = u.p().find_def(c);
+        if (ci >= 0) {
+            u.p().open_inventory(ci);
+            u.frames(5);
+            if (const Gump* pg = u.w().gumps.container_gump(id))
+                u.shot_crop(std::string("portrait_paperdoll_") + c, pg->x + pg->w / 2, pg->y + pg->h / 2, std::min(320, pg->w + 8), std::min(200, pg->h + 8));
+            u.w().close_gump(id);
+            if (uint16_t pack = u.w().equipped(id, 7)) u.w().close_gump(pack);
+            u.frames(3);
+        }
+    }
+    u.p().open_inventory(ni);
+    u.frames(5);
     // The painted head (data/portraits/nerissa_doll_head.png) is in her paperdoll picture.
     if (const ShapeFrame* dp = u.p().doll_picture(n->id)) {
         const ShapeFrame* hd = u.p().picture("portraits/nerissa_doll_head.png");

@@ -606,6 +606,11 @@ void PaperdollGump::paint(Surface8& s) {
         slot_pos(slot, px, py);
         s.draw(*f, x + kPdAreaX + px, y + kPdAreaY + py);
     }
+    // A companion's painted head over the Avatar's body: again over the equipment (party.h).
+    if (own) {
+        int hx = 0, hy = 0;
+        if (const ShapeFrame* hd = w_.party->doll_head_over(owner, hx, hy)) s.draw(*hd, x + own->xoff + hx + hd->xoff, y + own->yoff + hy + hd->yoff);
+    }
     if (ghost_item_)
         if (const Item* it = w_.item(ghost_item_)) {
             unsigned f = ghost_target_ == owner ? it->frame + 1u : it->frame;

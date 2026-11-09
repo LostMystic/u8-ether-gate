@@ -273,6 +273,10 @@ public:
     // original gump with its body panel cleared and the companion's standing frame drawn in
     // (party_gumps.cpp). nullptr = the usual recoloured body.
     const ShapeFrame* doll_picture(uint16_t actor) const;
+    // A companion on the Avatar's paperdoll body: the painted head and where it lies in the
+    // doll picture, drawn again over the equipment so a helmet's sprite does not hide the face
+    // (the helmet stays clickable: the paperdoll picks items by their own sprites). Null if none.
+    const ShapeFrame* doll_head_over(uint16_t actor, int& x, int& y) const;
     // The party-bar picture of a companion with art.portrait (nullptr = the cropped frame).
     const ShapeFrame* bar_portrait(uint16_t actor) const;
     // An engine-made picture by its path under the data folder (cached; nullptr if it fails).
@@ -385,6 +389,7 @@ private:
     bool step_done(const std::string& id) const;
     std::vector<std::array<uint8_t, 256>> remap_, doll_remap_;
     mutable std::map<int, std::unique_ptr<ShapeFrame>> doll_pictures_;
+    mutable std::map<int, std::pair<int, int>> doll_head_at_;
     mutable std::map<std::string, std::unique_ptr<ShapeFrame>> pictures_;  // by file; null = failed
     World& w_;
     uint32_t start_frame_ = 0;

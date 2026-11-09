@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+## 0.26.0 - 2026-11-10
+- New painted portraits for all the companions: Morvain, Kalvax, Brannoc, Varn, Ilvaran, Corvin and Wynna now have
+  their own faces in the party bar and the side panel, and on their character sheet, sized to the figure.
+
 ## 0.25.1 - 2026-11-09
 - The world now uses the original maps by default: each part of Tenebrae loads on its own, as in the original game.
   The joined-up world showed parts of neighbouring districts drawn over Central Tenebrae's river and banks. It is
