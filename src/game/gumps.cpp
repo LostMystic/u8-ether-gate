@@ -661,7 +661,15 @@ int PaperdollGump::icon_row_of(unsigned slot) {
 
 bool PaperdollGump::on_whole_figure(int lx, int ly) { return lx >= 20 && lx < kIconColX && ly >= 13 && ly <= 100; }
 
-PaperdollGump::PaperdollGump(World& w, uint16_t actor) : ContainerGump(w, actor, 1) {}
+int PaperdollGump::widen() const { return icon_sheet() ? kSheetWiden : 0; }
+
+int PaperdollGump::map_x(int lx) const {
+    const int n = widen();
+    if (!n || lx < kSheetSplit) return lx;
+    return lx < kSheetSplit + n ? kSheetSplit - 1 : lx - n;
+}
+
+PaperdollGump::PaperdollGump(World& w, uint16_t actor) : ContainerGump(w, actor, 1) { this->w += widen(); }
 
 void PaperdollGump::slot_pos(unsigned slot, int& x, int& y) {
     static const int p[7][2] = {{0, 0}, {24, 60}, {36, 50}, {40, 26}, {40, 63}, {40, 92}, {16, 18}};
@@ -691,6 +699,13 @@ void PaperdollGump::paint(Surface8& s) {
     }
     const Actor* a = w_.actor(owner);
     if (!a) return;
+    // Everything else at the narrow sheet's places, right of the portrait (kSheetWiden).
+    struct Shift {
+        int& x;
+        int n;
+        ~Shift() { x -= n; }
+    } shift{x, widen()};
+    x += shift.n;
     if (companion) {
         std::string n = w_.party->display_name(owner);
         const ShapeFont& nf = w_.font(7);
@@ -786,12 +801,19 @@ void PaperdollGump::paint(Surface8& s) {
 }
 
 bool PaperdollGump::hit(int lx, int ly) const {
+    if (widen()) {
+        const ShapeFrame* own = w_.party ? w_.party->doll_picture(owner) : nullptr;
+        if (own && own->opaque(lx, ly)) return true;
+    }
+    lx = map_x(lx);
     if (Gump::hit(lx, ly)) return true;
     if (const ShapeFrame* f = gump_frame(38, 0); f && f->opaque(lx - kStatsBtnX, ly - kStatsBtnY)) return true;
-    return trace_item(lx, ly) != 0;
+    return trace_local(lx, ly) != 0;
 }
 
-uint16_t PaperdollGump::trace_item(int lx, int ly) const {
+uint16_t PaperdollGump::trace_item(int lx, int ly) const { return trace_local(map_x(lx), ly); }
+
+uint16_t PaperdollGump::trace_local(int lx, int ly) const {
     if (icon_sheet()) {
         int row = icon_row_at(lx, ly);
         if (row < 0) return 0;
@@ -820,7 +842,7 @@ bool PaperdollGump::item_anchor(uint16_t item, int& sx, int& sy) const {
         int row = icon_row_of(unsigned(it->z)), bx, by, bw, bh;
         if (row < 0) return false;
         icon_box(row, bx, by, bw, bh);
-        sx = x + bx + 1;
+        sx = x + widen() + bx + 1;
         sy = y + by + 1;
         return true;
     }
@@ -832,12 +854,14 @@ bool PaperdollGump::item_anchor(uint16_t item, int& sx, int& sy) const {
 }
 
 bool PaperdollGump::press(int button, int lx, int ly) {
+    lx = map_x(lx);
     const ShapeFrame* f = gump_frame(38, 0);
     stats_down_ = button == 1 && f && lx >= kStatsBtnX && ly >= kStatsBtnY && lx < kStatsBtnX + f->w && ly < kStatsBtnY + f->h;
     return true;
 }
 
 void PaperdollGump::release(int button, int lx, int ly) {
+    lx = map_x(lx);
     if (!stats_down_) return;
     stats_down_ = false;
     const ShapeFrame* f = gump_frame(38, 0);
@@ -867,6 +891,7 @@ void PaperdollGump::double_click(int button, int lx, int ly) {
 
 std::string PaperdollGump::tip(int lx, int ly) const {
     if (!w_.party) return "";
+    lx = map_x(lx);
     if (icon_sheet()) {
         int row = icon_row_at(lx, ly);
         if (row < 0) return "";
@@ -883,7 +908,7 @@ std::string PaperdollGump::tip(int lx, int ly) const {
         return n;
     }
     // The Avatar's (and the recoloured) sheet: the name of the equipment under the pointer.
-    const Item* it = w_.item(trace_item(lx, ly));
+    const Item* it = w_.item(trace_local(lx, ly));
     if (!it || it->shape == 529) return "";
     std::string n = w_.party->item_label(it->shape, it->frame);
     if (!n.empty()) n[0] = char(std::toupper(static_cast<unsigned char>(n[0])));
@@ -895,7 +920,9 @@ bool PaperdollGump::can_drag_out(uint16_t item) const {
     return !w_.stasis && it && it->shape != 529;
 }
 
-Gump::Drop PaperdollGump::drag_over(uint16_t item, int lx, int ly, int gx, int gy) {
+Gump::Drop PaperdollGump::drag_over(uint16_t item, int lx, int ly, int, int) { return drag_local(item, map_x(lx), ly); }
+
+Gump::Drop PaperdollGump::drag_local(uint16_t item, int lx, int ly) {
     ghost_item_ = 0;
     drop_why.clear();
     const Item* it = w_.item(item);
@@ -950,7 +977,7 @@ Gump::Drop PaperdollGump::drag_over(uint16_t item, int lx, int ly, int gx, int g
 }
 
 bool PaperdollGump::drop(uint16_t item, int lx, int ly, int gx, int gy) {
-    Drop d = drag_over(item, lx, ly, gx, gy);
+    Drop d = drag_local(item, map_x(lx), ly);
     uint16_t target = ghost_target_;
     ghost_item_ = 0;
     if (d == kDropNo) return false;

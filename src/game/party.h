@@ -37,9 +37,12 @@ struct ShapeFrame;
 
 // The engine-only item flag marking a companion actor (world/item.h kExt* values).
 constexpr uint16_t kExtCompanion = 0x0040;
-// A whole-figure companion sheet (art.paperdoll_body): the figure's centre column in gump 1, left
-// of the equipment slot column (gumps.cpp kIconCol*).
-constexpr int kDollFigCx = 35;
+// A portrait companion sheet (art.sheet_portrait; NOTES.md "Companion sheets"): gump 1 widened by
+// kSheetWiden columns inserted at x kSheetSplit (between the picture and the equipment slot
+// column), the large portrait in a sunken box at kSheetPicX, kSheetPicY (inside: kSheetPicW x
+// kSheetPicH, the picture centred in it, never scaled).
+constexpr int kSheetWiden = 56, kSheetSplit = 50;
+constexpr int kSheetPicX = 21, kSheetPicY = 15, kSheetPicW = 80, kSheetPicH = 83;
 
 // A dialogue / bark condition: every field that is set must hold.
 struct PartyCond {
@@ -116,10 +119,10 @@ struct CompanionDef {
     // laid over the own figure's head in the paperdoll ({file, dx, dy}: offset from the fit).
     std::string portrait, doll_head;
     int doll_head_dx = 0, doll_head_dy = 0;
-    // art.paperdoll_body: a whole standing figure, painted from the portrait (tools/doll_body.py).
-    // With one the companion's sheet shows the figure and the equipment as icons in a column of
-    // slots beside it (gumps.cpp, NOTES.md "Companion sheets") instead of on the Avatar's body.
-    std::string doll_body;
+    // art.sheet_portrait: a large portrait (80 x 83, from the same painting as the bar portrait).
+    // With one the companion's sheet is wider, shows the portrait instead of a body and the
+    // equipment as icons in a column of slots beside it (gumps.cpp, NOTES.md "Companion sheets").
+    std::string sheet_portrait;
     // What they may wear and wield (data: "gear"; data/items/equipment.json): "caster", "rogue"
     // or "warrior". Default from the leveling class: caster -> caster, anything else -> warrior.
     std::string gear;
@@ -287,7 +290,7 @@ public:
     // doll picture, drawn again over the equipment so a helmet's sprite does not hide the face
     // (the helmet stays clickable: the paperdoll picks items by their own sprites). Null if none.
     const ShapeFrame* doll_head_over(uint16_t actor, int& x, int& y) const;
-    // A companion whose sheet shows equipment as icons (art.paperdoll_body).
+    // A companion whose sheet shows the portrait and equipment as icons (art.sheet_portrait).
     bool icon_sheet(uint16_t actor) const;
     // Why this companion may not wear or wield the item ("" = they may, or it is not equipment,
     // or the actor is not a companion): their gear class against the item's grade

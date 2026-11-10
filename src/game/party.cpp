@@ -293,7 +293,7 @@ bool Party::load_text(const std::string& text, std::string& err) {
                     d.doll_head_dx = h.value("dx", 0);
                     d.doll_head_dy = h.value("dy", 0);
                 }
-                d.doll_body = a.value("paperdoll_body", "");
+                d.sheet_portrait = a.value("sheet_portrait", "");
                 for (const json& r : art->value("recolour", json::array())) d.recolour.push_back(parse_rule(r));
                 for (const json& r : art->value("paperdoll_recolour", json::array())) d.doll_recolour.push_back(parse_rule(r));
             }
@@ -1067,6 +1067,19 @@ void Party::place_pack() {
     auto* d = dynamic_cast<ContainerGump*>(w_.gumps.container_gump(place_doll_));
     if (!g || !d) {
         if (++place_tries_ > 60) place_pack_ = 0;
+        return;
+    }
+    if (d->w + 2 + g->w > 320) {
+        // Too wide side by side (a portrait sheet): the sheet at the top left, the backpack in the
+        // bottom right corner, overlapping at most the sheet's bottom-right frame corner.
+        int dx = 0, dy = 0;
+        d->off_x += dx - d->x;
+        d->off_y += dy - d->y;
+        d->follow_item();
+        g->off_x += (320 - g->w) - g->x;
+        g->off_y += (200 - g->h) - g->y;
+        g->follow_item();
+        place_pack_ = 0;
         return;
     }
     // Side by side: shift the paperdoll left if the pair would not fit.

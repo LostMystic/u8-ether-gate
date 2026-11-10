@@ -292,6 +292,14 @@ void Party::ai(int idx) {
     switch (st.mode) {
     case CompanionState::kIdle: ai_idle(idx, *a); break;
     case CompanionState::kFollow:
+        // Two screens or more behind and out of sight while fighting (he was teleported or ran
+        // off): back beside him, the fight left behind (ai_follow does this when not fighting).
+        if (const Actor* av = w_.avatar(); av && av->chunk >= 0 && st.target &&
+            (dist(*a, *av) > 1200 || std::abs(a->z - av->z) > 160) && !on_screen(a->x, a->y, a->z) &&
+            place_near_avatar(idx, true)) {
+            st.target = 0;
+            break;
+        }
         if (!ai_combat(idx, *a)) ai_follow(idx, *a);
         break;
     case CompanionState::kWait:

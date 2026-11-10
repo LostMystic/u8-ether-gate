@@ -173,6 +173,19 @@ void Party::update_bar() {
 
 namespace {
 
+// The palette colour nearest an RGB (never a translucency index or 0..15, 255).
+uint8_t nearest_rgb(const GameData& d, int r, int g, int b) {
+    int best = 16, bd = 1 << 30;
+    for (int i = 16; i < 255; ++i) {
+        if (d.xform.loaded && d.xform.is_xform(uint8_t(i))) continue;
+        int dr = d.palette.rgb8[size_t(i)][0] - r, dg = d.palette.rgb8[size_t(i)][1] - g, db = d.palette.rgb8[size_t(i)][2] - b;
+        int e = 3 * dr * dr + 4 * dg * dg + 2 * db * db;
+        if (e < bd) { bd = e; best = i; }
+    }
+    return uint8_t(best);
+}
+
+
 // EPX / Scale2x: doubles a frame, rounding diagonal edges instead of making blocks.
 ShapeFrame scale2x(const ShapeFrame& f) {
     ShapeFrame o;
@@ -210,23 +223,32 @@ const ShapeFrame* Party::doll_picture(uint16_t actor) const {
     // Own figure (Nerissa), or the Avatar's paperdoll body in the companion's colours with a
     // painted head (art.paperdoll_head) over his.
     const bool own_fig = defs[size_t(i)].own_doll;
-    const bool whole = !defs[size_t(i)].doll_body.empty();
+    const bool whole = !defs[size_t(i)].sheet_portrait.empty();
     if (!own_fig && !whole && defs[size_t(i)].doll_head.empty()) return nullptr;
     auto it = doll_pictures_.find(i);
     if (it != doll_pictures_.end()) return it->second.get();
     const GameData& d = w_.data();
     const ShapeFrame* g = d.gumps.frame(1, 0);
     if (whole) {
-        // A whole standing figure (art.paperdoll_body): the body panel is plain stone, the
-        // figure stands on its floor left of the slot column (gumps.cpp draws the slots).
-        const ShapeFrame* body = picture(defs[size_t(i)].doll_body);
-        if (!g || !body || g->w < 80 || g->h < 104) {
+        // The portrait sheet: gump 1 with kSheetWiden columns inserted at kSheetSplit (copies of
+        // columns 20..39, where the frame, the panel's bevels and the stone run evenly across),
+        // the body panel plain stone, the portrait centred in a sunken box.
+        const ShapeFrame* pt = picture(defs[size_t(i)].sheet_portrait);
+        if (!g || !pt || g->w < 80 || g->h < 104) {
             doll_pictures_[i] = nullptr;
             return nullptr;
         }
         auto pic = std::make_unique<ShapeFrame>(*g);
+        pic->w = g->w + kSheetWiden;
+        pic->pixels.assign(size_t(pic->w) * pic->h, ShapeFrame::kTransparent);
+        for (int y = 0; y < g->h; ++y)
+            for (int x = 0; x < pic->w; ++x) {
+                int sx = x < kSheetSplit ? x : x < kSheetSplit + kSheetWiden ? 20 + (x - kSheetSplit) % 20 : x - kSheetWiden;
+                pic->pixels[size_t(y) * pic->w + x] = g->pixels[size_t(y) * g->w + sx];
+            }
+        const int right = 71 + kSheetWiden;
         for (int y = 15; y <= 100; ++y)
-            for (int x = 15; x <= 71; ++x) {
+            for (int x = 15; x <= right; ++x) {
                 uint8_t c;
                 if (x <= 19) c = g->pixels[size_t(96) * g->w + x];
                 else if (y == 100) c = 21;
@@ -237,13 +259,23 @@ const ShapeFrame* Party::doll_picture(uint16_t actor) const {
                 }
                 pic->pixels[size_t(y) * pic->w + x] = c;
             }
-        // Centred on x kDollFigCx, feet on row 99.
-        const int ox = kDollFigCx - body->w / 2, oy = 100 - body->h;
-        for (int v = 0; v < body->h; ++v)
-            for (int u = 0; u < body->w; ++u) {
-                uint8_t c = body->pixels[size_t(v) * body->w + u];
+        // The box: dark top and left edge, light bottom and right (sunken, as the slot boxes),
+        // a near-black well; the portrait centred in it at its own size (cropped only if larger).
+        const uint8_t dark = nearest_rgb(d, 52, 48, 44), light = nearest_rgb(d, 200, 196, 188), well = nearest_rgb(d, 16, 16, 20);
+        const int bx = kSheetPicX - 1, by = kSheetPicY - 1, bw = kSheetPicW + 2, bh = kSheetPicH + 2;
+        for (int y = by; y < by + bh; ++y)
+            for (int x = bx; x < bx + bw; ++x) {
+                uint8_t c = (x == bx + bw - 1 || y == by + bh - 1) ? light : (x == bx || y == by) ? dark : well;
+                pic->pixels[size_t(y) * pic->w + x] = c;
+            }
+        const int ox = kSheetPicX + (kSheetPicW - pt->w) / 2, oy = kSheetPicY + (kSheetPicH - pt->h) / 2;
+        for (int v = 0; v < pt->h; ++v)
+            for (int u = 0; u < pt->w; ++u) {
+                uint8_t c = pt->pixels[size_t(v) * pt->w + u];
                 int tx = ox + u, ty = oy + v;
-                if (c != ShapeFrame::kTransparent && tx >= 20 && tx <= 71 && ty >= 13 && ty <= 99) pic->pixels[size_t(ty) * pic->w + tx] = c;
+                if (c != ShapeFrame::kTransparent && tx >= kSheetPicX && tx < kSheetPicX + kSheetPicW && ty >= kSheetPicY &&
+                    ty < kSheetPicY + kSheetPicH)
+                    pic->pixels[size_t(ty) * pic->w + tx] = c;
             }
         const ShapeFrame* out = pic.get();
         doll_pictures_[i] = std::move(pic);
@@ -392,7 +424,7 @@ const ShapeFrame* Party::doll_head_over(uint16_t actor, int& x, int& y) const {
 
 bool Party::icon_sheet(uint16_t actor) const {
     int i = index_of(actor);
-    return i >= 0 && !defs[size_t(i)].doll_body.empty() && doll_picture(actor);
+    return i >= 0 && !defs[size_t(i)].sheet_portrait.empty() && doll_picture(actor);
 }
 
 void Party::load_equipment() const {

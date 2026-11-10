@@ -348,7 +348,7 @@
    "leveling": {"class": "caster", "str": 10, "dex": 10, "int": 14},
    "art": {
     "portrait": "portraits/morvain_bar.png",
-    "paperdoll_body": "portraits/morvain_doll_body.png",
+    "sheet_portrait": "portraits/morvain_sheet.png",
     "paperdoll_head": {"file": "portraits/morvain_doll_head.png", "dx": 0, "dy": 0},
     "shape": 187,
     "note": "Malchir's hooded robe (full walk/run/attack/hit/die/cast 27-31); red trim turned moss green",
@@ -780,7 +780,7 @@
    "leveling": {"class": "caster", "str": 10, "dex": 11, "int": 14},
    "art": {
     "portrait": "portraits/kalvax_bar.png",
-    "paperdoll_body": "portraits/kalvax_doll_body.png",
+    "sheet_portrait": "portraits/kalvax_sheet.png",
     "paperdoll_head": {"file": "portraits/kalvax_doll_head.png", "dx": 0, "dy": 0},
     "shape": 191,
     "note": "Vardion's sorcerer coat (cast 27-31); the red coat burned to amber",
@@ -1255,7 +1255,7 @@
    "leveling": {"class": "fighter", "str": 14, "dex": 13, "int": 9},
    "art": {
     "portrait": "portraits/brannoc_bar.png",
-    "paperdoll_body": "portraits/brannoc_doll_body.png",
+    "sheet_portrait": "portraits/brannoc_sheet.png",
     "paperdoll_head": {"file": "portraits/brannoc_doll_head.png", "dx": 0, "dy": 0},
     "shape": 401,
     "note": "Darion's plate armour (walk/run/attack with a hit frame/hit/die; Korick 431's attack never reaches); the plate tinted storm blue, the leather dark",
@@ -1618,7 +1618,7 @@
    "leveling": {"class": "hybrid", "str": 14, "dex": 10, "int": 11},
    "art": {
     "portrait": "portraits/varn_bar.png",
-    "paperdoll_body": "portraits/varn_doll_body.png",
+    "sheet_portrait": "portraits/varn_sheet.png",
     "paperdoll_head": {"file": "portraits/varn_doll_head.png", "dx": 0, "dy": 0},
     "shape": 574,
     "note": "the Tempest's guard in armour (walk/run/attack/hit/die, cast 27-29); the blue tabard turned sea green",
@@ -1990,7 +1990,7 @@
    "leveling": {"class": "caster", "str": 9, "dex": 10, "int": 14, "mana": 30},
    "art": {
     "portrait": "portraits/ilvaran_bar.png",
-    "paperdoll_body": "portraits/ilvaran_doll_body.png",
+    "sheet_portrait": "portraits/ilvaran_sheet.png",
     "paperdoll_head": {"file": "portraits/ilvaran_doll_head.png", "dx": 0, "dy": 0},
     "shape": 188,
     "note": "Stellos' theurgist robe (cast 27-31); the blue robe turned to Zealan gold",
@@ -2398,7 +2398,7 @@
    "leveling": {"class": "hybrid", "str": 11, "dex": 14, "int": 10},
    "art": {
     "portrait": "portraits/corvin_bar.png",
-    "paperdoll_body": "portraits/corvin_doll_body.png",
+    "sheet_portrait": "portraits/corvin_sheet.png",
     "paperdoll_head": {"file": "portraits/corvin_doll_head.png", "dx": 0, "dy": 0},
     "shape": 403,
     "note": "Orlok's dockside coat (walk/run/attack/hit/die); the blue coat dyed crow black-green, the vest rust; its attack animation has no hit frame, so the companion AI resolves his blows (half way through the swing when adjacent)",
@@ -2827,7 +2827,7 @@
    "leveling": {"class": "caster", "str": 9, "dex": 11, "int": 14},
    "art": {
     "portrait": "portraits/wynna_bar.png",
-    "paperdoll_body": "portraits/wynna_doll_body.png",
+    "sheet_portrait": "portraits/wynna_sheet.png",
     "paperdoll_head": {"file": "portraits/wynna_doll_head.png", "dx": 0, "dy": 0},
     "shape": 189,
     "note": "Mordea's gown (cast 27-29); the white dress tinted lavender",
@@ -3231,7 +3231,7 @@
     "note": "her own figure (data/shapes/nerissa.shp, painted over the Avatar's frames by pagan_skin): long dark hair, a sea-foam dress to mid-calf with a pale sash and deep-blue hem, bare arms, blue slippers; the paperdoll shows the same figure",
     "paperdoll": "own",
     "portrait": "portraits/nerissa_bar.png",
-    "paperdoll_body": "portraits/nerissa_doll_body.png",
+    "sheet_portrait": "portraits/nerissa_sheet.png",
     "paperdoll_head": {
      "file": "portraits/nerissa_doll_head.png",
      "dx": 0,

@@ -258,18 +258,19 @@ std::string PaperdollGump::click_message(int lx, int ly) const {
 
 void PaperdollGump::click(int button, int lx, int ly) {
     if (button == 1) {
-        const std::string m = click_message(lx, ly);
+        const int mx = map_x(lx);  // the narrow sheet's place (a portrait sheet is wider)
+        const std::string m = click_message(mx, ly);
         if (!m.empty()) {
             note = m;
             note_ticks = kNoteTicks;
-            note_x = lx;
+            note_x = mx;
             note_y = ly;
             w_.game_log.add(GameLog::kMessages, GameLog::kInfo, m, owner);
             return;
         }
-        if (gem_at(lx, ly) >= 0) return;  // the centre gem: nothing
+        if (gem_at(mx, ly) >= 0) return;  // the centre gem: nothing
     }
-    ContainerGump::click(button, lx, ly);
+    ContainerGump::click(button, lx, ly);  // trace_item maps again
 }
 
 void PaperdollGump::tick() {
@@ -284,7 +285,7 @@ void PaperdollGump::paint_note(Surface8& s) {
     if (!bg) { bg = nearest(w_.data().palette, {28, 24, 20}); edge = nearest(w_.data().palette, {150, 140, 120}); }
     const ShapeFont& f = w_.font(0);
     const int tw = f.text_width(note), bw = tw + 8, bh = f.height() + 3;
-    const int bx = std::clamp(note_x - bw / 2, 2, std::max(2, w - 2 - bw));
+    const int bx = std::clamp(note_x - bw / 2, 2 - widen(), std::max(2, w - widen() - 2 - bw));  // x is shifted by widen() here
     const int by = std::clamp(note_y - bh - 5, 2, std::max(2, h - 2 - bh));
     s.fill_rect(x + bx, y + by, bw, bh, edge);
     s.fill_rect(x + bx + 1, y + by + 1, bw - 2, bh - 2, bg);

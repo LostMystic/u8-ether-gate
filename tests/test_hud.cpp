@@ -692,6 +692,12 @@ void test_portraits(const GameData& d) {
     for (const auto& g : u.w().gumps.list)
         if (auto* pd = dynamic_cast<PaperdollGump*>(g.get()); pd && pd->owner == u.cid("brannoc")) open = true;
     CHECK(open);
+    // ...and his backpack beside it (user's request, 2026-11-11).
+    {
+        const uint16_t pk = u.w().equipped(u.cid("brannoc"), 7);
+        std::printf("  Brannoc's backpack %u: window %s\n", pk, pk && u.w().gumps.container_gump(pk) ? "open" : "NOT open");
+        CHECK(pk && u.w().gumps.container_gump(pk));
+    }
     u.key(kKeyBackspace);
     u.frames(2);
     // Drag an item from the world onto Varn's portrait: it goes into his backpack.

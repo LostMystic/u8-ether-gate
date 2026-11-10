@@ -163,10 +163,14 @@ public:
     void click(int button, int lx, int ly) override;
     std::string tip(int lx, int ly) const override;
 
-    // A companion with a whole figure (Party::icon_sheet): the equipment as icons in a column of
-    // boxes right of the figure (NOTES.md "Companion sheets"). Rows top to bottom: helmet, body,
-    // arms, legs, weapon, shield, backpack (equip types kIconSlots).
+    // A companion with a portrait sheet (Party::icon_sheet): the sheet kSheetWiden wider, their
+    // large portrait instead of a body and the equipment as icons in a column of boxes right of it
+    // (NOTES.md "Companion sheets"). Rows top to bottom: helmet, body, arms, legs, weapon, shield,
+    // backpack (equip types kIconSlots). The icon_* and on_whole_figure coordinates are the narrow
+    // sheet's: map_x takes a point on the wide sheet there (the portrait to x < kSheetSplit).
     bool icon_sheet() const;
+    int widen() const;
+    int map_x(int lx) const;
     static constexpr int kIconRows = 7;
     static const unsigned kIconSlots[kIconRows];
     static void icon_box(int row, int& bx, int& by, int& bw, int& bh);  // local
@@ -194,6 +198,8 @@ public:
 
 private:
     bool over_backpack(int lx, int ly) const;
+    uint16_t trace_local(int lx, int ly) const;  // narrow-sheet coordinates
+    Drop drag_local(uint16_t item, int lx, int ly);
     void paint_level_line(Surface8& s);
     void paint_octagon(Surface8& s);
     void paint_note(Surface8& s);

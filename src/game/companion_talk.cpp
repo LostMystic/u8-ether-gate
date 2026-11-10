@@ -204,14 +204,20 @@ void Party::open_inventory(int idx) {
     CompanionState& st = state[size_t(idx)];
     const Actor* a = w_.actor(st.id);
     if (!a || a->is(Actor::kDead)) return;
-    if (!w_.gumps.container_gump(st.id)) w_.open_gump(st.id, 1);
-    if (uint16_t pack = w_.equipped(st.id, 7))
-        if (!w_.gumps.container_gump(pack)) {
-            w_.call_event(pack, kEvUse);  // the backpack's own usecode opens its window
+    // The sheet and the backpack together, both on top; the backpack beside the sheet (place_pack).
+    // The backpack's window is opened directly (gump 2, as its usecode does), not through its use
+    // event, and one already open (perhaps under the sheet) is raised and moved beside it again.
+    if (Gump* g = w_.gumps.container_gump(st.id)) w_.gumps.raise(g);
+    else w_.open_gump(st.id, 1);
+    if (uint16_t pack = w_.equipped(st.id, 7)) {
+        if (Gump* g = w_.gumps.container_gump(pack)) w_.gumps.raise(g);
+        else w_.open_gump(pack, 2);
+        if (w_.gumps.container_gump(pack)) {
             place_pack_ = pack;
             place_doll_ = st.id;
             place_tries_ = 0;
         }
+    }
 }
 
 // ---------------------------------------------------------------------------------------------

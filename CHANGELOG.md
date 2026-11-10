@@ -2,6 +2,13 @@
 
 ## Unreleased
 
+## 0.27.1 - 2026-11-11
+- The companions' character sheets are wider and show a large version of their portrait instead of a body; the
+  equipment slots stay beside it.
+- Clicking a companion's portrait opens their backpack along with their character sheet again.
+- Followers fighting far behind you (after a teleport, say) now come back to you too, as followers left behind
+  already did.
+
 ## 0.27.0 - 2026-11-10
 - New character sheets for the companions: each one stands on their sheet in their own clothes with their painted
   face, and their equipment sits in a row of slots beside them, every item with its own little picture. Point at one

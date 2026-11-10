@@ -547,6 +547,34 @@ void test_follow(const GameData& d) {
     for (int m : u.p().members) near += dist(*u.w().actor(u.p().state[size_t(m)].id), *av) < 500;
     std::printf("  after a 2500-unit jump: %d of 4 caught up\n", near);
     CHECK(near >= 3);
+    // The same mid-fight: each with a monster for a target where they stand, he jumps back
+    // 2500 units: they leave the fight and catch up (user's request, 2026-11-11).
+    {
+        uint16_t foe = u.w().create_monster(142, 0);
+        const Actor* f0 = u.ca(u.p().defs[size_t(u.p().members[0])].id.c_str());
+        int fx = 0, fy = 0, fz = 0;
+        if (foe && find_free(u.w(), 142, f0->x + 64, f0->y, f0->z, 0, 300, foe, fx, fy, fz)) u.w().move_to(foe, fx, fy, fz, false);
+        if (Actor* fa = u.w().actor(foe)) { fa->hp = 500; fa->set(Actor::kInvincible, true); }
+        for (int m : u.p().members) {
+            u.p().state[size_t(m)].target = foe;
+            if (Actor* ma = u.w().actor(u.p().state[size_t(m)].id)) ma->set(Actor::kInvincible, true);
+        }
+        int tx = av->x - 2500, ty = av->y, tz = av->z;
+        u.w().teleport_actor(1, tx, ty, tz, 40);
+        u.frames(2);
+        CHECK(find_free(u.w(), av->shape, tx, ty, 48, 0, 400, 1, tx, ty, tz));
+        u.w().teleport_actor(1, tx, ty, tz, 40);
+        u.frames(200);
+        near = 0;
+        for (int m : u.p().members) near += dist(*u.w().actor(u.p().state[size_t(m)].id), *av) < 500;
+        std::printf("  after a 2500-unit jump mid-fight: %d of 4 caught up\n", near);
+        CHECK(near >= 3);
+        for (int m : u.p().members) {
+            u.p().state[size_t(m)].target = 0;
+            if (Actor* ma = u.w().actor(u.p().state[size_t(m)].id)) ma->set(Actor::kInvincible, false);
+        }
+        if (foe) u.w().destroy_item(foe);
+    }
     // Scenes: in stasis they hold still.
     u.w().stasis = true;
     std::vector<int> xs;
@@ -1074,18 +1102,19 @@ void test_nerissa(const GameData& d) {
     u.frames(5);
     CHECK(u.p().doll_picture(n->id) != nullptr);
     CHECK(u.p().doll_picture(1) == nullptr);
-    // Every companion's sheet: their whole standing figure (data/portraits/<id>_doll_body.png,
-    // 30 x 84) on the body panel, every pixel of it, feet on the panel's floor, and the
-    // equipment as icons (NOTES.md "Companion sheets").
+    // Every companion's sheet: wider by kSheetWiden, their large portrait (data/portraits/<id>_sheet.png,
+    // 80 x 83) unscaled and centred in its box, every pixel of it, and the equipment as icons
+    // (NOTES.md "Companion sheets").
     for (const char* c : {"morvain", "kalvax", "brannoc", "varn", "ilvaran", "corvin", "wynna", "nerissa"}) {
         uint16_t id = u.cid(c);
         const ShapeFrame* dp = u.p().doll_picture(id);
-        const ShapeFrame* body = u.p().picture(std::string("portraits/") + c + "_doll_body.png");
-        CHECK(dp != nullptr && body != nullptr && body->w == 30 && body->h == 84);
-        CHECK(u.p().icon_sheet(id));
+        const ShapeFrame* body = u.p().picture(std::string("portraits/") + c + "_sheet.png");
+        const ShapeFrame* g1 = u.w().data().gumps.frame(1, 0);
+        CHECK(dp != nullptr && body != nullptr && body->w == kSheetPicW && body->h == kSheetPicH);
+        CHECK(u.p().icon_sheet(id) && g1 && dp && dp->w == g1->w + kSheetWiden && dp->h == g1->h);
         if (!dp || !body) continue;
         int total = 0, same = 0;
-        const int ox = kDollFigCx - body->w / 2, oy = 100 - body->h;
+        const int ox = kSheetPicX + (kSheetPicW - body->w) / 2, oy = kSheetPicY + (kSheetPicH - body->h) / 2;
         for (int yy = 0; yy < body->h; ++yy)
             for (int xx = 0; xx < body->w; ++xx) {
                 uint8_t px = body->pixels[size_t(yy) * body->w + xx];
@@ -1093,12 +1122,19 @@ void test_nerissa(const GameData& d) {
                 ++total;
                 same += dp->pixels[size_t(oy + yy) * dp->w + ox + xx] == px;
             }
-        std::printf("  %s's sheet figure: %d of %d pixels\n", c, same, total);
-        CHECK(total > 900 && same == total);
+        std::printf("  %s's sheet portrait: %d of %d pixels\n", c, same, total);
+        CHECK(total == kSheetPicW * kSheetPicH && same == total);
         int ci = u.p().find_def(c);
         if (ci >= 0) {
             u.p().open_inventory(ci);
             u.frames(5);
+            // Their backpack opens with the sheet (a click on their portrait does this).
+            const uint16_t pk = u.w().equipped(id, 7);
+            const Gump* pkg = pk ? u.w().gumps.container_gump(pk) : nullptr;
+            const Actor* ca = u.w().actor(id);
+            std::printf("  %s: backpack %u window %s (%d tiles away)\n", c, pk, pkg ? "open" : "NOT open",
+                        ca ? int(std::max(std::abs(ca->x - u.w().avatar()->x), std::abs(ca->y - u.w().avatar()->y)) / 32) : -1);
+            CHECK(pk && pkg);
             if (const Gump* pg = u.w().gumps.container_gump(id))
                 u.shot_crop(std::string("sheet_") + c, pg->x + pg->w / 2, pg->y + pg->h / 2, std::min(320, pg->w + 8), std::min(200, pg->h + 8));
             u.w().close_gump(id);
@@ -1133,10 +1169,13 @@ void test_nerissa(const GameData& d) {
         u.p().open_inventory(ci);
         u.frames(5);
         auto* pg = dynamic_cast<PaperdollGump*>(u.w().gumps.container_gump(mo));
-        CHECK(pg && pg->icon_sheet());
+        CHECK(pg && pg->icon_sheet() && pg->widen() == kSheetWiden);
         if (pg) {
+            // The boxes are in the narrow sheet's coordinates; on the sheet they lie kSheetWiden on.
+            CHECK(pg->w == kSheetWiden + u.w().data().gumps.frame(1, 0)->w);
             int bx, by, bw, bh;
             PaperdollGump::icon_box(PaperdollGump::icon_row_of(6), bx, by, bw, bh);
+            bx += kSheetWiden;
             uint16_t dagger = u.w().equipped(mo, 6);
             CHECK(dagger && pg->trace_item(bx + bw / 2, by + bh / 2) == dagger);
             std::string t = pg->tip(bx + bw / 2, by + bh / 2);
@@ -1144,6 +1183,7 @@ void test_nerissa(const GameData& d) {
             CHECK(t == "Dagger");
             int hx, hy, hw, hh;
             PaperdollGump::icon_box(PaperdollGump::icon_row_of(3), hx, hy, hw, hh);
+            hx += kSheetWiden;
             t = pg->tip(hx + 2, hy + 2);
             std::printf("  helmet box tooltip: \"%s\"\n", t.c_str());
             CHECK(t == "Helmet: not for Morvain");
@@ -1152,6 +1192,8 @@ void test_nerissa(const GameData& d) {
             const Item* d = u.w().item(dagger);
             CHECK(d && d->parent == u.w().equipped(mo, 7) && !(d->flags & kItemEquipped) && u.w().equipped(mo, 6) == 0);
             CHECK(pg->drag_over(dagger, 35, 50, 0, 0) == Gump::kDropPlace);
+            CHECK(pg->drag_over(dagger, 95, 50, 0, 0) == Gump::kDropPlace);  // the portrait's right side
+            CHECK(pg->hit(95, 50) && pg->trace_item(95, 50) == 0);
             CHECK(pg->drop(dagger, 35, 50, 0, 0) && u.w().equipped(mo, 6) == dagger);
             u.w().move_to_container(dagger, u.w().equipped(mo, 7));
             CHECK(pg->drag_over(sword, bx + 3, by + 3, 0, 0) == Gump::kDropNo && pg->drop_why.find("dagger or a mace") != std::string::npos);
@@ -1159,7 +1201,7 @@ void test_nerissa(const GameData& d) {
             pg->drag_leave();
             CHECK(pg->drop(dagger, bx + 3, by + 3, 0, 0) && u.w().equipped(mo, 6) == dagger);
             // Anywhere else on the sheet (the stats): into his backpack.
-            CHECK(pg->drag_over(mace, 120, 60, 0, 0) == Gump::kDropInto);
+            CHECK(pg->drag_over(mace, 120 + kSheetWiden, 60, 0, 0) == Gump::kDropInto);
             pg->drag_leave();
             u.w().close_gump(mo);
             if (uint16_t pack = u.w().equipped(mo, 7)) u.w().close_gump(pack);
