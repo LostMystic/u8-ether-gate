@@ -2,6 +2,16 @@
 
 ## Unreleased
 
+## 0.27.0 - 2026-11-10
+- New character sheets for the companions: each one stands on their sheet in their own clothes with their painted
+  face, and their equipment sits in a row of slots beside them, every item with its own little picture. Point at one
+  to see its name; drag it out (or double-click it to put it in their backpack); drop a weapon or armour on them or
+  on a slot to equip it.
+- Companions now use gear that suits them: spellcasters wear no armour and carry a dagger or a mace, Corvin wears
+  up to chain mail and fights with blades, and the fighters can use anything. Their sheet says why when something
+  won't fit.
+- The Avatar's character sheet names the equipment under the pointer.
+
 ## 0.26.0 - 2026-11-10
 - New painted portraits for all the companions: Morvain, Kalvax, Brannoc, Varn, Ilvaran, Corvin and Wynna now have
   their own faces in the party bar and the side panel, and on their character sheet, sized to the figure.

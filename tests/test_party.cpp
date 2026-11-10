@@ -27,6 +27,7 @@
 #include "game/anim_tracker.h"
 #include "game/assist.h"
 #include "game/combat.h"
+#include "game/gumps.h"
 #include "game/party.h"
 #include "game/pathfinder.h"
 #include "game/processes.h"
@@ -1073,62 +1074,110 @@ void test_nerissa(const GameData& d) {
     u.frames(5);
     CHECK(u.p().doll_picture(n->id) != nullptr);
     CHECK(u.p().doll_picture(1) == nullptr);
-    // The others: the Avatar's paperdoll body in their colours, their painted head (14 x 18) over
-    // his, every pixel of it, inside the body panel and no wider than his head and shoulders.
-    for (const char* c : {"morvain", "kalvax", "brannoc", "varn", "ilvaran", "corvin", "wynna"}) {
+    // Every companion's sheet: their whole standing figure (data/portraits/<id>_doll_body.png,
+    // 30 x 84) on the body panel, every pixel of it, feet on the panel's floor, and the
+    // equipment as icons (NOTES.md "Companion sheets").
+    for (const char* c : {"morvain", "kalvax", "brannoc", "varn", "ilvaran", "corvin", "wynna", "nerissa"}) {
         uint16_t id = u.cid(c);
         const ShapeFrame* dp = u.p().doll_picture(id);
-        const ShapeFrame* hd = u.p().picture(std::string("portraits/") + c + "_doll_head.png");
-        CHECK(dp != nullptr && hd != nullptr && hd->w == 14 && hd->h == 18);
-        if (!dp || !hd) continue;
-        int total = 0, best = 0, bx = 0, by = 0;
-        for (uint8_t px : hd->pixels) total += px != ShapeFrame::kTransparent;
-        for (int oy = 0; oy + hd->h <= std::min(60, dp->h); ++oy)
-            for (int ox = 0; ox + hd->w <= std::min(80, dp->w); ++ox) {
-                int m = 0;
-                for (int yy = 0; yy < hd->h; ++yy)
-                    for (int xx = 0; xx < hd->w; ++xx) {
-                        uint8_t px = hd->pixels[size_t(yy) * hd->w + xx];
-                        m += px != ShapeFrame::kTransparent && dp->pixels[size_t(oy + yy) * dp->w + ox + xx] == px;
-                    }
-                if (m > best) { best = m; bx = ox; by = oy; }
+        const ShapeFrame* body = u.p().picture(std::string("portraits/") + c + "_doll_body.png");
+        CHECK(dp != nullptr && body != nullptr && body->w == 30 && body->h == 84);
+        CHECK(u.p().icon_sheet(id));
+        if (!dp || !body) continue;
+        int total = 0, same = 0;
+        const int ox = kDollFigCx - body->w / 2, oy = 100 - body->h;
+        for (int yy = 0; yy < body->h; ++yy)
+            for (int xx = 0; xx < body->w; ++xx) {
+                uint8_t px = body->pixels[size_t(yy) * body->w + xx];
+                if (px == ShapeFrame::kTransparent) continue;
+                ++total;
+                same += dp->pixels[size_t(oy + yy) * dp->w + ox + xx] == px;
             }
-        std::printf("  %s's paperdoll head: %d of %d pixels at %d,%d\n", c, best, total, bx, by);
-        CHECK(total > 100 && best == total && bx >= 15 && bx + hd->w <= 72 && by >= 13 && by < 40);
+        std::printf("  %s's sheet figure: %d of %d pixels\n", c, same, total);
+        CHECK(total > 900 && same == total);
         int ci = u.p().find_def(c);
         if (ci >= 0) {
             u.p().open_inventory(ci);
             u.frames(5);
             if (const Gump* pg = u.w().gumps.container_gump(id))
-                u.shot_crop(std::string("portrait_paperdoll_") + c, pg->x + pg->w / 2, pg->y + pg->h / 2, std::min(320, pg->w + 8), std::min(200, pg->h + 8));
+                u.shot_crop(std::string("sheet_") + c, pg->x + pg->w / 2, pg->y + pg->h / 2, std::min(320, pg->w + 8), std::min(200, pg->h + 8));
             u.w().close_gump(id);
             if (uint16_t pack = u.w().equipped(id, 7)) u.w().close_gump(pack);
             u.frames(3);
         }
     }
+    // Gear classes (data/items/equipment.json): a caster wears no armour and carries a dagger or a
+    // mace; a rogue wears up to chain; a warrior anything. The Avatar has no limits.
+    {
+        uint16_t mo = u.cid("morvain"), co = u.cid("corvin"), br = u.cid("brannoc");
+        auto loose = [&](unsigned shape, unsigned frame) {
+            uint16_t it = u.w().create_item(shape, frame);
+            if (it) u.w().move_to_container(it, u.w().equipped(1, 7));
+            return it;
+        };
+        uint16_t sword = loose(420, 0), plate = loose(523, 0), chain = loose(523, 2), robe = loose(823, 4), mace = loose(417, 0), helm = loose(531, 0);
+        std::string why = u.p().equip_refusal(mo, sword);
+        std::printf("  Morvain and a longsword: \"%s\"\n", why.c_str());
+        CHECK(why.find("dagger or a mace") != std::string::npos && !u.w().can_equip(mo, sword));
+        CHECK(!u.p().equip_refusal(mo, plate).empty() && !u.p().equip_refusal(mo, helm).empty());
+        CHECK(u.p().equip_refusal(mo, robe).empty() && u.p().equip_refusal(mo, mace).empty());
+        CHECK(u.p().equip_refusal(co, chain).empty() && !u.p().equip_refusal(co, plate).empty() && u.p().equip_refusal(co, sword).empty());
+        CHECK(u.p().equip_refusal(br, plate).empty() && u.p().equip_refusal(br, sword).empty());
+        CHECK(u.p().equip_refusal(1, plate).empty());
+        CHECK(!u.p().slot_usable(mo, 3) && !u.p().slot_usable(mo, 1) && u.p().slot_usable(mo, 4) && u.p().slot_usable(mo, 6));
+        CHECK(u.p().item_label(531, 0) == "iron helm" && u.p().item_label(523, 1) == "plate armor");
+
+        // Morvain's sheet: his dagger in the weapon box (name as the tooltip); a double-click puts it in
+        // his backpack; dropped on his figure it is worn again; the sword is refused with the reason.
+        int ci = u.p().find_def("morvain");
+        u.p().open_inventory(ci);
+        u.frames(5);
+        auto* pg = dynamic_cast<PaperdollGump*>(u.w().gumps.container_gump(mo));
+        CHECK(pg && pg->icon_sheet());
+        if (pg) {
+            int bx, by, bw, bh;
+            PaperdollGump::icon_box(PaperdollGump::icon_row_of(6), bx, by, bw, bh);
+            uint16_t dagger = u.w().equipped(mo, 6);
+            CHECK(dagger && pg->trace_item(bx + bw / 2, by + bh / 2) == dagger);
+            std::string t = pg->tip(bx + bw / 2, by + bh / 2);
+            std::printf("  weapon box tooltip: \"%s\"\n", t.c_str());
+            CHECK(t == "Dagger");
+            int hx, hy, hw, hh;
+            PaperdollGump::icon_box(PaperdollGump::icon_row_of(3), hx, hy, hw, hh);
+            t = pg->tip(hx + 2, hy + 2);
+            std::printf("  helmet box tooltip: \"%s\"\n", t.c_str());
+            CHECK(t == "Helmet: not for Morvain");
+            u.shot_crop("sheet_icons_morvain", pg->x + pg->w / 2, pg->y + pg->h / 2, std::min(320, pg->w + 8), std::min(200, pg->h + 8));
+            pg->double_click(1, bx + bw / 2, by + bh / 2);
+            const Item* d = u.w().item(dagger);
+            CHECK(d && d->parent == u.w().equipped(mo, 7) && !(d->flags & kItemEquipped) && u.w().equipped(mo, 6) == 0);
+            CHECK(pg->drag_over(dagger, 35, 50, 0, 0) == Gump::kDropPlace);
+            CHECK(pg->drop(dagger, 35, 50, 0, 0) && u.w().equipped(mo, 6) == dagger);
+            u.w().move_to_container(dagger, u.w().equipped(mo, 7));
+            CHECK(pg->drag_over(sword, bx + 3, by + 3, 0, 0) == Gump::kDropNo && pg->drop_why.find("dagger or a mace") != std::string::npos);
+            CHECK(u.w().equipped(mo, 4) != 0 || pg->drag_over(robe, 35, 50, 0, 0) == Gump::kDropPlace);  // clothes: he may
+            pg->drag_leave();
+            CHECK(pg->drop(dagger, bx + 3, by + 3, 0, 0) && u.w().equipped(mo, 6) == dagger);
+            // Anywhere else on the sheet (the stats): into his backpack.
+            CHECK(pg->drag_over(mace, 120, 60, 0, 0) == Gump::kDropInto);
+            pg->drag_leave();
+            u.w().close_gump(mo);
+            if (uint16_t pack = u.w().equipped(mo, 7)) u.w().close_gump(pack);
+        }
+        // Brannoc in plate armour and a kite shield: the icons in their boxes.
+        uint16_t shield = loose(539, 0);
+        if (uint16_t old = u.w().equipped(br, 4)) u.w().move_to_container(old, u.w().equipped(br, 7));
+        CHECK(u.w().equip(br, plate) && u.w().equip(br, shield));
+        u.p().open_inventory(u.p().find_def("brannoc"));
+        u.frames(5);
+        if (const Gump* bg = u.w().gumps.container_gump(br))
+            u.shot_crop("sheet_icons_brannoc", bg->x + bg->w / 2, bg->y + bg->h / 2, std::min(320, bg->w + 8), std::min(200, bg->h + 8));
+        u.w().close_gump(br);
+        if (uint16_t pack = u.w().equipped(br, 7)) u.w().close_gump(pack);
+        u.frames(3);
+    }
     u.p().open_inventory(ni);
     u.frames(5);
-    // The painted head (data/portraits/nerissa_doll_head.png) is in her paperdoll picture.
-    if (const ShapeFrame* dp = u.p().doll_picture(n->id)) {
-        const ShapeFrame* hd = u.p().picture("portraits/nerissa_doll_head.png");
-        CHECK(hd != nullptr);
-        if (hd) {
-            int total = 0, best = 0, bx = 0, by = 0;
-            for (uint8_t c : hd->pixels) total += c != ShapeFrame::kTransparent;
-            for (int oy = 0; oy + hd->h <= dp->h; ++oy)
-                for (int ox = 0; ox + hd->w <= dp->w; ++ox) {
-                    int m = 0;
-                    for (int yy = 0; yy < hd->h; ++yy)
-                        for (int xx = 0; xx < hd->w; ++xx) {
-                            uint8_t c = hd->pixels[size_t(yy) * hd->w + xx];
-                            m += c != ShapeFrame::kTransparent && dp->pixels[size_t(oy + yy) * dp->w + ox + xx] == c;
-                        }
-                    if (m > best) { best = m; bx = ox; by = oy; }
-                }
-            std::printf("  her paperdoll head: %d of %d pixels at %d,%d\n", best, total, bx, by);
-            CHECK(total > 120 && best == total && bx >= 15 && bx + hd->w <= 72 && by >= 13 && by < 40);
-        }
-    }
     u.shot("nerissa_paperdoll");
     if (const Gump* pg = u.w().gumps.container_gump(n->id))
         u.shot_crop("nerissa_portrait_paperdoll", pg->x + pg->w / 2, pg->y + pg->h / 2, std::min(320, pg->w + 8), std::min(200, pg->h + 8));

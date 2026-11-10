@@ -1244,7 +1244,7 @@ void GameMode::tick() {
     // Equipment taken off at drag start that did not go anywhere goes back on.
     if (drag_unequipped_ && drag_ == kDragNone && !w.gumps.find<SliderGump>()) {
         Item* e = w.item(drag_unequipped_);
-        if (e && e->parent == 1 && !(e->flags & kItemEquipped)) {
+        if (e && e->parent && e->parent < 256 && !(e->flags & kItemEquipped) && (e->flags & kItemContained)) {  // the Avatar or a companion
             e->flags = uint16_t((e->flags & ~kItemContained) | kItemEquipped);
         }
         drag_unequipped_ = 0;
@@ -1484,15 +1484,26 @@ void GameMode::draw_cursor(Surface8& surf) {
     // Why the red cross: beside the pointer while dragging, and for a moment after a refusal.
     std::string why = frame == kCursorRedCross && (drag_ == kDragItem || drag_ == kDragInvalid) ? drop_reason() : "";
     if (why.empty() && w.refuse_frames > 0) why = w.refuse_text;
+    // A gump's tooltip (the item names on a sheet), when nothing is dragged.
+    bool tip = false;
+    if (why.empty() && drag_ == kDragNone && frame != kCursorRedCross)
+        if (Gump* hg = w.gumps.at(mouse_x_, mouse_y_); hg && !hg->modal) {
+            why = hg->tip(mouse_x_ - hg->x, mouse_y_ - hg->y);
+            tip = !why.empty();
+        }
     if (!why.empty()) {
         const ShapeFont& f = w.font(1);
         const int tw = f.text_width(why), th = f.height();
         int tx = mouse_x_ + 12, ty = mouse_y_ + 12;
         if (tx + tw + 3 > 320) tx = std::max(3, mouse_x_ - 12 - tw);
         if (ty + th + 2 > 200) ty = std::max(2, mouse_y_ - 12 - th);
-        static uint8_t paper = 0, edge = 0;
-        if (!paper) { paper = cursor_note_colour(data_.palette, 222, 206, 160); edge = cursor_note_colour(data_.palette, 120, 30, 20); }
-        surf.fill_rect(tx - 3, ty - 2, tw + 6, th + 4, edge);
+        static uint8_t paper = 0, edge = 0, tip_edge = 0;
+        if (!paper) {
+            paper = cursor_note_colour(data_.palette, 222, 206, 160);
+            edge = cursor_note_colour(data_.palette, 120, 30, 20);
+            tip_edge = cursor_note_colour(data_.palette, 70, 56, 40);
+        }
+        surf.fill_rect(tx - 3, ty - 2, tw + 6, th + 4, tip ? tip_edge : edge);
         surf.fill_rect(tx - 2, ty - 1, tw + 4, th + 2, paper);
         f.draw_top(surf, tx, ty, why);
     }

@@ -37,6 +37,9 @@ struct ShapeFrame;
 
 // The engine-only item flag marking a companion actor (world/item.h kExt* values).
 constexpr uint16_t kExtCompanion = 0x0040;
+// A whole-figure companion sheet (art.paperdoll_body): the figure's centre column in gump 1, left
+// of the equipment slot column (gumps.cpp kIconCol*).
+constexpr int kDollFigCx = 35;
 
 // A dialogue / bark condition: every field that is set must hold.
 struct PartyCond {
@@ -113,6 +116,13 @@ struct CompanionDef {
     // laid over the own figure's head in the paperdoll ({file, dx, dy}: offset from the fit).
     std::string portrait, doll_head;
     int doll_head_dx = 0, doll_head_dy = 0;
+    // art.paperdoll_body: a whole standing figure, painted from the portrait (tools/doll_body.py).
+    // With one the companion's sheet shows the figure and the equipment as icons in a column of
+    // slots beside it (gumps.cpp, NOTES.md "Companion sheets") instead of on the Avatar's body.
+    std::string doll_body;
+    // What they may wear and wield (data: "gear"; data/items/equipment.json): "caster", "rogue"
+    // or "warrior". Default from the leveling class: caster -> caster, anything else -> warrior.
+    std::string gear;
     std::vector<ItemSpec> equip, pack;
     std::vector<std::string> spells;
     int spawn[3] = {0, 0, 0};  // the beach spot (map 3): debug mode, and the fallback for a home
@@ -277,6 +287,17 @@ public:
     // doll picture, drawn again over the equipment so a helmet's sprite does not hide the face
     // (the helmet stays clickable: the paperdoll picks items by their own sprites). Null if none.
     const ShapeFrame* doll_head_over(uint16_t actor, int& x, int& y) const;
+    // A companion whose sheet shows equipment as icons (art.paperdoll_body).
+    bool icon_sheet(uint16_t actor) const;
+    // Why this companion may not wear or wield the item ("" = they may, or it is not equipment,
+    // or the actor is not a companion): their gear class against the item's grade
+    // (data/items/equipment.json). Items not in that table are allowed.
+    std::string equip_refusal(uint16_t actor, uint16_t item) const;
+    // Whether anything in data/items/equipment.json for that equip slot suits their gear class
+    // (a caster has no helmet, arm guard, leggings or shield slot). True for unknown gear classes.
+    bool slot_usable(uint16_t actor, unsigned slot) const;
+    // The item's name from data/items/equipment.json ("" if it is not there).
+    std::string item_label(unsigned shape, unsigned frame) const;
     // The party-bar picture of a companion with art.portrait (nullptr = the cropped frame).
     const ShapeFrame* bar_portrait(uint16_t actor) const;
     // An engine-made picture by its path under the data folder (cached; nullptr if it fails).
@@ -390,6 +411,12 @@ private:
     std::vector<std::array<uint8_t, 256>> remap_, doll_remap_;
     mutable std::map<int, std::unique_ptr<ShapeFrame>> doll_pictures_;
     mutable std::map<int, std::pair<int, int>> doll_head_at_;
+    // data/items/equipment.json, read on first use.
+    struct EquipInfo { std::string name, grade; };
+    mutable bool equip_loaded_ = false;
+    mutable std::map<uint32_t, EquipInfo> equip_info_;            // shape << 8 | frame
+    mutable std::map<std::string, std::vector<std::string>> gear_armour_, gear_weapon_;
+    void load_equipment() const;
     mutable std::map<std::string, std::unique_ptr<ShapeFrame>> pictures_;  // by file; null = failed
     World& w_;
     uint32_t start_frame_ = 0;

@@ -293,6 +293,7 @@ bool Party::load_text(const std::string& text, std::string& err) {
                     d.doll_head_dx = h.value("dx", 0);
                     d.doll_head_dy = h.value("dy", 0);
                 }
+                d.doll_body = a.value("paperdoll_body", "");
                 for (const json& r : art->value("recolour", json::array())) d.recolour.push_back(parse_rule(r));
                 for (const json& r : art->value("paperdoll_recolour", json::array())) d.doll_recolour.push_back(parse_rule(r));
             }
@@ -319,6 +320,7 @@ bool Party::load_text(const std::string& text, std::string& err) {
             d.caster = c.value("caster", !d.spells.empty());
             d.healer = c.value("healer", false);
             d.rogue = c.value("rogue", false);
+            d.gear = c.value("gear", d.lv_class == "caster" ? "caster" : "warrior");
             for (const json& t : c.value("talk", json::array())) d.topics.push_back(parse_topic(t));
             if (c.contains("barks"))
                 for (auto it = c["barks"].begin(); it != c["barks"].end(); ++it) d.barks[it.key()] = str_list(it.value());

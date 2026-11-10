@@ -6,7 +6,10 @@
 #include "game/gumps.h"
 
 #include <algorithm>
+#include <cctype>
+#include <cmath>
 #include <cstdio>
+#include <map>
 
 #include "core/config.h"
 #include "core/log.h"
@@ -561,7 +564,102 @@ namespace {
 const int kPdAreaX = 7, kPdAreaY = 9;
 const int kBpX = 49, kBpY = 25, kBpW = 59, kBpH = 50;  // backpack hot spot, item-area coords
 const int kStatsBtnX = 81, kStatsBtnY = 84;
+// The icon column of a whole-figure companion sheet (gump 1 local; the body panel is x 15..71).
+const int kIconColX = 50, kIconColY = 16, kIconW = 22, kIconH = 12;
+
+uint8_t nearest_colour(const Palette& pal, const XForm& xf, int r, int g, int b) {
+    int best = 0, bd = 1 << 30;
+    for (int i = 16; i < 255; ++i) {
+        if (xf.loaded && xf.is_xform(uint8_t(i))) continue;
+        int dr = pal.rgb8[size_t(i)][0] - r, dg = pal.rgb8[size_t(i)][1] - g, db = pal.rgb8[size_t(i)][2] - b;
+        int d = 3 * dr * dr + 4 * dg * dg + 2 * db * db;
+        if (d < bd) { bd = d; best = i; }
+    }
+    return uint8_t(best);
+}
+
+// An item's inventory frame shrunk to fit maxw x maxh (area average, back to the palette); the
+// frame itself when it fits. Anchor top-left (xoff = yoff = 0). Cached.
+const ShapeFrame* item_icon(const GameData& d, unsigned shape, unsigned frame, int maxw, int maxh) {
+    static std::map<uint64_t, std::unique_ptr<ShapeFrame>> cache;
+    const uint64_t key = uint64_t(shape) << 32 | uint64_t(frame) << 16 | uint64_t(maxw) << 8 | uint64_t(maxh);
+    auto it = cache.find(key);
+    if (it != cache.end()) return it->second.get();
+    const ShapeFrame* f = d.shapes.frame(shape, frame);
+    std::unique_ptr<ShapeFrame> out;
+    if (f && f->w > 0 && f->h > 0) {
+        out = std::make_unique<ShapeFrame>();
+        const float k = std::min(1.0f, std::min(float(maxw) / f->w, float(maxh) / f->h));
+        out->w = std::max(1, int(f->w * k + 0.5f));
+        out->h = std::max(1, int(f->h * k + 0.5f));
+        out->xoff = out->yoff = 0;
+        out->pixels.assign(size_t(out->w) * out->h, ShapeFrame::kTransparent);
+        if (k >= 1.0f) {
+            out->pixels = f->pixels;
+        } else {
+            for (int y = 0; y < out->h; ++y)
+                for (int x = 0; x < out->w; ++x) {
+                    // Source box of this pixel; opaque pixels averaged, transparent counted.
+                    const float sx0 = x / k, sx1 = (x + 1) / k, sy0 = y / k, sy1 = (y + 1) / k;
+                    float r = 0, g = 0, b = 0, a = 0, tot = 0;
+                    for (int v = int(sy0); v < std::min(f->h, int(std::ceil(sy1))); ++v)
+                        for (int u = int(sx0); u < std::min(f->w, int(std::ceil(sx1))); ++u) {
+                            const float wx = std::min(sx1, float(u + 1)) - std::max(sx0, float(u));
+                            const float wy = std::min(sy1, float(v + 1)) - std::max(sy0, float(v));
+                            const float wgt = std::max(0.0f, wx) * std::max(0.0f, wy);
+                            tot += wgt;
+                            const uint8_t c = f->pixels[size_t(v) * f->w + u];
+                            if (c == ShapeFrame::kTransparent) continue;
+                            const auto& rgb = d.palette.rgb8[c];
+                            r += wgt * rgb[0]; g += wgt * rgb[1]; b += wgt * rgb[2]; a += wgt;
+                        }
+                    if (tot <= 0 || a < 0.4f * tot) continue;
+                    out->pixels[size_t(y) * out->w + x] = nearest_colour(d.palette, d.xform, int(r / a + 0.5f), int(g / a + 0.5f), int(b / a + 0.5f));
+                }
+        }
+    }
+    const ShapeFrame* res = out.get();
+    cache[key] = std::move(out);
+    return res;
+}
+
+const char* slot_word(unsigned slot) {
+    switch (slot) {
+    case 1: return "Shield";
+    case 2: return "Arm guards";
+    case 3: return "Helmet";
+    case 4: return "Armor or clothes";
+    case 5: return "Leggings";
+    case 6: return "Weapon";
+    case 7: return "Backpack";
+    }
+    return "";
+}
 }  // namespace
+
+const unsigned PaperdollGump::kIconSlots[PaperdollGump::kIconRows] = {3, 4, 2, 5, 6, 1, 7};
+
+bool PaperdollGump::icon_sheet() const { return owner != 1 && w_.party && w_.party->icon_sheet(owner); }
+
+void PaperdollGump::icon_box(int row, int& bx, int& by, int& bw, int& bh) {
+    bx = kIconColX;
+    by = kIconColY + row * kIconH;
+    bw = kIconW;
+    bh = kIconH;
+}
+
+int PaperdollGump::icon_row_at(int lx, int ly) {
+    if (lx < kIconColX || lx >= kIconColX + kIconW || ly < kIconColY || ly >= kIconColY + kIconRows * kIconH) return -1;
+    return (ly - kIconColY) / kIconH;
+}
+
+int PaperdollGump::icon_row_of(unsigned slot) {
+    for (int r = 0; r < kIconRows; ++r)
+        if (kIconSlots[r] == slot) return r;
+    return -1;
+}
+
+bool PaperdollGump::on_whole_figure(int lx, int ly) { return lx >= 20 && lx < kIconColX && ly >= 13 && ly <= 100; }
 
 PaperdollGump::PaperdollGump(World& w, uint16_t actor) : ContainerGump(w, actor, 1) {}
 
@@ -572,14 +670,18 @@ void PaperdollGump::slot_pos(unsigned slot, int& x, int& y) {
 }
 
 bool PaperdollGump::over_backpack(int lx, int ly) const {
+    if (icon_sheet()) return icon_row_at(lx, ly) == icon_row_of(7);
     int ix = lx - kPdAreaX, iy = ly - kPdAreaY;
     return ix >= kBpX && iy >= kBpY && ix < kBpX + kBpW && iy < kBpY + kBpH;
 }
 
 void PaperdollGump::paint(Surface8& s) {
-    // Companions (game/party.h): the same picture with the body in their colours, their name.
+    // Companions (game/party.h): the same picture with the body in their colours, their name;
+    // or their own whole figure with the equipment as icons (icon_sheet).
     const uint8_t* doll = (owner != 1 && w_.party) ? w_.party->doll_remap(owner) : nullptr;
     const ShapeFrame* own = (owner != 1 && w_.party) ? w_.party->doll_picture(owner) : nullptr;
+    const bool icons = icon_sheet();
+    const bool companion = owner != 1 && w_.party && w_.party->index_of(owner) >= 0;
     if (own) {
         s.draw(*own, x + own->xoff, y + own->yoff);
     } else if (doll) {
@@ -589,12 +691,50 @@ void PaperdollGump::paint(Surface8& s) {
     }
     const Actor* a = w_.actor(owner);
     if (!a) return;
-    if (doll) {
+    if (companion) {
         std::string n = w_.party->display_name(owner);
         const ShapeFont& nf = w_.font(7);
         if (nf.text_width(n) > 64 && n.find(' ') != std::string::npos) n = n.substr(0, n.find(' '));
         nf.draw(s, x + 117 - nf.text_width(n) / 2, y + 15, n);
     }
+    if (icons) {
+        // The slot column: a sunken box per slot, the item's own picture shrunk into it. A slot
+        // this companion can never use (a caster's helmet) is darker.
+        static uint8_t dark = 0, light = 0, well = 0, shut = 0;
+        if (!dark) {
+            const Palette& pal = w_.data().palette;
+            const XForm& xf = w_.data().xform;
+            dark = nearest_colour(pal, xf, 52, 48, 44);
+            light = nearest_colour(pal, xf, 200, 196, 188);
+            well = nearest_colour(pal, xf, 118, 112, 104);
+            shut = nearest_colour(pal, xf, 60, 56, 52);
+        }
+        for (int row = 0; row < kIconRows; ++row) {
+            int bx, by, bw, bh;
+            icon_box(row, bx, by, bw, bh);
+            bx += x;
+            by += y;
+            const unsigned slot = kIconSlots[row];
+            const bool usable = slot == 7 || w_.party->slot_usable(owner, slot);
+            s.fill_rect(bx, by, bw, bh, light);
+            s.fill_rect(bx, by, bw - 1, bh - 1, dark);
+            s.fill_rect(bx + 1, by + 1, bw - 2, bh - 2, usable ? well : shut);
+            uint16_t id = w_.equipped(owner, slot);
+            const Item* it = w_.item(id);
+            if (!it || id == hidden_item) continue;
+            if (const ShapeFrame* ic = item_icon(w_.data(), it->shape, it->frame, bw - 2, bh - 2))
+                s.draw(*ic, bx + 1 + (bw - 2 - ic->w) / 2, by + 1 + (bh - 2 - ic->h) / 2);
+        }
+        if (const Item* it = w_.item(ghost_item_)) {
+            int row = ghost_target_ == owner ? icon_row_of(w_.data().typeflags.get(it->shape).equip_type()) : icon_row_of(7);
+            if (row >= 0) {
+                int bx, by, bw, bh;
+                icon_box(row, bx, by, bw, bh);
+                if (const ShapeFrame* ic = item_icon(w_.data(), it->shape, it->frame, bw - 2, bh - 2))
+                    s.draw(*ic, x + bx + 1 + (bw - 2 - ic->w) / 2, y + by + 1 + (bh - 2 - ic->h) / 2, false, nullptr, ghost_table(w_).data());
+            }
+        }
+    } else {
     // Equipment, slot 6 first so shields end on top; each with frame + 1.
     for (unsigned slot = 6; slot >= 1; --slot) {
         uint16_t id = w_.equipped(owner, slot);
@@ -617,10 +757,11 @@ void PaperdollGump::paint(Surface8& s) {
             if (const ShapeFrame* fr = w_.data().shapes.frame(it->shape, f))
                 s.draw(*fr, x + ghost_x_, y + ghost_y_, false, nullptr, ghost_table(w_).data());
         }
+    }
     // Stats (baseline positions).
     static const char* labels[7] = {"STR", "INT", "DEX", "ARMR", "HITS", "MANA", "WGHT"};
     int armour = armour_class(w_, *a);
-    uint32_t weight = w_.total_weight(*a) - (doll ? w_.item_weight(*a) : 0);
+    uint32_t weight = w_.total_weight(*a) - (companion || doll ? w_.item_weight(*a) : 0);
     if (const Item* g = w_.item(ghost_item_)) {
         // While an item is dragged over, show what the Avatar would have (gumps.md 2.5).
         if (w_.root_container(*g)->id != owner) weight += w_.total_weight(*g);
@@ -651,6 +792,12 @@ bool PaperdollGump::hit(int lx, int ly) const {
 }
 
 uint16_t PaperdollGump::trace_item(int lx, int ly) const {
+    if (icon_sheet()) {
+        int row = icon_row_at(lx, ly);
+        if (row < 0) return 0;
+        uint16_t id = w_.equipped(owner, kIconSlots[row]);
+        return id == hidden_item ? 0 : id;
+    }
     for (unsigned slot = 1; slot <= 6; ++slot) {
         uint16_t id = w_.equipped(owner, slot);
         const Item* it = w_.item(id);
@@ -669,6 +816,14 @@ uint16_t PaperdollGump::trace_item(int lx, int ly) const {
 bool PaperdollGump::item_anchor(uint16_t item, int& sx, int& sy) const {
     const Item* it = w_.item(item);
     if (!it || it->parent != owner || !(it->flags & kItemEquipped)) return false;
+    if (icon_sheet()) {
+        int row = icon_row_of(unsigned(it->z)), bx, by, bw, bh;
+        if (row < 0) return false;
+        icon_box(row, bx, by, bw, bh);
+        sx = x + bx + 1;
+        sy = y + by + 1;
+        return true;
+    }
     int px, py;
     slot_pos(unsigned(it->z), px, py);
     sx = x + kPdAreaX + px;
@@ -696,7 +851,43 @@ void PaperdollGump::release(int button, int lx, int ly) {
 
 void PaperdollGump::double_click(int button, int lx, int ly) {
     if (button != 1 || w_.stasis) return;
-    if (uint16_t id = trace_item(lx, ly)) w_.use_item(id);
+    uint16_t id = trace_item(lx, ly);
+    if (!id) return;
+    const Item* it = w_.item(id);
+    uint16_t pack = w_.equipped(owner, 7);
+    if (icon_sheet() && it && it->shape != 529 && pack) {
+        // A double-click on an icon takes the item off, into the backpack.
+        std::string why = w_.put_in_refusal(id, pack);
+        if (why.empty() && w_.move_to_container(id, pack, true)) return;
+        w_.refuse(why.empty() ? "No room in the backpack" : why);
+        return;
+    }
+    w_.use_item(id);
+}
+
+std::string PaperdollGump::tip(int lx, int ly) const {
+    if (!w_.party) return "";
+    if (icon_sheet()) {
+        int row = icon_row_at(lx, ly);
+        if (row < 0) return "";
+        const unsigned slot = kIconSlots[row];
+        const Item* it = w_.item(w_.equipped(owner, slot));
+        if (slot == 7) return it ? "Backpack (double-click opens it)" : "";
+        if (!it) {
+            if (!w_.party->slot_usable(owner, slot)) return std::string(slot_word(slot)) + ": not for " + w_.party->display_name(owner);
+            return std::string(slot_word(slot)) + ": empty";
+        }
+        std::string n = w_.party->item_label(it->shape, it->frame);
+        if (n.empty()) n = slot_word(slot);
+        n[0] = char(std::toupper(static_cast<unsigned char>(n[0])));
+        return n;
+    }
+    // The Avatar's (and the recoloured) sheet: the name of the equipment under the pointer.
+    const Item* it = w_.item(trace_item(lx, ly));
+    if (!it || it->shape == 529) return "";
+    std::string n = w_.party->item_label(it->shape, it->frame);
+    if (!n.empty()) n[0] = char(std::toupper(static_cast<unsigned char>(n[0])));
+    return n;
 }
 
 bool PaperdollGump::can_drag_out(uint16_t item) const {
@@ -717,6 +908,29 @@ Gump::Drop PaperdollGump::drag_over(uint16_t item, int lx, int ly, int gx, int g
     (void)ix; (void)iy;
     unsigned slot = w_.data().typeflags.get(it->shape).equip_type();
     uint16_t pack = w_.equipped(owner, 7);
+    if (icon_sheet()) {
+        // On the figure or an equipment box: worn, if this companion may and the slot is free
+        // (the red cross says why not, for their gear class); anywhere else into the backpack.
+        int row = icon_row_at(lx, ly);
+        bool onto = (on_whole_figure(lx, ly) || (row >= 0 && kIconSlots[row] != 7)) && slot >= 1 && slot <= 6;
+        if (onto) {
+            std::string why = w_.party->equip_refusal(owner, item);
+            if (!why.empty()) {
+                drop_why = why;
+                return kDropNo;
+            }
+            if (w_.can_equip(owner, item)) {
+                ghost_item_ = item;
+                ghost_target_ = owner;
+                return kDropPlace;
+            }
+        }
+        drop_why = pack ? w_.put_in_refusal(item, pack) : "No backpack";
+        if (!drop_why.empty()) return kDropNo;
+        ghost_item_ = item;
+        ghost_target_ = pack;
+        return kDropInto;
+    }
     if (on_figure && slot && slot <= 6 && !over_backpack(lx, ly) && w_.can_equip(owner, item)) {
         int px, py;
         slot_pos(slot, px, py);

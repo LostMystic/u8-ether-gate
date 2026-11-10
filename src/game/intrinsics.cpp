@@ -14,6 +14,7 @@
 #include "data/gamedata.h"
 #include "game/banish.h"
 #include "game/grant_peace.h"
+#include "game/party.h"
 #include "game/processes.h"
 #include "game/world.h"
 #include "game/world_stages.h"
@@ -620,6 +621,7 @@ void register_intrinsics(World& w) {
         unsigned et = w.data().typeflags.get(it->shape).equip_type();
         unsigned slot = it->shape == 529 ? 6 : et ? et - 1 : 99;
         if (slot == 99 || equipped(w, *a, slot)) return 0;
+        if (w.party && (a->ext_flags & kExtCompanion) && !w.party->equip_refusal(a->id, it->id).empty()) return 0;  // gear class
         if (!w.move_to_container(it->id, a->id)) return 0;
         it->flags = uint16_t((it->flags & ~kItemContained) | kItemEquipped);
         it->z = int(slot + 1);

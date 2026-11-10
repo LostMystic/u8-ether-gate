@@ -55,6 +55,8 @@ public:
     virtual void click(int button, int lx, int ly) {}
     virtual void double_click(int button, int lx, int ly) {}
     virtual void hover(int lx, int ly) {}
+    // A tooltip for the spot (local coordinates; "" = none), drawn beside the pointer.
+    virtual std::string tip(int lx, int ly) const { return ""; }
     // Keys; true if handled.
     virtual bool key(int key, unsigned mods) { return false; }
     virtual bool text(const std::string& utf8) { return false; }
@@ -159,6 +161,18 @@ public:
     bool item_anchor(uint16_t item, int& sx, int& sy) const override;
     static void slot_pos(unsigned slot, int& x, int& y);
     void click(int button, int lx, int ly) override;
+    std::string tip(int lx, int ly) const override;
+
+    // A companion with a whole figure (Party::icon_sheet): the equipment as icons in a column of
+    // boxes right of the figure (NOTES.md "Companion sheets"). Rows top to bottom: helmet, body,
+    // arms, legs, weapon, shield, backpack (equip types kIconSlots).
+    bool icon_sheet() const;
+    static constexpr int kIconRows = 7;
+    static const unsigned kIconSlots[kIconRows];
+    static void icon_box(int row, int& bx, int& by, int& bw, int& bh);  // local
+    static int icon_row_at(int lx, int ly);                              // -1: none
+    static int icon_row_of(unsigned slot);
+    static bool on_whole_figure(int lx, int ly);
     void tick() override;
 
     // Engine extras (game/sheet_extras.cpp; PLAN-VIRTUES.md 2), all in local coordinates.

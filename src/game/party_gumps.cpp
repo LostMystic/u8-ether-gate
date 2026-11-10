@@ -6,6 +6,7 @@
 // (it is rebuilt from the party every frame).
 #include <algorithm>
 #include <cmath>
+#include <fstream>
 
 #include "data/gamedata.h"
 #include "core/log.h"
@@ -13,6 +14,7 @@
 #include "gfx/surface.h"
 #include "game/party.h"
 #include "game/world.h"
+#include "json/json.hpp"
 
 namespace pg {
 
@@ -208,11 +210,45 @@ const ShapeFrame* Party::doll_picture(uint16_t actor) const {
     // Own figure (Nerissa), or the Avatar's paperdoll body in the companion's colours with a
     // painted head (art.paperdoll_head) over his.
     const bool own_fig = defs[size_t(i)].own_doll;
-    if (!own_fig && defs[size_t(i)].doll_head.empty()) return nullptr;
+    const bool whole = !defs[size_t(i)].doll_body.empty();
+    if (!own_fig && !whole && defs[size_t(i)].doll_head.empty()) return nullptr;
     auto it = doll_pictures_.find(i);
     if (it != doll_pictures_.end()) return it->second.get();
     const GameData& d = w_.data();
     const ShapeFrame* g = d.gumps.frame(1, 0);
+    if (whole) {
+        // A whole standing figure (art.paperdoll_body): the body panel is plain stone, the
+        // figure stands on its floor left of the slot column (gumps.cpp draws the slots).
+        const ShapeFrame* body = picture(defs[size_t(i)].doll_body);
+        if (!g || !body || g->w < 80 || g->h < 104) {
+            doll_pictures_[i] = nullptr;
+            return nullptr;
+        }
+        auto pic = std::make_unique<ShapeFrame>(*g);
+        for (int y = 15; y <= 100; ++y)
+            for (int x = 15; x <= 71; ++x) {
+                uint8_t c;
+                if (x <= 19) c = g->pixels[size_t(96) * g->w + x];
+                else if (y == 100) c = 21;
+                else {
+                    uint32_t h = uint32_t(x) * 73856093u ^ uint32_t(y) * 19349663u;
+                    h ^= h >> 13; h *= 0x5bd1e995u; h ^= h >> 15;
+                    c = (h % 100) < 18 ? 21 : 22;
+                }
+                pic->pixels[size_t(y) * pic->w + x] = c;
+            }
+        // Centred on x kDollFigCx, feet on row 99.
+        const int ox = kDollFigCx - body->w / 2, oy = 100 - body->h;
+        for (int v = 0; v < body->h; ++v)
+            for (int u = 0; u < body->w; ++u) {
+                uint8_t c = body->pixels[size_t(v) * body->w + u];
+                int tx = ox + u, ty = oy + v;
+                if (c != ShapeFrame::kTransparent && tx >= 20 && tx <= 71 && ty >= 13 && ty <= 99) pic->pixels[size_t(ty) * pic->w + tx] = c;
+            }
+        const ShapeFrame* out = pic.get();
+        doll_pictures_[i] = std::move(pic);
+        return out;
+    }
     const AnimSequence* stand = own_fig ? d.anim.get(defs[size_t(i)].shape, 2) : nullptr;
     // Facing east (towards the screen's lower right), as the Avatar's paperdoll body does.
     const ShapeFrame* body = stand ? d.shapes.frame(defs[size_t(i)].shape, stand->at(2, 0).frame) : nullptr;
@@ -352,6 +388,74 @@ const ShapeFrame* Party::doll_head_over(uint16_t actor, int& x, int& y) const {
     x = it->second.first;
     y = it->second.second;
     return picture(defs[size_t(i)].doll_head);
+}
+
+bool Party::icon_sheet(uint16_t actor) const {
+    int i = index_of(actor);
+    return i >= 0 && !defs[size_t(i)].doll_body.empty() && doll_picture(actor);
+}
+
+void Party::load_equipment() const {
+    if (equip_loaded_) return;
+    equip_loaded_ = true;
+    std::string path = (data_dir.empty() ? std::string("data") : data_dir) + "/items/equipment.json";
+    std::ifstream f(path);
+    if (!f) { PG_LOG("party: %s not found: companions may use any equipment", path.c_str()); return; }
+    nlohmann::json j = nlohmann::json::parse(f, nullptr, false);
+    if (j.is_discarded()) { PG_LOG("party: %s: bad JSON", path.c_str()); return; }
+    const nlohmann::json items = j.value("items", nlohmann::json::object());
+    const nlohmann::json gear = j.value("gear", nlohmann::json::object());
+    for (auto& [k, v] : items.items()) {
+        unsigned sh = 0, fr = 0;
+        if (std::sscanf(k.c_str(), "%u:%u", &sh, &fr) != 2) continue;
+        equip_info_[sh << 8 | fr] = {v.value("name", std::string()), v.value("grade", std::string())};
+    }
+    for (auto& [k, v] : gear.items()) {
+        gear_armour_[k] = v.value("armour", std::vector<std::string>());
+        gear_weapon_[k] = v.value("weapon", std::vector<std::string>());
+    }
+}
+
+std::string Party::item_label(unsigned shape, unsigned frame) const {
+    load_equipment();
+    auto it = equip_info_.find(shape << 8 | (frame & ~1u));
+    return it == equip_info_.end() ? std::string() : it->second.name;
+}
+
+bool Party::slot_usable(uint16_t actor, unsigned slot) const {
+    int i = index_of(actor);
+    if (i < 0 || slot < 1 || slot > 6) return true;
+    load_equipment();
+    const auto& table = slot == 6 ? gear_weapon_ : gear_armour_;
+    auto allowed = table.find(defs[size_t(i)].gear);
+    if (allowed == table.end()) return true;
+    for (const auto& [key, info] : equip_info_)
+        if (w_.data().typeflags.get(key >> 8).equip_type() == slot &&
+            std::find(allowed->second.begin(), allowed->second.end(), info.grade) != allowed->second.end())
+            return true;
+    return false;
+}
+
+std::string Party::equip_refusal(uint16_t actor, uint16_t item) const {
+    int i = index_of(actor);
+    const Item* it = w_.item(item);
+    if (i < 0 || !it) return "";
+    unsigned slot = w_.data().typeflags.get(it->shape).equip_type();
+    if (slot < 1 || slot > 6) return "";
+    load_equipment();
+    auto info = equip_info_.find(uint32_t(it->shape) << 8 | (it->frame & ~1u));
+    if (info == equip_info_.end()) return "";
+    const std::string& gear = defs[size_t(i)].gear;
+    const auto& table = slot == 6 ? gear_weapon_ : gear_armour_;
+    auto allowed = table.find(gear);
+    if (allowed == table.end()) return "";
+    const std::string& grade = info->second.grade;
+    if (std::find(allowed->second.begin(), allowed->second.end(), grade) != allowed->second.end()) return "";
+    const std::string who = display_name(actor);
+    const std::string what = info->second.name.empty() ? std::string("that") : info->second.name;
+    if (slot == 6) return who + (gear == "caster" ? " only carries a dagger or a mace" : " can't wield the " + what);
+    if (gear == "caster") return who + " can't wear armor";
+    return who + " can't wear the " + what;
 }
 
 const ShapeFrame* Party::bar_portrait(uint16_t actor) const {

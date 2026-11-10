@@ -226,6 +226,16 @@ else()
   set_target_properties(pagan_party_tests PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
   add_test(NAME party COMMAND pagan_party_tests ${PAGAN_GAME_DIR} ${CMAKE_SOURCE_DIR}/data ${CMAKE_BINARY_DIR}/party_shots
     ${CMAKE_BINARY_DIR}/party_saves)
+  # Equipment probe (not a test; tests/equip_probe.cpp).
+  add_executable(pagan_equip_probe ${CMAKE_SOURCE_DIR}/tests/equip_probe.cpp ${PG_GAMEMODE_SOURCES})
+  target_link_libraries(pagan_equip_probe PRIVATE pagan_core)
+  target_compile_options(pagan_equip_probe PRIVATE ${PG_WARNINGS})
+  set_target_properties(pagan_equip_probe PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
+  # Promotional screenshots (not a test; tests/promo_shots.cpp).
+  add_executable(pagan_promo_shots ${CMAKE_SOURCE_DIR}/tests/promo_shots.cpp ${PG_GAMEMODE_SOURCES})
+  target_link_libraries(pagan_promo_shots PRIVATE pagan_core)
+  target_compile_options(pagan_promo_shots PRIVATE ${PG_WARNINGS})
+  set_target_properties(pagan_promo_shots PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
   # Companions' homes on their maps, debug mode's beach, old saves (tests/test_homes.cpp).
   add_executable(pagan_homes_tests ${CMAKE_SOURCE_DIR}/tests/test_homes.cpp ${PG_GAMEMODE_SOURCES})
   target_link_libraries(pagan_homes_tests PRIVATE pagan_core)

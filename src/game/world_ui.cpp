@@ -393,6 +393,8 @@ bool World::can_equip(uint16_t actor_id, uint16_t id) const {
     if ((actor_id == 1 || (a->ext_flags & kExtCompanion)) && root_container(*it)->id != actor_id &&
         total_weight(*a) - (actor_id == 1 ? 0 : item_weight(*a)) + total_weight(*it) > uint32_t(40 * std::max<int>(0, a->str)))
         return false;
+    // A companion's gear class (engine extra; data/items/equipment.json): casters wear no armour.
+    if (party && (a->ext_flags & kExtCompanion) && !party->equip_refusal(actor_id, id).empty()) return false;
     // An occupied slot refuses the item (gumps.md 2.5 'Occupied slot': no swap).
     uint16_t old = equipped(actor_id, slot);
     if (old && old != id) return false;
