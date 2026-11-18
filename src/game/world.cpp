@@ -886,7 +886,9 @@ void World::check_eggs() {
         e->hatched = true;
         if (data_.typeflags.get(e->shape).family() == kFamTeleportEgg) {
             if (e->frame != 1) {
-                if (stitch && stitch_portal(*e)) {
+                if (stitch && stitch_road_portal(*e)) {
+                    // Stitched world: the docks road replaces this jump (NOTES.md "The docks road").
+                } else if (stitch && stitch_portal(*e)) {
                     // Stitched world: a teleporter between two seam maps is a crossing point.
                     pending_cross_ = e->mapnum;
                     pending_cross_egg_ = e->quality & 0xFF;

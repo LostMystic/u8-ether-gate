@@ -397,7 +397,7 @@ void test_turn_panel(const GameData& d, int ww, int wh, const char* tag) {
     CHECK(u.hud().button_point(HudPanel::kBDefend, bx, by));
     u.move(320 + bx, by);
     u.frames(12);
-    CHECK(u.hud().tooltip().find("Defend") != std::string::npos);
+    CHECK(u.hud().tooltip().find("Block") != std::string::npos);
     u.shot(std::string("hud_") + tag + "_combat_tooltip");
     // The keys still drive the menu: the arrows move the highlight, which the buttons show.
     u.move(160, 100);
@@ -427,9 +427,19 @@ void test_turn_panel(const GameData& d, int ww, int wh, const char* tag) {
         CHECK(u.t().awaiting_player());
     }
     u.dump(GameLog::kCombat, 8);
-    // Party Auto from the panel's button, then the "Auto mode: ON" button turns it off.
-    CHECK(u.hud().button_point(HudPanel::kBPartyAuto, bx, by));
+    // Party Auto from the panel's Auto button (its drop-down's third line), then the "Auto mode:
+    // ON" button turns it off.
+    CHECK(u.hud().button_point(HudPanel::kBAuto, bx, by));
     u.click(320 + bx, by);
+    CHECK(u.ui().mode() == TurnUI::kList);
+    CHECK_EQ(u.ui().active_entry(), int(TurnUI::kEAuto));
+    u.frames(2);
+    u.shot(std::string("hud_") + tag + "_auto_dropdown");
+    {
+        int lx = 0, ly = 0;
+        CHECK(u.ui().list_point(2, lx, ly));
+        u.click(lx, ly);
+    }
     CHECK(u.t().party_auto);
     u.frames(20);
     int ax, ay;
@@ -562,11 +572,17 @@ void test_combat2(const GameData& d, int ww, int wh, int cols, const char* tag, 
     CHECK_EQ(ui.selected_entry(), nrows > 1 ? 2 + cols : 2);  // wraps
     u.key(kKeyDown);
     CHECK_EQ(ui.selected_entry(), 2);
-    // The tenth icon is reached too, and works: Party Auto on, B off.
+    // The last icon is reached too (End turn), and Auto works from the pad: its drop-down, the
+    // third line = Party Auto on, B off.
     while (ui.selected_entry() != 0) u.key(kKeyLeft);
     if (nrows > 1) u.key(kKeyDown);
     u.key(kKeyLeft);
-    CHECK_EQ(ui.selected_entry(), int(HudPanel::kBPartyAuto));
+    CHECK_EQ(ui.selected_entry(), int(HudPanel::kBEnd));
+    ui.set_selected(TurnUI::kEAuto);
+    u.pad(kPadA);
+    CHECK(ui.mode() == TurnUI::kList);
+    u.pad(kPadDown);
+    u.pad(kPadDown);
     u.pad(kPadA);
     CHECK(u.t().party_auto);
     u.pad(kPadB);
@@ -781,8 +797,8 @@ int main(int argc, char** argv) {
     run("turn43", [&] { test_turn_panel(d, 1024, 768, "4x3"); });
     run("move", [&] { test_move_range(d); });
     run("portraits", [&] { test_portraits(d); });
-    run("combat2", [&] { test_combat2(d, 1280, 720, 5, "five to a row", false); test_combat2(d, 2400, 1000, 10, "ten in a row", false); });
-    run("combat2shots", [&] { test_combat2(d, 1280, 720, 5, "shots", true); });
+    run("combat2", [&] { test_combat2(d, 1280, 720, 4, "four to a row", false); test_combat2(d, 2400, 1000, 8, "eight in a row", false); });
+    run("combat2shots", [&] { test_combat2(d, 1280, 720, 4, "shots", true); });
     std::printf("%d checks passed, %d failed\n", g_pass, g_fail);
     return g_fail ? 1 : 0;
 }

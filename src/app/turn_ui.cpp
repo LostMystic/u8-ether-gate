@@ -20,19 +20,18 @@ namespace pg {
 
 namespace {
 
-const char* const kEntryNames[TurnUI::kEntries] = {"Move", "Attack", "Cast", "Use item", "Defend", "Wait",
-                                                   "Auto", "Keep on Auto", "End turn"};
+const char* const kEntryNames[TurnUI::kEntries] = {"Move", "Attack", "Cast", "Use item", "Block", "Auto", "Flee", "End turn"};
 const char* const kEntryHelp[TurnUI::kEntries] = {
-    "Walk up to 300 units: pick a spot, then confirm. One move, then one action.",
+    "Walk up to 600 units: pick a spot, then confirm. One move, then one action.",
     "Strike a foe in reach (walks in first if the move can get there).",
     "Cast a spell, then pick its target.",
     "Drink a potion or use an item. Ends the turn.",
-    "Block until your next turn: half damage.",
-    "Act later, at the end of this round (once a round).",
-    "This character acts by himself this turn.",
-    "This character acts by himself every turn, until you take him back.",
+    "Block until your next turn: half damage. Also the way to wait.",
+    "This turn, keep on Auto, or the whole party. While Auto is on: turns it off.",
+    "Run: foes next to the party get a free attack, then the fight ends. No new fight for 5 s (C starts one).",
     "End this character's turn now.",
 };
+const char* const kAutoLines[3] = {"This turn only", "Keep on Auto", "Whole party (Party Auto)"};
 
 void plot(Surface8& s, int x, int y, uint8_t c) {
     if (x >= 0 && y >= 0 && x < s.width() && y < s.height()) s.fill_rect(x, y, 1, 1, c);
@@ -76,13 +75,24 @@ int TurnUI::active_entry() const {
     if (!awaiting()) return -1;
     if (mode_ == kPickMove) return kEMove;
     if (mode_ == kPickTarget && purpose_ == kForAttack) return kEAttack;
+    if (mode_ == kList && list_ == kListAuto) return kEAuto;
     if (mode_ == kList || (mode_ == kPickTarget && purpose_ == kForCast)) return list_ == kListCast ? kECast : kEUse;
     return -1;
 }
 
-bool TurnUI::entry_on(int e) { return awaiting() && entry_enabled(e); }
+bool TurnUI::entry_on(int e) {
+    // Auto turns Auto off at any time in a fight (Party Auto: nobody is asked for a command).
+    if (e == kEAuto && gm_.world().turn && tc().active() && tc().any_auto()) return true;
+    return awaiting() && entry_enabled(e);
+}
 
 void TurnUI::press_entry(int e) {
+    if (e == kEAuto && gm_.world().turn && tc().active() && tc().any_auto()) {
+        tc().cancel_auto();
+        mode_ = kMenu;
+        reset_pick();
+        return;
+    }
     if (!awaiting() || e < 0 || e >= menu_size()) return;
     if (tc().current() != last_current_) { mode_ = kMenu; sel_ = 0; reset_pick(); last_current_ = tc().current(); }
     if (mode_ != kMenu) { mode_ = kMenu; reset_pick(); }
@@ -113,7 +123,7 @@ int TurnUI::grid_step(int cur, int n, int cols, int dx, int dy) {
     return row * cols + col;
 }
 
-int TurnUI::menu_size() const { return gm_.panel_on() ? kEPartyAuto + 1 : int(kEntries); }
+int TurnUI::menu_size() const { return int(kEntries); }
 int TurnUI::menu_columns() const { return gm_.panel_on() ? gm_.hud_panel().columns() : 1; }
 
 void TurnUI::party_auto_off() {
@@ -260,11 +270,14 @@ void TurnUI::choose(int e) {
         sel_ = 0;
         break;
     case kEDefend: t.cmd_defend(); break;
-    case kEWait: t.cmd_wait(); break;
-    case kEAuto: t.cmd_auto(false); break;
-    case kEKeepAuto: t.cmd_auto(true); break;
+    case kEAuto:
+        if (t.any_auto()) { t.cancel_auto(); break; }  // on: the button turns it off
+        mode_ = kList;
+        list_ = kListAuto;
+        sel_ = 0;
+        break;
+    case kEFlee: t.cmd_flee(); break;
     case kEEnd: t.cmd_end_turn(); break;
-    case kEPartyAuto: t.toggle_party_auto(); break;
     default: break;
     }
     if (mode_ == kPickTarget) {
@@ -294,6 +307,16 @@ void TurnUI::confirm() {
     }
     case kList: {
         uint16_t me = t.current();
+        if (list_ == kListAuto) {
+            if (sel_ < 0 || sel_ > 2) return;
+            const int pick = sel_;
+            mode_ = kMenu;
+            sel_ = 0;
+            if (pick == 0) t.cmd_auto(false);
+            else if (pick == 1) t.cmd_auto(true);
+            else if (!t.party_auto) t.toggle_party_auto();
+            return;
+        }
         if (list_ == kListCast) {
             std::vector<TurnCombat::CastOption> opts = t.cast_options(me);
             if (sel_ < 0 || size_t(sel_) >= opts.size()) return;
@@ -330,7 +353,7 @@ void TurnUI::nav(int dx, int dy) {
         return;
     }
     if (mode_ == kList) {
-        int n = list_ == kListCast ? int(t.cast_options(t.current()).size()) : int(t.use_items(t.current()).size());
+        int n = list_ == kListAuto ? 3 : list_ == kListCast ? int(t.cast_options(t.current()).size()) : int(t.use_items(t.current()).size());
         if (n > 0 && dy) sel_ = (sel_ + dy + n) % n;
         return;
     }
@@ -1074,10 +1097,10 @@ void TurnUI::draw_hud(Surface8& s) {
         if (e == sel_ && mode_ == kMenu) s.fill_rect(r.x, r.y - 1, r.w, r.h, colours_[6]);
         if (mode_ != kMenu && ((mode_ == kPickMove && e == kEMove) || (mode_ == kPickTarget && purpose_ == kForAttack && e == kEAttack) ||
                                ((mode_ == kList || (mode_ == kPickTarget && purpose_ == kForCast)) &&
-                                e == (list_ == kListCast ? kECast : kEUse))))
+                                e == (list_ == kListAuto ? kEAuto : list_ == kListCast ? kECast : kEUse))))
             s.fill_rect(r.x, r.y - 1, r.w, r.h, colours_[6]);
         std::string txt = std::to_string(e + 1) + " " + kEntryNames[e];
-        if (e == kEKeepAuto && t.keep_auto(cur)) txt += " *";
+        if (e == kEAuto && t.any_auto()) txt += " (on)";
         mf.draw_top(s, r.x + 2, r.y, txt);
         if (!on) s.fill_rect(r.x + 2, r.y + mf.height() / 2, mf.text_width(txt), 1, colours_[8]);
     }
@@ -1085,7 +1108,9 @@ void TurnUI::draw_hud(Surface8& s) {
     if (mode_ == kList) {
         std::vector<std::string> lines;
         uint16_t me = cur;
-        if (list_ == kListCast)
+        if (list_ == kListAuto)
+            for (const char* l : kAutoLines) lines.push_back(l);
+        else if (list_ == kListCast)
             for (const auto& o : t.cast_options(me)) {
                 std::string l = o.name + (o.mana ? " (" + std::to_string(o.mana) + ")" : "");
                 // Leveling stage 5: the uses left, or why it cannot be cast (greyed below).
@@ -1109,7 +1134,7 @@ void TurnUI::draw_hud(Surface8& s) {
         if (panel) list_box_.y = std::max(2, 162 - list_box_.h);
         s.fill_rect(list_box_.x, list_box_.y, list_box_.w, list_box_.h, colours_[5]);
         frame_rect(s, list_box_.x, list_box_.y, list_box_.w, list_box_.h, colours_[4]);
-        mf.draw_top(s, list_box_.x + 4, list_box_.y + 3, list_ == kListCast ? "Spells" : "Items");
+        mf.draw_top(s, list_box_.x + 4, list_box_.y + 3, list_ == kListAuto ? "Auto" : list_ == kListCast ? "Spells" : "Items");
         const Actor* a = w.actor(me);
         const std::vector<TurnCombat::CastOption> cast_opts = list_ == kListCast ? t.cast_options(me) : std::vector<TurnCombat::CastOption>();
         for (size_t i = 0; i < lines.size(); ++i) {

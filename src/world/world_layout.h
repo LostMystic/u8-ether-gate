@@ -1,6 +1,7 @@
 // Pagan engine. Copyright (c) 2026 Mark B. Licensed under the GNU GPL v3 or later, see LICENSE.
 #pragma once
 #include <cstdint>
+#include <array>
 #include <map>
 #include <string>
 #include <vector>
@@ -33,9 +34,14 @@ struct WorldSeam {
     int dx = 0, dy = 0;          // b's offset in a's coordinates (a point of b + (dx, dy) = a's point)
     int dz = 0;                  // b's group dz - a's (a height trim: the two maps' ground at one world z)
     int votes = 0;               // identical border items that line up at that offset
-    std::string basis = "votes"; // why it is a seam: "votes" (identical border items) or "teleport edge" (declared)
+    std::string basis = "votes"; // why it is a seam: "votes" (identical border items), "teleport edge" (declared)
+                                 // or "road": the maps were moved apart and a road built between them
+                                 // (`road`, a map patch group of world_roads.json, part of one of them)
     int strip[4] = {0, 0, 0, 0}; // world box (x0, y0, x1, y1) of the 64-unit cells both maps cover
-    std::vector<WorldPortal> portals;
+    std::vector<WorldPortal> portals;  // a road seam's are left idle (the road replaces the jump)
+    std::string road;                 // basis "road": the road's patch group id
+    // basis "road": where to walk to cross, in each map's own coordinates (end_a in map a, end_b in b)
+    int end_a[3] = {0, 0, 0}, end_b[3] = {0, 0, 0};
     std::string derived;
 };
 
@@ -57,15 +63,31 @@ struct WorldVariant {
     std::string derived;
 };
 
+// Cells where a map hides its scenery in the stitched world because a neighbour's version of that
+// ground is the real one (map_patches::set_hidden; NOTES.md "Which map is real"). Rows of 128-unit
+// cells in the map's own coordinates: {y, x0, x1}.
+struct WorldHidden {
+    unsigned map = 0;
+    std::vector<std::array<int, 3>> rows;
+    // Of those, the cells where the map's floor stays (the map kept there has no floor of its own
+    // under part of the cell): only what stands on the floor is hidden.
+    std::vector<std::array<int, 3>> ground_rows;
+    std::string derived;
+};
+
 struct WorldLayoutFile {
     AtlasLayout atlas;  // groups with dx, dy, dz, layer
     std::vector<WorldSeam> seams;
     std::vector<WorldLink> links;
     std::vector<WorldVariant> variants;
+    std::vector<WorldHidden> hidden;
     std::map<int, std::string> layer_names;
     // Generation of the curated layout plan this file was made from (1: derived by rule, 2: the
-    // fan-map layout with no overlap on any layer). The editor replaces a stored layout of an
-    // older generation by the shipped one (keeping its painted areas).
+    // fan-map layout with no overlap on any layer, 3: the planes moved to kPlanesLayer, 4: the
+    // Cemetery and Herdsman's Valley aligned, 5: the docks moved, the docks road, 6: map pieces). The editor replaces a stored layout of generation 0
+    // or 1 by the shipped one (keeping its painted areas); one of generation 2 to 4 is updated in
+    // place (update_stored_layout): the planes moved up, maps 6 and 7 aligned if still at their old
+    // spots; every other group keeps its place.
     int layout_revision = 0;
 
     // Reads the groups and the extra fields from world_layout.json text (an atlas-only file
@@ -78,6 +100,11 @@ struct WorldLayoutFile {
     // A whole file (groups + extra fields, no editor areas): for tools and tests.
     std::string to_json() const;
     const WorldSeam* seam(unsigned m1, unsigned m2) const;
+    // The road patch groups the layout's road seams name (map_patches::set_active_roads).
+    std::vector<std::string> roads() const;
+    // Turns the layout's hidden cells on (map_patches::set_hidden) for the maps this copy has as
+    // shipped; `d` null turns them off.
+    void activate_hidden(const GameData* d) const;
 };
 
 // Derives the stitched layout from the game data and the critical path's map links
@@ -100,6 +127,19 @@ std::vector<std::string> check_world_layout(const WorldLayoutFile& l, const std:
 
 constexpr int kLayerZ = 256;
 constexpr int kMaxHeightTrim = 64;  // a group's dz = 256 x layer + a trim of at most this (seam partners' ground heights)
-constexpr int kLayoutRevision = 2;  // generate_world_layout's plan
+constexpr int kLayoutRevision = 6;  // generate_world_layout's plan (3: the planes moved from layer 1 to kPlanesLayer;
+                                    // 4: maps 6 and 7 aligned; 5: the docks (3) moved, the docks road; see layout_moves();
+                                    // 6: pieces of maps 4 and 8 (their caves) placed on their own, AtlasGroup::part;
+                                    // a layout may also carry "hidden" cells, NOTES.md "Which map is real")
+// The planes and realms (ethereal, elemental, and any added later) live far above the surface, so the
+// layers between (1 .. kPlanesLayer - 1) stay free for places above ground (the user, 2026-11-17).
+constexpr int kPlanesLayer = 100;
+
+// Groups a layout generation moved (for updating a stored older layout in place: a map still at
+// `from` goes to `to`; one the user has moved stays where it is; the seams to it are taken from the
+// shipped layout). Generation 4: the Cemetery (6) and Herdsman's Valley (7) aligned by the overlap
+// report (pagan_overlaps); 5: the docks (3) moved apart and joined by the docks road. 2026-11-17.
+struct LayoutMove { int generation; unsigned map; int from_dx, from_dy, to_dx, to_dy; };
+const std::vector<LayoutMove>& layout_moves();
 
 }  // namespace pg

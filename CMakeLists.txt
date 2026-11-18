@@ -219,6 +219,12 @@ else()
   set_target_properties(pagan_options_tests PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
   add_test(NAME options COMMAND pagan_options_tests ${PAGAN_GAME_DIR} ${CMAKE_BINARY_DIR}/options_shots
     ${CMAKE_BINARY_DIR}/options_saves)
+  # The Ether Gate credits (game/ether_credits.*, data/credits/).
+  add_executable(pagan_credits_tests ${CMAKE_SOURCE_DIR}/tests/test_credits.cpp ${PG_GAMEMODE_SOURCES})
+  target_link_libraries(pagan_credits_tests PRIVATE pagan_core)
+  target_compile_options(pagan_credits_tests PRIVATE ${PG_WARNINGS})
+  set_target_properties(pagan_credits_tests PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
+  add_test(NAME credits COMMAND pagan_credits_tests ${PAGAN_GAME_DIR} ${CMAKE_SOURCE_DIR}/data ${CMAKE_BINARY_DIR}/credits_shots)
   # Companions (game/party.*, companion_ai.cpp, companion_talk.cpp, party_gumps.cpp, data/companions.json).
   add_executable(pagan_party_tests ${CMAKE_SOURCE_DIR}/tests/test_party.cpp ${PG_GAMEMODE_SOURCES})
   target_link_libraries(pagan_party_tests PRIVATE pagan_core)
@@ -427,7 +433,13 @@ else()
   add_executable(pagan_layout ${CMAKE_SOURCE_DIR}/src/editor/layout_main.cpp)
   target_link_libraries(pagan_layout PRIVATE pagan_editor)
   add_test(NAME layout_check COMMAND pagan_layout ${PAGAN_GAME_DIR} check ${CMAKE_SOURCE_DIR}/data/world_layout.json)
-  foreach(t pagan_tilekit pagan_dress pagan_dress_tests pagan_skin pagan_layout)
+  # The overlap report (NOTES.md "The overlap report"): where the placed maps cover the same ground.
+  add_executable(pagan_overlaps ${CMAKE_SOURCE_DIR}/src/editor/overlap_main.cpp ${CMAKE_SOURCE_DIR}/src/platform/screenshot.cpp
+    ${CMAKE_SOURCE_DIR}/src/app/rgba_draw.cpp)
+  target_link_libraries(pagan_overlaps PRIVATE pagan_editor)
+  add_test(NAME overlaps COMMAND pagan_overlaps ${PAGAN_GAME_DIR} ${CMAKE_SOURCE_DIR}/data/world_layout.json
+    ${CMAKE_BINARY_DIR}/overlaps_report --no-pictures)
+  foreach(t pagan_tilekit pagan_dress pagan_dress_tests pagan_skin pagan_layout pagan_overlaps)
     target_include_directories(${t} SYSTEM PRIVATE ${CMAKE_SOURCE_DIR}/third_party/sdl2)
     target_compile_options(${t} PRIVATE ${PG_WARNINGS})
     set_target_properties(${t} PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)

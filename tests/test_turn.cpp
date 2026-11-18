@@ -784,13 +784,19 @@ bool to_turn(Ui& u, uint16_t who, int limit = 3000) {
 }
 
 // A reachable node: the farthest from `foe`, or the first the attack can hit `foe` from.
-int node_far_from(Ui& u, uint16_t foe) {
+// A spot 100-250 units of walking away that does not hit `foe` (the farthest one can be off the
+// encounter area since the 600-unit Move, which ends the fight as an escape).
+int node_mid(Ui& u, uint16_t who, uint16_t foe) {
     const auto& r = u.t().reach();
     const Item* f = u.w().item(foe);
+    const Item* me = u.w().item(who);
     int best = -1;
     long long bd = -1;
     for (size_t i = 1; i < r.size(); ++i) {
+        if (r[i].cost < 100 || r[i].cost > 250 || u.t().can_hit_from(who, r[i].st, foe)) continue;
         long long dx = r[i].st.x - f->x, dy = r[i].st.y - f->y, d = dx * dx + dy * dy;
+        long long mx = r[i].st.x - me->x, my = r[i].st.y - me->y;
+        if (mx * mx + my * my > 250LL * 250) continue;
         if (d > bd) { bd = d; best = int(i); }
     }
     return best;
@@ -834,7 +840,7 @@ void test_auto_end(const GameData& d) {
         std::printf("  in the pack: %zu usable; followup %d\n", u.t().use_items(1).size(), int(u.t().has_followup(1)));
         av->hp = uint16_t(2 * av->str);
         CHECK(!u.t().has_followup(1));
-        int n = node_far_from(u, g);
+        int n = node_mid(u, 1, g);
         CHECK(n > 0);
         CHECK(u.t().cmd_move(n));
         CHECK(!after_move(u, 1));
@@ -894,7 +900,7 @@ void test_auto_end(const GameData& d) {
         Actor* ka = u.w().actor(k);
         ka->mana = 30;
         CHECK(u.t().has_followup(k));
-        int n = node_far_from(u, g);
+        int n = node_mid(u, k, g);
         CHECK(n > 0);
         CHECK(u.t().cmd_move(n));
         CHECK(after_move(u, k));
@@ -909,7 +915,7 @@ void test_auto_end(const GameData& d) {
         if (!u.t().active()) { u.combat_key(); u.frames(3); }
         CHECK(to_turn(u, k));
         ka->mana = 0;
-        n = node_far_from(u, g);
+        n = node_mid(u, k, g);
         CHECK(n > 0);
         CHECK(u.t().cmd_move(n));
         CHECK(!after_move(u, k));
@@ -1497,6 +1503,140 @@ void test_banter(const GameData& d) {
     CHECK(cc[0] >= 10);
     CHECK(cc[1] * 2 < cc[0]);
 }
+// Flee and the Auto button (the user's requests of 2026-11-17): the 600-unit Move, a ghoul's
+// 150, Flee with a free attack, the 5 s grace (no new fight, no harm), C starting one anyway,
+// the foes hunting again after the grace; Auto off from its button.
+void test_flee(const GameData& d) {
+    std::printf("Flee, Move ranges in a fight, the Auto button\n");
+    Ui u(d, false);
+    u.frames(60);
+    u.avatar_to(14300, 6150, 0);
+    u.frames(60);
+    uint16_t near = spawn(u, 142, 40, 140, 0.5), far = spawn(u, 142, 300, 420, 2.5);
+    CHECK(near && far);
+    u.frames(2);
+    u.combat_key();
+    CHECK(to_turn(u, 1));
+    // The Avatar's Move reaches past the old 300, never past 600 (+ the DEX bonus).
+    int most = 0;
+    for (const auto& n : u.t().reach()) most = std::max(most, n.cost);
+    std::printf("  Avatar: %zu spots, the farthest %d units of walking\n", u.t().reach().size(), most);
+    CHECK(most > 300 && most <= u.t().move_range(1));
+    CHECK(u.t().move_range(1) >= TurnCombat::kMoveRange);
+    CHECK_EQ(u.t().move_range(near), 150);
+    // Wait out the ghouls' turns once (Block), measuring a ghoul's reach on its turn.
+    int ghoul_most = -1;
+    u.key('5');
+    for (int i = 0; i < 3000 && u.t().active() && !(u.t().awaiting_player() && u.t().current() == 1); ++i) {
+        uint16_t c = u.t().current();
+        if ((c == near || c == far) && ghoul_most < 0) {
+            ghoul_most = 0;
+            for (const auto& n : u.t().reach()) ghoul_most = std::max(ghoul_most, n.cost);
+        }
+        u.frames(1, false);
+    }
+    std::printf("  a ghoul's turn: the farthest spot %d units\n", ghoul_most);
+    CHECK(ghoul_most >= 0 && ghoul_most <= 150);
+    CHECK(u.t().awaiting_player() && u.t().current() == 1);
+    // Wait is gone, Block is the fifth entry; Flee the seventh.
+    CHECK(std::string(TurnUI::entry_name(TurnUI::kEDefend)) == "Block");
+    CHECK(std::string(TurnUI::entry_name(TurnUI::kEFlee)) == "Flee");
+    // Flee: every foe that can hit gets one blow, then the fight is over.
+    std::vector<uint16_t> can;
+    for (uint16_t g : {near, far})
+        if (u.t().can_hit_now(g, 1)) can.push_back(g);
+    const int fa0 = u.t().free_attacks;
+    u.key('7');
+    for (int i = 0; i < 1500 && u.t().active(); ++i) u.frames(1, false);
+    std::printf("  fled: %s, %d free attack(s) (%zu foe(s) in reach)\n", u.t().last_end == TurnCombat::kFled ? "yes" : "no",
+                u.t().free_attacks - fa0, can.size());
+    CHECK(!u.t().active());
+    CHECK(u.t().last_end == TurnCombat::kFled);
+    CHECK_EQ(u.t().free_attacks - fa0, int(can.size()));
+    const Actor* av = u.w().avatar();
+    CHECK(av && !av->is(Actor::kDead));
+    CHECK(!av->is(Actor::kInCombat));  // back to normal mode
+    CHECK(u.t().flee_grace > 0);
+    CHECK_EQ(u.w().kernel().count_exact(near, kProcCombat), 0u);  // the foes stand for now
+    // A blow in the grace does no harm and starts no fight.
+    const int hp0 = av->hp;
+    u.w().receive_hit(1, near, 0, 6, 0);
+    u.frames(10, false);
+    CHECK_EQ(int(av->hp), hp0);
+    CHECK(!u.t().active());
+    // After the grace the ghouls hunt in real time again.
+    u.frames(TurnCombat::kFleeGraceFrames + 5, false);
+    CHECK_EQ(u.t().flee_grace, 0);
+    CHECK(u.t().active() || u.w().kernel().count_exact(near, kProcCombat) == 1);
+    std::printf("  after the grace: %s\n", u.t().active() ? "a new fight (hit)" : "the ghouls hunt in real time");
+
+    // C during the grace starts the fight at once.
+    {
+        Ui v(d, false);
+        v.frames(60);
+        v.avatar_to(14300, 6150, 0);
+        v.frames(60);
+        uint16_t g = spawn(v, 142, 200, 300, 0.5);
+        CHECK(g);
+        v.frames(2);
+        v.combat_key();
+        CHECK(to_turn(v, 1));
+        v.key('7');
+        for (int i = 0; i < 1500 && v.t().active(); ++i) v.frames(1, false);
+        CHECK(v.t().last_end == TurnCombat::kFled);
+        CHECK(v.t().flee_grace > 0);
+        v.frames(10, false);
+        CHECK(!v.t().active());
+        v.combat_key();
+        v.frames(6, false);
+        CHECK(v.t().active());
+        CHECK_EQ(v.t().flee_grace, 0);
+        std::printf("  C in the grace: %s\n", v.t().active() ? "fight" : "none");
+        // The Auto button: a drop-down while Auto is off, off while it is on.
+        CHECK(to_turn(v, 1));
+        v.ui().press_entry(TurnUI::kEAuto);
+        CHECK(v.ui().mode() == TurnUI::kList);
+        CHECK(!v.t().any_auto());
+        v.key(kKeyDown);
+        v.key(kKeyReturn);  // Keep on Auto
+        CHECK(v.t().keep_auto(1));
+        CHECK(v.ui().entry_on(TurnUI::kEAuto));  // on while the Avatar acts by himself
+        v.ui().press_entry(TurnUI::kEAuto);
+        CHECK(!v.t().any_auto());
+        v.key('a');  // Party Auto (the shortcut)
+        CHECK(v.t().party_auto);
+        v.frames(3, false);
+        v.ui().press_entry(TurnUI::kEAuto);
+        CHECK(!v.t().party_auto);
+    }
+}
+
+// Move ranges (the user's request of 2026-11-17): the party 600, monsters by their walk.
+void test_move_ranges(const GameData& d) {
+    std::printf("Move ranges: party 600, monsters by walking speed\n");
+    const double av = TurnCombat::walk_speed(d, 1);
+    std::printf("  Avatar walk: %.2f units a tick\n", av);
+    CHECK(av > 0);
+    std::map<int, std::vector<std::string>> by;
+    for (unsigned sh = 0; sh < 2048; ++sh) {
+        const MonsterInfo* m = monster_info(sh);
+        if (!m || m->shape != sh) continue;
+        double sp = TurnCombat::walk_speed(d, sh);
+        int r = TurnCombat::monster_move_range(d, sh);
+        char b[96];
+        std::snprintf(b, sizeof b, "%u %s (%.2f)", sh, d.usecode.class_name(sh).c_str(), sp);
+        by[r].push_back(b);
+    }
+    CHECK_EQ(TurnCombat::monster_move_range(d, 142), 150);  // the ghoul: the user's example
+    CHECK(TurnCombat::monster_move_range(d, 807) >= TurnCombat::kMinMonsterMove);
+    CHECK(TurnCombat::monster_move_range(d, 411) < TurnCombat::kMoveRange);  // even the ghost is slower
+    for (auto& [r, v] : by) {
+        std::printf("  %d:", r);
+        for (auto& x : v) std::printf(" %s;", x.c_str());
+        std::printf("\n");
+    }
+}
+
 }  // namespace
 
 int main(int argc, char** argv) {
@@ -1535,6 +1675,8 @@ int main(int argc, char** argv) {
     run("lightning", test_lightning);
     run("peace", test_peace);
     run("banter", test_banter);
+    run("ranges600", test_move_ranges);
+    run("flee", test_flee);
     std::printf("%d checks passed, %d failed\n", g_pass, g_fail);
     return g_fail ? 1 : 0;
 }

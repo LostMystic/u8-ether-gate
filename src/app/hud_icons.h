@@ -9,8 +9,8 @@ namespace pg {
 
 constexpr int kIconSize = 12;
 
-// Order: Move, Attack, Cast, Use item, Defend, Wait, Auto, Keep on Auto, End turn, Party Auto.
-inline const char* const kHudIcons[10][kIconSize] = {
+// Order (TurnUI's entries): Move, Attack, Cast, Use item, Block, Auto, Flee, End turn.
+inline const char* const kHudIcons[8][kIconSize] = {
     {// Move: a boot with speed lines
      "....####....",
      "....#nn#....",
@@ -76,19 +76,6 @@ inline const char* const kHudIcons[10][kIconSize] = {
      "...#sbbs#...",
      "....#ss#....",
      ".....##....."},
-    {// Wait: an hourglass
-     ".#########..",
-     ".#nnnnnnn#..",
-     "..#.....#...",
-     "..#yyyyy#...",
-     "...#yyy#....",
-     "....#y#.....",
-     "....#.#.....",
-     "...#.y.#....",
-     "..#..y..#...",
-     "..#yyyyy#...",
-     ".#nnnnnnn#..",
-     ".#########.."},
     {// Auto: a cog
      "....#ss#....",
      ".##.#ss#.##.",
@@ -102,19 +89,19 @@ inline const char* const kHudIcons[10][kIconSize] = {
      ".#s#ssss#s#.",
      ".##.#ss#.##.",
      "....#ss#...."},
-    {// Keep on Auto: a green cog with a pin
-     "....#gg#....",
-     ".##.#gg#.##.",
-     ".#g#gggg#g#.",
-     "..#gg##gg#..",
-     "###g#ww#g###",
-     "#ggg#ww#ggg#",
-     "#ggg#ww#ggg#",
-     "###g#ww#g###",
-     "..#gg##gg#..",
-     ".#g#gggg#g#.",
-     ".##.#gg#.##.",
-     "....#gg#...."},
+    {// Flee: a figure running to the right, away from a spark
+     ".......##...",
+     "......#pp#..",
+     "......#pp#..",
+     ".......##...",
+     ".....#nnn#..",
+     "....#nnnn#ww",
+     "r..#n#nn#...",
+     ".r...#nn#...",
+     "r...#b##b#..",
+     "...#b#..#b#.",
+     "..#b#....#b#",
+     "..##......##"},
     {// End turn: an arrow to a bar
      "............",
      ".........##.",
@@ -128,19 +115,6 @@ inline const char* const kHudIcons[10][kIconSize] = {
      "..##....#w#.",
      "..#.....#w#.",
      ".........##."},
-    {// Party Auto: three figures and a cog
-     ".##..##..##.",
-     "#pp##pp##pp#",
-     "#pp##pp##pp#",
-     ".##..##..##.",
-     "#bb##rr##gg#",
-     "#bb##rr##gg#",
-     "#bb##rr##gg#",
-     "############",
-     "....#ss#....",
-     "...#s##s#...",
-     "...#s##s#...",
-     "....#ss#...."},
 };
 
 }  // namespace pg

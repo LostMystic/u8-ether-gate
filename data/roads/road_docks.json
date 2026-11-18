@@ -1,0 +1,52 @@
+{
+  "format": "pagan-road",
+  "version": 1,
+  "id": "road_docks",
+  "name": "The docks road: Central Tenebrae's south gate to the docks gate",
+  "map": 40,
+  "seam": [
+    3,
+    40
+  ],
+  "doc": "The user, 2026-11-17: move the shore south and build a walk down through the walls; space things out so nothing is stamped over anything. The docks (map 3) moved 20 chunks south and 15 east so they overlap nothing; this road, part of map 40, joins Central Tenebrae's south street to the hedge path inside the docks' wall. Cells are 128 world units in map 40's own coordinates (= world, map 40 sits at 0,0). floor: rectangles [cx0, cy0, cx1, cy1] (inclusive) of road surface; walls go on every empty cell next to the road. tools/road_patch.py builds data/patches/world_roads.json from this.",
+  "theme": "tenebrae",
+  "styles": {
+    "floor": "fs242",
+    "wall": "ws15"
+  },
+  "base_z": 48,
+  "seed": 17,
+  "floor": [
+    [
+      101,
+      132,
+      102,
+      174
+    ],
+    [
+      101,
+      172,
+      166,
+      174
+    ],
+    [
+      165,
+      172,
+      166,
+      183
+    ]
+  ],
+  "ends": {
+    "40": [
+      21247,
+      23480,
+      48
+    ],
+    "3": [
+      11519,
+      600,
+      48
+    ]
+  },
+  "ends_doc": "where to walk to cross: in map 40 the road's end at the docks; in map 3 the top of the hedge path (local coordinates of each map)"
+}

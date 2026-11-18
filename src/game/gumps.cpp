@@ -18,6 +18,7 @@
 #include "game/combat.h"
 #include "game/container_sort.h"
 #include "game/credits.h"
+#include "game/ether_credits.h"
 #include "game/movie.h"
 #include "game/leveling.h"
 #include "game/party.h"
@@ -1782,7 +1783,14 @@ void MenuGump::choose(int entry) {
         else PG_LOG("menu: saving is not allowed now");
         break;
     case 4: set_mode(kOptions); break;
-    case 5: w_.gumps.add(std::make_unique<CreditsGump>(w_, CreditsGump::kCredits, 30)); break;
+    case 5: {
+        // The Ether Gate credits (game/ether_credits.h), the game's own one click away; the
+        // original screen alone if the data is missing.
+        auto ec = std::make_unique<EtherCreditsGump>(w_, w_.credits_dir.empty() ? std::string("data/credits") : w_.credits_dir);
+        if (ec->loaded()) w_.gumps.add(std::move(ec));
+        else w_.gumps.add(std::make_unique<CreditsGump>(w_, CreditsGump::kCredits, 30));
+        break;
+    }
     case 6: w_.gumps.add(std::make_unique<QuitGump>(w_)); break;
     case 7:
         if (entry_visible(6)) w_.gumps.add(std::make_unique<CreditsGump>(w_, CreditsGump::kQuotes, 30));

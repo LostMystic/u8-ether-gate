@@ -52,7 +52,9 @@ public:
     // Milestone 6 (the game's far zoom): only the fixed map (fixed items and their globs) is
     // drawn; everything that can move or change is drawn live on top by the game mode.
     void set_fixed_only(bool on) { fixed_only_ = on; loaded_dirty_ = true; }
-    // Chunks of `map` that are not drawn (atlas overlaps). Drops the map's tiles if changed.
+    // Chunks of `map` that are not drawn (atlas overlaps, pieces). Drops the map's tiles if changed.
+    // Everywhere here `map` may be a view id (AtlasLayout::view_id): a piece of the map (id & 0xFF)
+    // drawn apart, with its own tiles and exclusions.
     void set_exclusion(unsigned map, const std::bitset<64 * 64>& chunks);
     void clear_map(unsigned map);
     // How many chunks of `map` are not drawn (0: the map is drawn whole).
@@ -72,10 +74,12 @@ public:
 private:
     struct MapState;
     MapState& state(unsigned map);
+    // `map` is a view id (AtlasLayout::view_id): the map number, plus 256 x n for a piece of it.
     static uint64_t key(unsigned map, int level, int tx, int ty) {
-        return (uint64_t(map) << 56) | (uint64_t(level & 0xFF) << 48) | (uint64_t(uint32_t(tx + 0x800000) & 0xFFFFFF) << 24) |
-               (uint64_t(uint32_t(ty + 0x800000) & 0xFFFFFF));
+        return (uint64_t(map & 0xFFFF) << 48) | (uint64_t(level & 0xFF) << 40) | (uint64_t(uint32_t(tx + 0x80000) & 0xFFFFF) << 20) |
+               (uint64_t(uint32_t(ty + 0x80000) & 0xFFFFF));
     }
+    unsigned loaded_id_ = 0xFFFFFFFFu;
     Tile& put(uint64_t k);
     void render_block(unsigned map, int bx, int by);
     void evict();

@@ -1,6 +1,63 @@
 # U8 Ether Gate - what's new
 
+> **This package keeps the original world-map layout.** The joined-up world changes listed below
+> (maps lined up, the docks road, map pieces) are in the code but switched off in this package
+> while that work goes on; everything else is in.
+
 ## Unreleased
+
+## 0.28.6 - 2026-11-18
+- World map: a piece of a map can now be placed on its own. First try: the caves of Fisherman's Reef (map 4)
+  and the Plateau (map 8) are split off and sit on the level below, under the teleporters that lead into
+  them, so the Reef and the Plateau no longer carry them around. Nothing changes in play: the teleporters,
+  people and scripts work as before.
+- In the map editor the four caves are their own segments: drag them, change their level, or put one back
+  with "Reset to Pagan". A layout you saved online gets the caves added the next time you open the editor
+  (save to keep it).
+
+## 0.28.5 - 2026-11-17
+- Turn-based combat: the Avatar and the companions can now move up to 600 units a turn (twice as far).
+  Monsters move as far as their walking speed allows next to the Avatar's: a ghoul 150, a troll 125, a
+  skeleton 225, a ghost 425, the slowest 100.
+- New Flee command: the whole party runs. Any foe close enough gets one free attack, then the fight ends and
+  you are back in normal play. For 5 seconds the foes stand still, can't hurt you and no new fight starts.
+  Press C to fight again sooner.
+- The three Auto commands are now one Auto button with a drop-down: this turn only, keep on Auto, or the whole
+  party. While any Auto is on, the same button turns it off.
+- Wait is gone: use Block (the old Defend) instead. It holds your ground until your next turn and halves
+  the damage you take.
+- A move no longer walks through campfires or other burning things.
+
+## 0.28.4 - 2026-11-17
+- Joined-up world: the docks moved south of the city so nothing overlaps them any more, and a new walled road
+  leads from Central Tenebrae's south gate down between the districts' walls and on to the docks' gate. The old
+  gate teleporters stay quiet while the road is there; the Original maps are unchanged.
+
+## 0.28.3 - 2026-11-17
+- World editor: the planes (ethereal and elemental) moved up to layer 100, leaving layers 1 to 99 free
+  for new places above ground; a layout you saved keeps everything else where you put it.
+- Joined-up world: the Cemetery and Herdsman's Valley now sit exactly where their ground matches the East
+  Road and Tenebrae (they were 464 and 23 units off), so walking across those joins lines up.
+- Joined-up world in the browser: crossing between districts lands you at the right spot.
+
+## 0.28.2 - 2026-11-11
+- Credits: the mod author's line shows only his name.
+
+## 0.28.1 - 2026-11-11
+- Credits: people with no photo of their own now appear in a group photo from Origin's newsletter, with everyone in it
+  named (and where they stand, when the newsletter says), so seven more of the team have a picture.
+- Credits: click a name with a dotted underline to open a page about them (their own site, Wikipedia, an interview or
+  their profile) in your browser; 40 of the names have one. The roll waits while you point at a name.
+- Credits: the mod author is named near the end.
+
+## 0.28.0 - 2026-11-11
+- New credits: Credits on the main menu now opens a roll in honour of everyone who made Ultima VIII, in the game's
+  own order, with their photos where we could find them (36 of them, mostly from Origin's own staff newsletter of
+  the time), their roles and a line about their work. Each team's names appear their own way: typed out for the
+  programmers, painted in for the artists, rune by rune for the writers, on a sound wave for the sound team, checked
+  off for the testers, with an echo for the voice actors, and in gold for Lord British.
+- The game's original credits are still there, one click away ("Original Credits"); Back or Esc returns to the
+  menu from either.
 
 ## 0.27.1 - 2026-11-11
 - The companions' character sheets are wider and show a large version of their portrait instead of a body; the

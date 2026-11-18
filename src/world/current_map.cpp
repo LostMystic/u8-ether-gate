@@ -94,6 +94,7 @@ void apply_map_fixes(unsigned map, std::vector<ItemRecord>& f) {
     default: break;
     }
     map_patches::apply(map, f);  // new content, after the fixes (world/map_patches.h)
+    map_patches::apply_hidden(map, f);  // the stitched world: a neighbour's copy hidden where the neighbour is real
 }
 
 std::vector<unsigned> CurrentMap::populated_maps(const GameData& d) {

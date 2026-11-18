@@ -34,7 +34,7 @@ struct InputEvent;
 class HudPanel {
 public:
     explicit HudPanel(GameMode& gm);
-    enum Button { kBMove, kBAttack, kBCast, kBUse, kBDefend, kBWait, kBAuto, kBKeepAuto, kBEnd, kBPartyAuto, kButtons };
+    enum Button { kBMove, kBAttack, kBCast, kBUse, kBDefend, kBAuto, kBFlee, kBEnd, kButtons };  // TurnUI's entries
 
     void draw(Surface8& s);  // the whole panel (s is panel width x 200)
     void tick();             // once per game frame

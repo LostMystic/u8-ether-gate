@@ -64,11 +64,20 @@ bool WorldSpace::load(const WorldLayoutFile& l) {
     for (Region& r : region_) r = Region{};
     for (size_t g = 0; g < l.atlas.groups.size(); ++g) {
         const AtlasGroup& G = l.atlas.groups[g];
+        if (G.is_part()) continue;
         for (unsigned m : G.maps) {
             if (m >= 256) continue;
             Region& r = region_[m];
             r.placed = true; r.group = int(g); r.dx = G.dx; r.dy = G.dy; r.dz = G.dz; r.layer = G.layer;
         }
+    }
+    for (size_t g = 0; g < l.atlas.groups.size(); ++g) {
+        const AtlasGroup& G = l.atlas.groups[g];
+        if (!G.is_part() || G.maps.size() != 1 || G.maps[0] >= 256 || !region_[G.maps[0]].placed) continue;
+        Part p;
+        p.chunks = l.atlas.chunk_mask(g, G.maps[0]);
+        p.group = int(g); p.dx = G.dx; p.dy = G.dy; p.dz = G.dz; p.layer = G.layer;
+        region_[G.maps[0]].parts.push_back(p);
     }
     for (const WorldSeam& s : l.seams) {
         if (s.a >= 256 || s.b >= 256) continue;
@@ -81,6 +90,7 @@ bool WorldSpace::load(const WorldLayoutFile& l) {
     for (const AtlasGroup& G : l.atlas.groups) {
         for (unsigned m : G.maps) mix(int(m));
         mix(G.dx); mix(G.dy); mix(G.dz); mix(G.layer);
+        for (const auto& r : G.part) { mix(r[0]); mix(r[1]); mix(r[2]); mix(r[3]); }
     }
     for (const WorldSeam& s : l.seams) { mix(int(s.a)); mix(int(s.b)); mix(s.dx); mix(s.dy); }
     hash_ = h;
@@ -101,15 +111,63 @@ void WorldSpace::offset(unsigned map, int& dx, int& dy, int& dz) const {
     dx = region_[map].dx; dy = region_[map].dy; dz = region_[map].dz;
 }
 
+int WorldSpace::piece_of(unsigned map, int x, int y) const {
+    if (map >= 256 || x < 0 || y < 0 || x >= 32768 || y >= 32768) return -1;
+    const std::vector<Part>& ps = region_[map].parts;
+    const size_t c = size_t(y >> 9) * 64 + size_t(x >> 9);
+    for (size_t i = 0; i < ps.size(); ++i)
+        if (ps[i].chunks[c]) return int(i);
+    return -1;
+}
+
+void WorldSpace::offset_at(unsigned map, int x, int y, int& dx, int& dy, int& dz) const {
+    const int p = piece_of(map, x, y);
+    if (p < 0) { offset(map, dx, dy, dz); return; }
+    const Part& q = region_[map].parts[size_t(p)];
+    dx = q.dx; dy = q.dy; dz = q.dz;
+}
+
+int WorldSpace::layer_at(unsigned map, int x, int y) const {
+    const int p = piece_of(map, x, y);
+    return p < 0 ? layer(map) : region_[map].parts[size_t(p)].layer;
+}
+
+std::bitset<64 * 64> WorldSpace::piece_chunks(unsigned map, int piece) const {
+    std::bitset<64 * 64> b;
+    if (map >= 256) return b;
+    const std::vector<Part>& ps = region_[map].parts;
+    if (piece >= 0) return size_t(piece) < ps.size() ? ps[size_t(piece)].chunks : b;
+    b.set();
+    for (const Part& q : ps) b &= ~q.chunks;
+    return b;
+}
+
 void WorldSpace::to_world(unsigned map, int x, int y, int z, int32_t out[3]) const {
     int dx, dy, dz;
-    offset(map, dx, dy, dz);
+    offset_at(map, x, y, dx, dy, dz);
     out[0] = x + dx; out[1] = y + dy; out[2] = z + dz;
 }
 
 void WorldSpace::to_local(unsigned map, const int32_t w[3], int out[3]) const {
     int dx, dy, dz;
     offset(map, dx, dy, dz);
+    if (map < 256 && !region_[map].parts.empty()) {
+        // The piece (or the map's own group) whose chunk lies at (x, y), at the height of z: a piece
+        // may lie right under its map (a cave below the teleporter that leads into it).
+        const std::vector<Part>& ps = region_[map].parts;
+        int pick = -2, best = 1 << 30;  // -1: the map's own group
+        auto consider = [&](int i, int ox, int oy, int oz) {
+            const long long lx = (long long)w[0] - ox, ly = (long long)w[1] - oy;
+            if (lx < 0 || ly < 0 || lx >= 32768 || ly >= 32768) return;
+            if (piece_of(map, int(lx), int(ly)) != i) return;
+            const int z = w[2] - oz, off = z < 0 ? -z : z > kLayerZ - 1 ? z - (kLayerZ - 1) : 0;  // how far out of its z range
+            if (off < best) { best = off; pick = i; }
+        };
+        for (size_t i = 0; i < ps.size(); ++i) consider(int(i), ps[i].dx, ps[i].dy, ps[i].dz);
+        consider(-1, dx, dy, dz);
+        const int i = pick;
+        if (i >= 0) { dx = ps[size_t(i)].dx; dy = ps[size_t(i)].dy; dz = ps[size_t(i)].dz; }
+    }
     out[0] = w[0] - dx; out[1] = w[1] - dy; out[2] = w[2] - dz;
 }
 
@@ -125,6 +183,8 @@ bool WorldSpace::map_at(int32_t x, int32_t y, int lay, unsigned& map,
         for (unsigned m : maps) {
             int lx = x - G.dx, ly = y - G.dy;
             if (lx < 0 || ly < 0 || lx >= 32768 || ly >= 32768) continue;
+            // A piece of a map has only its chunks here; the map's own group has the rest.
+            if (G.is_part() ? !G.part_has(lx >> 9, ly >> 9) : piece_of(m, lx, ly) >= 0) continue;
             WorldSpace& me = const_cast<WorldSpace&>(*this);
             if (!me.coverage(m).land(lx, ly)) continue;
             // Several maps cover it (a seam's strip): the one with the most scenery in that chunk.
@@ -183,27 +243,35 @@ void NeighborStream::clear() {
 void NeighborStream::update(WorldSpace& ws, unsigned active, const int cam[3], int w, int h,
                             const std::function<const std::vector<MapEntry>*(unsigned)>& stored) {
     auto t0 = std::chrono::steady_clock::now();
-    if (active != active_) {
+    // The piece of the active map the camera is in (NOTES.md "Map pieces"): the view is that
+    // piece's place in the world, and only its own ground hides the neighbours' copies.
+    const int apiece = ws.piece_of(active, cam[0], cam[1]);
+    if (active != active_ || apiece != active_piece_) {
         chunks_.clear();  // the dedupe depends on the active map; stored items changed
         active_ = active;
+        active_piece_ = apiece;
     }
     ++tick_;
     items_.clear();
     if (!ws.placed(active) || ws.seam_partners(active).empty()) { chunks_live = 0; update_ms_last = ms_since(t0); return; }
     int ax, ay, az;
-    ws.offset(active, ax, ay, az);
+    ws.offset_at(active, cam[0], cam[1], ax, ay, az);
     const MapCoverage& acov = ws.coverage(active);
+    const bool apieces = ws.has_pieces(active);
+    auto own_land = [&](int sx, int sy) { return acov.land(sx, sy) && (!apieces || ws.piece_of(active, sx, sy) == apiece); };
+    const int alayer = ws.layer_at(active, cam[0], cam[1]);
     // The view in screen space (active-local), with a chunk of margin like the fast area.
     int left = (cam[0] - cam[1]) / 4 - (w / 2 + 256), right = (cam[0] - cam[1]) / 4 + (w / 2 + 256);
     int top = (cam[0] + cam[1]) / 8 - cam[2] - (h / 2 + 256), bottom = (cam[0] + cam[1]) / 8 - cam[2] + (h / 2 + 256);
     for (unsigned p : ws.seam_partners(active)) {
-        int px, py, pz;
-        ws.offset(p, px, py, pz);
-        const int ddx = px - ax, ddy = py - ay, ddz = pz - az;  // p's point + dd = the active map's point
         const MapStatics& st = ws.statics(p);
         const std::vector<MapEntry>* nonfixed = stored ? stored(p) : nullptr;
         for (int cy = 0; cy < 64; ++cy)
             for (int cx = 0; cx < 64; ++cx) {
+                if (ws.layer_at(p, cx * 512, cy * 512) != alayer) continue;  // (a piece of p, or the view in one, elsewhere)
+                int px, py, pz;
+                ws.offset_at(p, cx * 512, cy * 512, px, py, pz);
+                const int ddx = px - ax, ddy = py - ay, ddz = pz - az;  // p's point + dd = the active map's point
                 int X = cx * 512 + ddx, Y = cy * 512 + ddy;
                 int scx = (X - Y) / 4, scy = (X + Y) / 8 - ddz;
                 if (scx + 128 <= left || scx - 128 >= right || scy + 128 <= top || scy - 256 >= bottom) continue;
@@ -222,7 +290,7 @@ void NeighborStream::update(WorldSpace& ws, unsigned active, const int cam[3], i
                         data_.typeflags.get(r.shape).footprint(r.flags & kItemFlipped, xd, yd, zd);
                         for (int sy = y - std::max(yd - 1, 0);; sy = std::min(sy + MapCoverage::kCell, y)) {
                             for (int sx = x - std::max(xd - 1, 0);; sx = std::min(sx + MapCoverage::kCell, x)) {
-                                if (acov.land(sx, sy)) return;
+                                if (own_land(sx, sy)) return;
                                 if (sx >= x) break;
                             }
                             if (sy >= y) break;

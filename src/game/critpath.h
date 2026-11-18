@@ -34,6 +34,12 @@ public:
     virtual bool spell_known(unsigned n) const = 0;
     virtual bool npc_location(unsigned npc, unsigned& map, int& x, int& y, int& z) const = 0;
     virtual bool avatar_location(unsigned& map, int& x, int& y, int& z) const = 0;
+    // The stitched world: where to walk in `from` to cross into `to` when a road joins them (the
+    // link's own teleporter is idle then; NOTES.md "The docks road"). False: no road.
+    virtual bool road_end(unsigned from, unsigned to, int& x, int& y, int& z) const {
+        (void)from; (void)to; (void)x; (void)y; (void)z;
+        return false;
+    }
 };
 
 // A condition tree: all / any / not, or one test.
@@ -166,6 +172,7 @@ public:
     bool spell_known(unsigned n) const override;
     bool npc_location(unsigned npc, unsigned& map, int& x, int& y, int& z) const override;
     bool avatar_location(unsigned& map, int& x, int& y, int& z) const override;
+    bool road_end(unsigned from, unsigned to, int& x, int& y, int& z) const override;
 
 private:
     World& w_;

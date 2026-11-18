@@ -536,8 +536,11 @@ bool TurnCombat::start_fight(const char* reason) {
 
 void TurnCombat::end_fight(End why) {
     if (phase_ == kIdle) return;
-    static const char* const kNames[] = {"", "Victory", "Defeat", "Escaped", "Real time", "Ended"};
-    say(std::string(kNames[why]) + (why == kVictory || why == kEscape ? "!" : ""));
+    static const char* const kNames[] = {"", "Victory", "Defeat", "Escaped", "Real time", "Ended", "Fled"};
+    say(std::string(kNames[why]) + (why == kVictory || why == kEscape || why == kFled ? "!" : ""));
+    fleeing_ = false;
+    flee_queue_.clear();
+    flee_foes_.clear();
     last_end = why;
     Actor* av = w_.avatar();
     // Survivors go back to the real-time AI.
@@ -546,6 +549,13 @@ void TurnCombat::end_fight(End why) {
         if (!a || a->is(Actor::kDead)) continue;
         a->set(Actor::kAnimLock, a->is(Actor::kAnimLock) && w_.kernel().count_exact(f.id, kProcActorAnim));
         if (f.party) continue;
+        if (why == kFled) {
+            // They stand where they are until the grace is over, then hunt (wake_flee_foes).
+            w_.kernel().kill(f.id, kProcCombat);
+            a->set(Actor::kInCombat, false);
+            flee_foes_.push_back(f.id);
+            continue;
+        }
         if (!w_.kernel().count_exact(f.id, kProcCombat) && av) {
             a->set(Actor::kInCombat, false);
             if (why != kEscape || is_enemy(*a, *av)) {
@@ -567,7 +577,8 @@ void TurnCombat::end_fight(End why) {
     let_run_.clear();
     // Won or got away: back to peace, whatever the stance was before the fight (the user's rule,
     // PLAN-TURNBASED.md). A fight handed over to real time or stopped leaves things as they were.
-    if (why == kVictory || why == kEscape) {
+    if (why == kFled) flee_grace = kFleeGraceFrames;
+    if (why == kVictory || why == kEscape || why == kFled) {
         leave_combat();
     } else if (av && !av->is(Actor::kDead) && !avatar_was_combat_ && why != kDefeat) {
         w_.clear_in_combat(1);
@@ -619,6 +630,18 @@ void TurnCombat::realtime_calm() {
     leave_combat();
 }
 
+void TurnCombat::wake_flee_foes() {
+    const Actor* av = w_.avatar();
+    for (uint16_t id : flee_foes_) {
+        Actor* a = w_.actor(id);
+        if (!a || !av || a->is(Actor::kDead) || a->mapnum != av->mapnum || w_.kernel().count_exact(id, kProcCombat)) continue;
+        if (!is_hostile(id) && !is_enemy(*a, *av)) continue;
+        w_.set_in_combat(id);
+        if ((a = w_.actor(id))) a->target = 1;
+    }
+    flee_foes_.clear();
+}
+
 void TurnCombat::world_replaced() {
     if (active()) PG_LOG("turn: world replaced (load / new game), fight dropped");
     reset_silently();
@@ -643,6 +666,10 @@ void TurnCombat::reset_silently() {
     rt_foes_seen_ = false;
     rt_calm_ = 0;
     fallback_ids_.clear();
+    fleeing_ = false;
+    flee_queue_.clear();
+    flee_foes_.clear();
+    flee_grace = 0;
 }
 
 int TurnCombat::on_hit(uint16_t victim, uint16_t attacker, int damage) {
@@ -652,6 +679,8 @@ int TurnCombat::on_hit(uint16_t victim, uint16_t attacker, int damage) {
         if (f && f->defending && damage > 0) damage = std::max(0, damage / 2);
         return damage;
     }
+    // Just fled: blows on the party from anyone not on its side do no harm (the foes stand).
+    if (flee_grace > 0 && attacker && party_side(victim) && !party_side(attacker)) return 0;
     if (!start_on_hit || !attacker || !party_side(victim) || party_side(attacker)) return damage;
     const Actor* av = w_.avatar();
     if (av && !(av->is(Actor::kInCombat) && !av->is(Actor::kCombatRun))) pending_start_ = true;
@@ -682,6 +711,17 @@ void TurnCombat::pre_frame() {
     }
     if (!enabled) { pending_start_ = false; realtime_calm(); return; }
     if (active() || !av || av->is(Actor::kDead) || w_.stasis || w_.kernel().paused()) return;
+    // After a flight: no fight starts by itself for a while; the player can start one with C.
+    bool combat_mode_now = av->is(Actor::kInCombat) && !av->is(Actor::kCombatRun);
+    if (flee_grace > 0) {
+        pending_start_ = false;
+        if (!combat_mode_now) {
+            if (--flee_grace == 0) wake_flee_foes();
+            return;
+        }
+        flee_grace = 0;  // C: the player wants the fight
+        wake_flee_foes();
+    }
     // Hostiles of a scripted encounter that died or left no longer block turn-based fights.
     for (auto it = fallback_ids_.begin(); it != fallback_ids_.end();) {
         if (!is_hostile(*it)) it = fallback_ids_.erase(it);
@@ -722,6 +762,19 @@ void TurnCombat::frame() {
             phase_ = kTurn;
             new_round();
         }
+        return;
+    }
+    if (fleeing_) {
+        // The free attacks of a flight, one foe at a time (the turn order is not used).
+        if (direct_hit_ && --direct_in_ <= 0) {
+            uint16_t t = direct_hit_;
+            direct_hit_ = 0;
+            if (valid_fighter(t)) w_.receive_hit(t, acting_, direct_dir_, 0, 0);
+        }
+        if (sub_frames_ < 4 || direct_hit_) return;
+        if (!settled() && sub_frames_ < kTurnTimeoutFrames) return;
+        sub_frames_ = 0;
+        flee_attacks();
         return;
     }
     if (check_end()) return;
@@ -868,7 +921,6 @@ void TurnCombat::new_round() {
         const Actor* a = w_.actor(f.id);
         f.dex = a ? a->dex : 0;
         f.tiebreak = w_.rand_below(1000);
-        f.waited = false;
     }
     std::stable_sort(order_.begin(), order_.end(), [](const Fighter& a, const Fighter& b) {
         return a.dex != b.dex ? a.dex > b.dex : a.tiebreak < b.tiebreak;
@@ -976,7 +1028,7 @@ void TurnCombat::turn_timed_out() {
 }
 
 bool TurnCombat::settled() const {
-    uint16_t id = current();
+    uint16_t id = fleeing_ ? acting_ : current();
     if (busy(id)) return false;
     if (w_.target_pid || w_.gumps.top_modal() || w_.ask_menu) return false;  // the player is picking / reading
     if (w_.party && !w_.party->bolts.empty()) return false;                    // a spell in flight
@@ -994,6 +1046,37 @@ bool TurnCombat::settled() const {
 
 // ---------------------------------------------------------------------------------------------
 // The reachable area
+
+double TurnCombat::walk_speed(const GameData& d, unsigned shape) {
+    const AnimSequence* sq = d.anim.get(shape, kWalk);
+    if (!sq || !sq->length) sq = d.anim.get(shape, kAdvance);
+    if (!sq || !sq->length || sq->frames.size() < size_t(sq->length) * 8) return 0;
+    // Direction 2 runs along one world axis; each frame's distance is in steps of 4 units.
+    int dist = 0;
+    for (unsigned i = 0; i < sq->length; ++i) dist += std::abs(int(sq->at(2, i).distance));
+    return dist * 4.0 / double(sq->length * (sq->repeat + 1));
+}
+
+int TurnCombat::move_range(uint16_t id) const {
+    const Actor* a = w_.actor(id);
+    if (!a) return 0;
+    const Fighter* f = fighter(id);
+    const bool party = f ? f->party : party_side(id);
+    if (party || id == 1) return kMoveRange + (w_.leveling ? w_.leveling->move_bonus(*a) : 0);
+    return monster_move_range(w_.data(), a->shape);
+}
+
+int TurnCombat::monster_move_range(const GameData& d, unsigned shape) {
+    static std::unordered_map<unsigned, int> cache;
+    auto it = cache.find(shape);
+    if (it != cache.end()) return it->second;
+    const double av = walk_speed(d, 1), me = walk_speed(d, shape);
+    int r = kMoveRange / 2;  // no walk to measure (a few villagers)
+    if (av > 0 && me > 0) r = int(std::lround(kMoveRange * std::min(1.0, me / av) / 25.0)) * 25;
+    r = std::clamp(r, kMinMonsterMove, kMoveRange);
+    cache[shape] = r;
+    return r;
+}
 
 const std::vector<TurnCombat::Node>& TurnCombat::reach() {
     uint16_t id = current();
@@ -1023,8 +1106,11 @@ void TurnCombat::compute_reach(uint16_t id) {
         }
         return;
     }
-    // Leveling: a little further with DEX (game/leveling.h kMoveBonusPerDex).
-    const int move_range = kMoveRange + (w_.leveling ? w_.leveling->move_bonus(*a) : 0);
+    // The party: 600 and leveling's DEX bonus; monsters by how fast they walk (move_range).
+    const int move_range = this->move_range(id);
+    // 16-unit cells up to 300 units of travel, 32 beyond (the spots grow with the area: 600 in
+    // 16-unit cells would be ~6000 of them, 4x the search time).
+    const int cell = move_range > 300 ? 5 : 4;
     Node n0;
     n0.st.x = a->x; n0.st.y = a->y; n0.st.z = a->z;
     n0.st.dir = a->dir;
@@ -1035,10 +1121,10 @@ void TurnCombat::compute_reach(uint16_t id) {
     n0.st.in_combat = a->is(Actor::kInCombat);
     reach_.push_back(n0);
     const unsigned action = n0.st.in_combat && w_.data().anim.get(a->shape, kAdvance) ? kAdvance : kWalk;
-    auto key = [](const ActorState& s) {
-        // 16-unit cells: a 300-unit Move covers ~1100 of them per level (8-unit cells took 4x
-        // the spots and ~0.3 s).
-        return (int64_t(s.x >> 4) << 32) ^ (int64_t(s.y >> 4) << 12) ^ int64_t((s.z >> 3) & 0xFFF);
+    auto key = [cell](const ActorState& s) {
+        // A 300-unit Move covers ~1100 16-unit cells per level (8-unit cells took 4x the spots
+        // and ~0.3 s); a 600-unit one about as many 32-unit cells.
+        return (int64_t(s.x >> cell) << 32) ^ (int64_t(s.y >> cell) << 12) ^ int64_t((s.z >> 3) & 0xFFF);
     };
     // Each edge plays the first k frames of one walk / advance cycle from the parent's state,
     // exactly as the move will be played (so the preview is the walk). Cost = distance; the
@@ -1050,6 +1136,26 @@ void TurnCombat::compute_reach(uint16_t id) {
     std::priority_queue<QE, std::vector<QE>, std::greater<QE>> open;
     open.push({0, 0});
     AnimTracker tr(w_);
+    // Damaging things (a campfire, a fire field): a Move does not walk into or through them
+    // (their box, 8 around; with 600 units a fall-back once crossed the beach fire). The spot
+    // the fighter stands on is not checked, so one already in the fire can still walk out.
+    int fxd = 0, fyd = 0, fzd = 0;
+    w_.footprint(*a, fxd, fyd, fzd);
+    std::vector<Box> harm;
+    {
+        std::vector<uint16_t> near;
+        w_.area_search(a->x, a->y, move_range + 128, false, near);
+        for (uint16_t n : near)
+            if (const Item* it = w_.item(n); it && !it->as_actor() && w_.data().typeflags.get(it->shape).is(ShapeInfo::kDamaging))
+                harm.push_back(w_.box_of(*it));
+    }
+    auto burns = [&](const ActorState& s) {
+        for (const Box& b : harm)
+            if (s.x - fxd < b.x + 8 && s.x > b.x - b.xd - 8 && s.y - fyd < b.y + 8 && s.y > b.y - b.yd - 8 &&
+                s.z < b.z + b.zd + 8 && s.z + fzd > b.z - 8)
+                return true;
+        return false;
+    };
     while (!open.empty() && reach_.size() < kMaxNodes) {
         auto [rank, ni] = open.top();
         open.pop();
@@ -1065,8 +1171,9 @@ void TurnCombat::compute_reach(uint16_t id) {
                 ++steps;
                 if ((tr.blocked() && !tr.unstoppable()) || tr.unsupported()) break;
                 if (std::abs(tr.z() - from.z) > 24) break;  // no climbing or dropping in a Move
+                if (!harm.empty() && burns(tr.state())) break;
                 double moved = std::sqrt(double(d2(tr.x(), tr.y(), from.x, from.y)));
-                if (moved < 12.0 * (emitted + 1) && !tr.done()) continue;
+                if (moved < (cell > 4 ? 24.0 : 12.0) * (emitted + 1) && !tr.done()) continue;
                 if (moved < 4) break;
                 ++emitted;
                 int nc = cost + int(std::lround(moved));
@@ -1285,11 +1392,27 @@ int TurnCombat::node_away_from(uint16_t id, uint16_t threat) {
     if (!t || r.size() < 2) return -1;
     int best = -1;
     long long bd = d2(r[0].st.x, r[0].st.y, t->x, t->y) + 1024;
+    // Not into harm: water, lava or a damaging floor under the body (assist::hazard), or a
+    // damaging thing (a campfire) close by. The 600-unit Move made backing off into the beach
+    // fire a real case.
+    std::vector<uint16_t> near;
+    const Actor* a = w_.actor(id);
+    w_.area_search(r[0].st.x, r[0].st.y, move_range(id) + 64, false, near);
+    std::vector<const Item*> harm;
+    for (uint16_t n : near)
+        if (const Item* it = w_.item(n); it && !it->as_actor() && w_.data().typeflags.get(it->shape).is(ShapeInfo::kDamaging))
+            harm.push_back(it);
     for (size_t i = 1; i < r.size(); ++i) {
         long long d = d2(r[i].st.x, r[i].st.y, t->x, t->y);
-        if (d > bd) { bd = d; best = int(i); }
+        if (d <= bd) continue;
+        if (a && assist::hazard(w_, *a, r[i].st.x, r[i].st.y, r[i].st.z)) continue;
+        bool hot = false;
+        for (const Item* h : harm)
+            if (d2(r[i].st.x, r[i].st.y, h->x, h->y) < 96LL * 96 && std::abs(int(h->z) - r[i].st.z) < 40) hot = true;
+        if (hot) continue;
+        bd = d;
+        best = int(i);
     }
-    (void)id;
     return best;
 }
 
@@ -1493,27 +1616,86 @@ void TurnCombat::cmd_defend_now(uint16_t id) {
     sub_frames_ = 0;
 }
 
-bool TurnCombat::cmd_wait() {
-    if (!awaiting_player()) return false;
-    Fighter* f = fighter(current());
-    if (!f) return false;
-    if (f->waited || size_t(idx_) + 1 >= order_.size()) { status = "Nobody left to wait for"; return false; }
-    Fighter copy = *f;
-    copy.waited = true;
-    order_.erase(order_.begin() + idx_);
-    order_.push_back(copy);
-    say(name_of(copy.id) + " waits");
-    --idx_;
-    next_turn();
-    return true;
-}
-
 bool TurnCombat::cmd_auto(bool keep) {
     if (!awaiting_player()) return false;
     if (keep) toggle_keep_auto(current());
     sub_ = kThink;
     sub_frames_ = 0;
     return true;
+}
+
+bool TurnCombat::any_auto() const {
+    if (party_auto) return true;
+    for (const Fighter& f : order_)
+        if (f.keep_auto) return true;
+    for (const Fighter& f : joiners_)
+        if (f.keep_auto) return true;
+    return false;
+}
+
+void TurnCombat::cancel_auto() {
+    if (!any_auto()) return;
+    party_auto = false;
+    for (Fighter& f : order_) f.keep_auto = false;
+    for (Fighter& f : joiners_) f.keep_auto = false;
+    say("Auto: off (you take the next party turn)");
+    // A party member the AI is about to move gets the menu instead.
+    if (phase_ == kTurn && sub_ == kThink) {
+        const Fighter* f = fighter(current());
+        if (f && f->controllable && !w_.auto_ui && !moved_) {
+            sub_ = kChoose;
+            sub_frames_ = 0;
+            status = name_of(current()) + ": your move";
+        }
+    }
+}
+
+bool TurnCombat::cmd_flee() {
+    if (!awaiting_player()) return false;
+    // Every foe that can hit a party member from where it stands gets one blow.
+    flee_queue_.clear();
+    std::vector<uint16_t> party = party_actors();
+    for (const Fighter& f : order_) {
+        if (f.party || !valid_fighter(f.id)) continue;
+        for (uint16_t p : party)
+            if (valid_fighter(p) && can_hit_now(f.id, p)) { flee_queue_.push_back(f.id); break; }
+    }
+    say(flee_queue_.empty() ? "The party flees" : "The party flees: free attacks!");
+    fleeing_ = true;
+    acting_ = 0;
+    sub_ = kActing;
+    sub_frames_ = 0;
+    pending_attack_ = 0;
+    route_.clear();
+    flee_attacks();
+    return true;
+}
+
+// The next free attack, or (all made) the end of the fight.
+void TurnCombat::flee_attacks() {
+    std::vector<uint16_t> party = party_actors();
+    while (!flee_queue_.empty()) {
+        uint16_t foe = flee_queue_.front();
+        flee_queue_.erase(flee_queue_.begin());
+        if (!valid_fighter(foe)) continue;
+        uint16_t target = 0;
+        const Actor* fa = w_.actor(foe);
+        int best = 0;
+        for (uint16_t p : party) {
+            const Actor* pa = w_.actor(p);
+            if (!pa || !valid_fighter(p) || !can_hit_now(foe, p)) continue;
+            int dd = d2(pa->x, pa->y, fa->x, fa->y);
+            if (!target || dd < best) { target = p; best = dd; }
+        }
+        if (!target) continue;
+        acting_ = foe;
+        ++free_attacks;
+        do_attack(foe, target);
+        say(name_of(foe) + " gets a free attack on " + name_of(target));
+        return;
+    }
+    fleeing_ = false;
+    end_fight(kFled);
 }
 
 bool TurnCombat::cmd_end_turn() {

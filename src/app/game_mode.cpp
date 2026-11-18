@@ -25,6 +25,7 @@
 #include "game/virtues.h"
 #include "game/spellbook.h"
 #include "game/rock_flesh.h"
+#include "game/ether_credits.h"
 #include "game/creatures.h"
 #include "game/story_fixes.h"
 #include "game/ask_nav.h"
@@ -696,6 +697,7 @@ void GameMode::handle(const InputEvent& ev) {
     case InputEvent::kWheel:
         if (!w.gumps.top_modal() && ev.wheel) zoom_by(ev.wheel > 0 ? -1 : 1);
         else if (auto* book = dynamic_cast<MenuGump*>(w.gumps.top_modal())) book->wheel(ev.wheel);
+        else if (auto* ec = dynamic_cast<EtherCreditsGump*>(w.gumps.top_modal())) ec->wheel(ev.wheel);
         break;
     case InputEvent::kKeyDown: key_down(ev); break;
     case InputEvent::kKeyUp:
@@ -1569,6 +1571,14 @@ void GameMode::render_world(Surface8& surf, const int cam[3]) {
     };
     // The stitched world: the neighbouring maps' scenery across a seam (world/world_space.h).
     opt_.extra = w.neighbors && !w.neighbors->items().empty() ? &w.neighbors->items() : nullptr;
+    // A map with pieces placed elsewhere in the world (NOTES.md "Map pieces"): only the piece the
+    // camera is in is drawn; the others are somewhere else.
+    opt_.hidden_chunks = nullptr;
+    if (w.stitch && w.stitch->has_pieces(w.map().map_number())) {
+        const unsigned m = w.map().map_number();
+        hidden_chunks_ = ~w.stitch->piece_chunks(m, w.stitch->piece_of(m, cam[0], cam[1]));
+        opt_.hidden_chunks = &hidden_chunks_;
+    }
     view_.render(w.map(), surf, cam, cam, opt_);
 }
 

@@ -1,5 +1,6 @@
 // Pagan engine. Copyright (c) 2026 Mark B. Licensed under the GNU GPL v3 or later, see LICENSE.
 #pragma once
+#include <bitset>
 #include <cstdint>
 #include <functional>
 #include <map>
@@ -52,12 +53,22 @@ public:
     const std::string& path() const { return path_; }
 
     bool placed(unsigned map) const { return map < 256 && region_[map].placed; }
-    // The map's group offset in world units, and its layer.
+    // The map's group offset in world units, and its layer (the map's own group: without its pieces).
     void offset(unsigned map, int& dx, int& dy, int& dz) const;
     int layer(unsigned map) const { return map < 256 ? region_[map].layer : 0; }
     int group(unsigned map) const { return map < 256 ? region_[map].group : -1; }
+    // Pieces of a map placed on their own (AtlasGroup::part; NOTES.md "Map pieces"): the live game
+    // still runs the whole map in its own coordinates; only where its chunks lie in the world differs.
+    // piece_of: -1 for the map's own group, else the piece's index; the offset / layer of a local point.
+    bool has_pieces(unsigned map) const { return map < 256 && !region_[map].parts.empty(); }
+    int piece_of(unsigned map, int x, int y) const;
+    void offset_at(unsigned map, int x, int y, int& dx, int& dy, int& dz) const;
+    int layer_at(unsigned map, int x, int y) const;
+    // The chunks of `map` in piece `piece` (-1: the map's own group, all its chunks but the pieces').
+    std::bitset<64 * 64> piece_chunks(unsigned map, int piece) const;
     void to_world(unsigned map, int x, int y, int z, int32_t out[3]) const;
-    // Local point of world point w in `map`.
+    // Local point of world point w in `map` (in the piece of the map whose chunk lies there, else
+    // by the map's own group).
     void to_local(unsigned map, const int32_t w[3], int out[3]) const;
     // The map whose content covers world point (x, y) on `layer` (the densest fixed scenery
     // there; variants: the one `variant_pick` chooses). false if none.
@@ -79,7 +90,8 @@ public:
     void forget_statics(unsigned map) { statics_.erase(map); }
 
 private:
-    struct Region { bool placed = false; int group = -1; int dx = 0, dy = 0, dz = 0, layer = 0; std::vector<unsigned> partners; };
+    struct Part { std::bitset<64 * 64> chunks; int group = -1, dx = 0, dy = 0, dz = 0, layer = 0; };
+    struct Region { bool placed = false; int group = -1; int dx = 0, dy = 0, dz = 0, layer = 0; std::vector<unsigned> partners; std::vector<Part> parts; };
     const GameData& data_;
     WorldLayoutFile layout_;
     std::string path_;
@@ -112,6 +124,7 @@ private:
     struct Chunk { std::vector<Item> items; uint32_t last_used = 0; };
     const GameData& data_;
     unsigned active_ = 0xFFFF;
+    int active_piece_ = -2;
     uint32_t tick_ = 0;
     std::map<std::pair<unsigned, int>, Chunk> chunks_;  // (map, chunk index) -> items (world coords)
     std::vector<const Item*> items_;

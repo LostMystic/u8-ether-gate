@@ -25,6 +25,7 @@
 #include "gfx/surface.h"
 #include "json/json.hpp"
 #include "world/current_map.h"
+#include "world/map_patches.h"
 #include "world/world_layout.h"
 #include "world/world_view.h"
 #define PG_HAVE_DRESSER 1
@@ -203,7 +204,8 @@ const std::vector<std::string>& EditMode::themes() {
 
 EditMode::EditMode(const GameData& data) : data_(data), cache_(data) {
     for (unsigned i = 0; i < data.fonts.count(); ++i) fonts_.emplace_back(data.fonts.shape(i), int(i));
-    fps_ = compute_footprints(data);
+    raw_fps_ = compute_footprints(data);
+    fps_ = raw_fps_;
 #ifdef __EMSCRIPTEN__
     cache_.set_budget_bytes(160u << 20);
 #else
@@ -274,6 +276,91 @@ bool EditMode::load_all() {
             if (!r.ok) return;
             int have = rev_of(mine), ship = rev_of(r.text);
             if (ship <= have) return;
+            if (have >= 2) {
+                // Later generations only moved some groups: update the stored layout in place, so
+                // every group the user placed keeps its place. 3: the planes (maps 43-47) from layer
+                // 1 to kPlanesLayer; 4 on: layout_moves() (a group still at its old spot moves).
+                std::vector<std::string> what;
+                if (have < 3) {
+                    for (AtlasGroup& g : doc.layout.atlas.groups) {
+                        bool planes = !g.maps.empty();
+                        for (unsigned m : g.maps) planes &= m >= 43 && m <= 47;
+                        if (!planes || g.layer == kPlanesLayer) continue;
+                        g.dz += (kPlanesLayer - g.layer) * kLayerZ;
+                        g.layer = kPlanesLayer;
+                    }
+                    what.push_back("planes moved to layer " + std::to_string(kPlanesLayer));
+                }
+                std::set<unsigned> moved;
+                for (const LayoutMove& mv : layout_moves()) {
+                    if (mv.generation <= have || mv.generation > ship) continue;
+                    int gi = doc.layout.atlas.group_of(mv.map);
+                    if (gi < 0) continue;
+                    AtlasGroup& g = doc.layout.atlas.groups[size_t(gi)];
+                    if (g.dx != mv.from_dx || g.dy != mv.from_dy) {
+                        what.push_back("map " + std::to_string(mv.map) + " kept where it was placed");
+                        continue;
+                    }
+                    g.dx = mv.to_dx;
+                    g.dy = mv.to_dy;
+                    moved.insert(mv.map);
+                    what.push_back("map " + std::to_string(mv.map) + " aligned");
+                }
+                // 6: pieces of maps split off on their own (AtlasGroup::part): the shipped pieces the
+                // stored layout lacks are added at their shipped places; the rest of each map stays put.
+                if (have < 6 && ship >= 6) {
+                    AtlasLayout shipped;
+                    std::string e3;
+                    if (shipped.from_json(r.text, e3))
+                        for (const AtlasGroup& sg : shipped.groups) {
+                            if (!sg.is_part() || doc.layout.atlas.group_of(sg.maps[0]) < 0) continue;
+                            bool there = false;
+                            for (const AtlasGroup& g : doc.layout.atlas.groups) there |= g.name == sg.name;
+                            if (there) continue;
+                            doc.layout.atlas.groups.push_back(sg);
+                            what.push_back(sg.label + " split off");
+                        }
+                }
+                nlohmann::json b = nlohmann::json::parse(r.text, nullptr, false, true);
+                nlohmann::json x = doc.layout.extra.empty() ? nlohmann::json::object() : nlohmann::json::parse(doc.layout.extra, nullptr, false);
+                if (b.is_object() && x.is_object()) {
+                    for (const char* k : {"layers", "layout_revision", "hidden"})  // 6: the hidden cells (the shipped list)
+                        if (b.contains(k)) x[k] = b[k];
+                    // The seams to a moved map: the shipped layout's entry (a seam may have become a
+                    // road), its offset from the groups' places.
+                    auto pair_of = [](const nlohmann::json& sm, unsigned& sa, unsigned& sb) {
+                        if (!sm.is_object() || !sm.contains("maps") || sm["maps"].size() < 2) return false;
+                        sa = sm["maps"][0].get<unsigned>();
+                        sb = sm["maps"][1].get<unsigned>();
+                        return true;
+                    };
+                    if (x.contains("seams") && x["seams"].is_array() && b.contains("seams") && b["seams"].is_array())
+                        for (auto& sm : x["seams"]) {
+                            unsigned sa, sb;
+                            if (!pair_of(sm, sa, sb) || (!moved.count(sa) && !moved.count(sb))) continue;
+                            for (const auto& bs : b["seams"]) {
+                                unsigned ba, bb;
+                                if (pair_of(bs, ba, bb) && ba == sa && bb == sb) sm = bs;
+                            }
+                        }
+                    if (x.contains("seams") && x["seams"].is_array())
+                        for (auto& sm : x["seams"]) {
+                            if (!sm.contains("maps") || sm["maps"].size() < 2 || !sm.contains("offset") || sm["offset"].size() < 2) continue;
+                            unsigned sa = sm["maps"][0].get<unsigned>(), sb = sm["maps"][1].get<unsigned>();
+                            if (!moved.count(sa) && !moved.count(sb)) continue;
+                            int ga = doc.layout.atlas.group_of(sa), gb = doc.layout.atlas.group_of(sb);
+                            if (ga < 0 || gb < 0) continue;
+                            sm["offset"][0] = doc.layout.atlas.groups[size_t(gb)].dx - doc.layout.atlas.groups[size_t(ga)].dx;
+                            sm["offset"][1] = doc.layout.atlas.groups[size_t(gb)].dy - doc.layout.atlas.groups[size_t(ga)].dy;
+                        }
+                    doc.layout.extra = x.dump();
+                }
+                replaced_stale_ = true;
+                std::string w;
+                for (const std::string& s2 : what) w += (w.empty() ? "" : ", ") + s2;
+                PG_LOG("editor: the stored layout (generation %d) updated to generation %d in place: %s", have, ship, w.c_str());
+                return;
+            }
             WorldLayout wl;
             std::string e2;
             if (!wl.from_json(r.text, e2)) return;
@@ -313,6 +400,15 @@ bool EditMode::load_all() {
         saved_text_[a.id] = a.to_json();
     }
     doc.sync_layout();
+    {
+        // The layout's roads (map patches, NOTES.md "The docks road") are drawn with their maps.
+        WorldLayoutFile wf;
+        std::string e;
+        if (wf.from_json(doc.layout.to_json(), e)) {
+            map_patches::set_active_roads(wf.roads());
+            wf.activate_hidden(&data_);  // and the hidden cells (a neighbour's copy where the neighbour is real)
+        }
+    }
     saved_layout_ = doc.layout.to_json();  // (a layout from the atlas or the seed is saved with the first change)
     if (replaced_stale_) {
         saved_layout_.clear();  // unsaved: Save stores the new layout
@@ -746,7 +842,7 @@ void EditMode::show_world_point(int x, int y, int level) {
 }
 
 void EditMode::show_map_point(unsigned map, int x, int y, int z, int level) {
-    int gi = doc.layout.atlas.group_of(map);
+    int gi = doc.layout.atlas.group_at_point(map, x, y);
     if (gi < 0) { show_world_point(16384, 16384, level); return; }
     const AtlasGroup& g = doc.layout.atlas.groups[size_t(gi)];
     layer = g.layer;
@@ -757,7 +853,6 @@ void EditMode::show_map_point(unsigned map, int x, int y, int z, int level) {
 std::vector<PlacedMap> EditMode::placed(int lay) const {
     std::vector<PlacedMap> out, top;
     for (size_t gi = 0; gi < doc.layout.atlas.groups.size(); ++gi) {
-        const AtlasGroup& g = doc.layout.atlas.groups[gi];
         int dx, dy, gl;
         shown_place(int(gi), dx, dy, gl);
         if (gl != lay) continue;
@@ -766,7 +861,7 @@ std::vector<PlacedMap> EditMode::placed(int lay) const {
         // The selected (and the grabbed) segment is drawn last: on top where segments overlap.
         bool up = int(gi) == selected_group || multi.count(int(gi)) ||
                   std::find(drag_set_.begin(), drag_set_.end(), int(gi)) != drag_set_.end();
-        for (unsigned m : g.maps) (up ? top : out).push_back({m, sx, sy});
+        for (unsigned m : ids_of(gi)) (up ? top : out).push_back({m, sx, sy});
     }
     out.insert(out.end(), top.begin(), top.end());
     return out;
@@ -776,8 +871,11 @@ void EditMode::refresh_exclusions() {
     // The editor draws every segment whole: all the FIXED and NONFIXED items of its maps, with no
     // seam de-duplication and no "densest map per chunk" choice. Where segments overlap both are
     // drawn (the selected one on top) and the outlines mark the overlap.
-    for (const AtlasGroup& g : doc.layout.atlas.groups)
-        for (unsigned m : g.maps) cache_.set_exclusion(m, std::bitset<64 * 64>());
+    // A piece of a map (AtlasGroup::part) is drawn apart from the rest of the map.
+    fps_ = doc.layout.atlas.view_footprints(raw_fps_);
+    for (size_t gi = 0; gi < doc.layout.atlas.groups.size(); ++gi)
+        for (unsigned m : doc.layout.atlas.groups[gi].maps)
+            cache_.set_exclusion(doc.layout.atlas.view_id(gi, m), ~doc.layout.atlas.chunk_mask(gi, m));
     overlap_stamp_ = -1;
 }
 
@@ -789,6 +887,8 @@ void EditMode::draw_maps(std::vector<uint32_t>& out) {
     auto compose = [&](int lay, unsigned f) {
         if (hidden_layers.count(lay)) return;
         std::vector<PlacedMap> pm = placed(lay);
+        if (!only_maps.empty())
+            pm.erase(std::remove_if(pm.begin(), pm.end(), [&](const PlacedMap& p) { return !only_maps.count(p.map & 0xFFu); }), pm.end());
         if (pm.empty()) return;
         if (level_ >= 0) {
             missing += draw_tiles(cache_, pm, level_, int(std::lround(cx_)), int(std::lround(cy_)), buf.data(), W_, H_, deadline, 0);
@@ -804,9 +904,9 @@ void EditMode::draw_maps(std::vector<uint32_t>& out) {
             }
         }
     };
-    compose(layer - 1, 80);
+    if (!picture) compose(layer - 1, 80);
     compose(layer, 256);
-    compose(layer + 1, 56);
+    if (!picture) compose(layer + 1, 56);
     pending_ = size_t(missing);
 }
 
@@ -1012,7 +1112,7 @@ int EditMode::group_under(double u, double v) const {
     for (int gi = int(doc.layout.atlas.groups.size()) - 1; gi >= 0; --gi) {
         const AtlasGroup& g = doc.layout.atlas.groups[size_t(gi)];
         if (g.layer != layer) continue;
-        for (unsigned m : g.maps)
+        for (unsigned m : ids_of(size_t(gi)))
             for (const MapFootprint& f : fps_) {
                 if (f.map != m) continue;
                 for (int z : {f.median_z, 0, 48, 96}) {
@@ -2274,7 +2374,7 @@ void EditMode::select_group(int gi, bool centre) {
     layer = g.layer;
     hidden_layers.erase(layer);
     if (centre)
-        for (unsigned m : g.maps)
+        for (unsigned m : ids_of(size_t(gi)))
             for (const MapFootprint& f : fps_)
                 if (f.map == m && f.cx0 <= f.cx1) {
                     show_world_point(g.dx + (f.cx0 + f.cx1 + 1) * 256, g.dy + (f.cy0 + f.cy1 + 1) * 256, std::max(level_, 5));
@@ -2535,7 +2635,10 @@ void EditMode::shown_place(int gi, int& dx, int& dy, int& lay) const {
         cached.from_json(ref_[show_spots], err);
         cached_text = ref_[show_spots];
     }
-    int r = cached.group_of(g.maps[0]);
+    int r = -1;
+    for (size_t i = 0; i < cached.groups.size() && r < 0; ++i)
+        if (cached.groups[i].name == g.name) r = int(i);
+    if (r < 0) r = cached.group_of(g.maps[0]);
     if (r < 0) return;
     dx = cached.groups[size_t(r)].dx;
     dy = cached.groups[size_t(r)].dy;
@@ -2551,7 +2654,7 @@ int EditMode::select_box(double u0, double v0, double u1, double v1, bool add) {
         const AtlasGroup& g = doc.layout.atlas.groups[gi];
         if (g.layer != layer || hidden_layers.count(g.layer)) continue;
         bool hit = false;
-        for (unsigned m : g.maps)
+        for (unsigned m : ids_of(size_t(gi)))
             for (const MapFootprint& f : fps_) {
                 if (f.map != m || hit) continue;
                 for (int cy = f.cy0; cy <= f.cy1 && !hit; ++cy)
@@ -2583,7 +2686,12 @@ bool EditMode::reset_group(int gi, int which) {
     std::string err;
     if (!ref.from_json(ref_[which], err)) return false;
     AtlasGroup& g = doc.layout.atlas.groups[size_t(gi)];
-    int r = ref.group_of(g.maps[0]);
+    // The same group (a piece of a map has its own spot only where the reference has the piece;
+    // otherwise it goes back with its map, where the original has it).
+    int r = -1;
+    for (size_t i = 0; i < ref.groups.size() && r < 0; ++i)
+        if (ref.groups[i].name == g.name) r = int(i);
+    if (r < 0) r = ref.group_of(g.maps[0]);
     if (r < 0) { say(g.label + ": not in " + reference_name(which)); return false; }
     const AtlasGroup& R = ref.groups[size_t(r)];
     const bool outer = !doc.in_change();
@@ -2703,7 +2811,7 @@ void EditMode::draw_group_outlines(RgbaCanvas& c) {
         const bool ov = over.count(int(gi)) > 0;
         int d = g.layer - layer;
         int x0 = INT_MAX, y0 = INT_MAX, x1 = INT_MIN, y1 = INT_MIN;
-        for (unsigned m : g.maps)
+        for (unsigned m : ids_of(size_t(gi)))
             for (const MapFootprint& fp : fps_)
                 if (fp.map == m && fp.cx0 <= fp.cx1) {
                     x0 = std::min(x0, fp.cx0 * 512); y0 = std::min(y0, fp.cy0 * 512);
@@ -2788,6 +2896,7 @@ void EditMode::render(std::vector<uint32_t>& out, int& w, int& h, int S) {
         return;
     }
     draw_maps(out);
+    if (picture) return;
     RgbaCanvas c{out.data(), W_, H_, &data_.palette};
     draw_grid(c);
     if (dressed_ && dressed_->area != selected) dressed_.reset();

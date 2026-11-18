@@ -1,5 +1,6 @@
 // Pagan engine. Copyright (c) 2026 Mark B. Licensed under the GNU GPL v3 or later, see LICENSE.
 #pragma once
+#include <array>
 #include <bitset>
 #include <cstdint>
 #include <string>
@@ -42,6 +43,16 @@ struct AtlasGroup {
     std::string derived;         // how the offset was found
     bool from_data = false;      // true: from teleport links; false: placed by a rule / guess
     std::string extra;           // other fields of the group (JSON object text), kept on save
+    // A piece of a map (the stitched world, NOTES.md "Map pieces"): only these chunk boxes of its
+    // one map ([cx0, cy0, cx1, cy1] inclusive, the map's own chunks), placed on their own. The
+    // group holding the map whole ("part" empty) leaves them out. Empty: the whole of its maps.
+    std::vector<std::array<int, 4>> part;
+    bool is_part() const { return !part.empty(); }
+    bool part_has(int cx, int cy) const {
+        for (const auto& r : part)
+            if (cx >= r[0] && cx <= r[2] && cy >= r[1] && cy <= r[3]) return true;
+        return false;
+    }
 };
 
 struct AtlasLayout {
@@ -52,8 +63,21 @@ struct AtlasLayout {
     // duplicated border strip is drawn once); every other overlap draws both maps whole.
     std::vector<std::pair<unsigned, unsigned>> seam_pairs;
 
-    // Index of the group holding `map`, or -1.
+    // Index of the group holding `map` (its main group: not a piece), or -1.
     int group_of(unsigned map) const;
+    // The group holding the map's chunk (cx, cy): a piece of the map that has it, else the main group.
+    int group_at(unsigned map, int cx, int cy) const;
+    int group_at_point(unsigned map, int x, int y) const { return group_at(map, x >> 9, y >> 9); }
+    bool has_parts() const;
+    // A view id per (group, map) for drawing (TileCache, PlacedMap, footprints): the map number for a
+    // main group, map + 256 x (1 + the piece's index among the pieces) for a piece. Map: id & 0xFF.
+    unsigned view_id(size_t group, unsigned map) const;
+    std::vector<unsigned> view_ids(size_t group) const;
+    // The chunks of `map` group `group` draws (all of them for a main group less its pieces').
+    std::bitset<64 * 64> chunk_mask(size_t group, unsigned map) const;
+    // The maps' footprints as the groups draw them: one per (group, map), its `map` the view id,
+    // masked to the group's chunks.
+    std::vector<MapFootprint> view_footprints(const std::vector<MapFootprint>& fps) const;
     std::string to_json() const;
     bool from_json(const std::string& text, std::string& err);
     bool load(const std::string& path, std::string& err);
@@ -70,7 +94,8 @@ std::vector<TeleportLink> teleport_links(const GameData& data);
 AtlasLayout generate_atlas_layout(const GameData& data);
 
 // Where placed maps overlap, each atlas chunk shows only the map with the most records
-// there (ties: the earlier group). Returns, per map, the chunks it must not draw. Only groups
+// there (ties: the earlier group). Returns, per view id (AtlasLayout::view_id), the chunks it must
+// not draw (a piece's and a main group's chunks outside them included). Only groups
 // on the same layer compete (a layout without layers: all of them); in a layout with seams
 // only seam partners do (nothing else is ever hidden).
 std::vector<std::pair<unsigned, std::bitset<64 * 64>>> atlas_exclusions(const AtlasLayout& layout,

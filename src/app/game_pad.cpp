@@ -18,6 +18,7 @@
 #include "game/ask_nav.h"
 #include "game/container_sort.h"
 #include "game/credits.h"
+#include "game/ether_credits.h"
 #include "game/leveling.h"
 #include "game/party.h"
 #include "game/movie.h"
@@ -389,6 +390,12 @@ void GameMode::pad_event(const InputEvent& ev) {
         bool prompt = false, skippable = false;
         if (auto* m = dynamic_cast<MovieGump*>(modal)) { prompt = m->prompt_open(); skippable = true; }
         if (auto* c = dynamic_cast<CreditsGump*>(modal)) { prompt = c->prompt_open(); skippable = true; }
+        // The Ether Gate credits: B / Start back to the menu, Y the original credits; the
+        // pointer, A and the D-pad as in other windows.
+        if (dynamic_cast<EtherCreditsGump*>(modal)) {
+            if (b == kPadB || b == kPadStart) { key(kKeyEscape); return; }
+            if (b == kPadY) { key('o'); return; }
+        }
         if (skippable) {
             if (prompt && b == kPadA) key('y');
             else if (prompt && b == kPadB) key('n');

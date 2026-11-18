@@ -802,6 +802,10 @@ void test_turn(const GameData& d) {
     const uint16_t wr = spawn_near(u, "wraith", 200);
     equip(u, 1, 816);  // Slayer
     u.av()->set(Actor::kWithstandDeath, true);
+    // Sturdy enough to stand and fight: since the 600-unit Move a badly hurt Avatar on Party
+    // Auto backs off right out of the encounter (an escape) before he strikes.
+    u.av()->str = 60;
+    u.av()->hp = 120;
     u.key('c');
     u.frames(4);
     if (!u.w().turn->active()) u.w().turn->start_fight("test");

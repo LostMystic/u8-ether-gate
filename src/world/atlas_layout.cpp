@@ -142,10 +142,92 @@ struct Placer {
 }  // namespace
 
 int AtlasLayout::group_of(unsigned map) const {
-    for (size_t i = 0; i < groups.size(); ++i)
+    for (size_t i = 0; i < groups.size(); ++i) {
+        if (groups[i].is_part()) continue;
         for (unsigned m : groups[i].maps)
             if (m == map) return int(i);
+    }
     return -1;
+}
+
+int AtlasLayout::group_at(unsigned map, int cx, int cy) const {
+    for (size_t i = 0; i < groups.size(); ++i)
+        if (groups[i].is_part() && groups[i].maps.size() == 1 && groups[i].maps[0] == map && groups[i].part_has(cx, cy)) return int(i);
+    return group_of(map);
+}
+
+bool AtlasLayout::has_parts() const {
+    for (const AtlasGroup& g : groups)
+        if (g.is_part()) return true;
+    return false;
+}
+
+unsigned AtlasLayout::view_id(size_t group, unsigned map) const {
+    if (group >= groups.size() || !groups[group].is_part()) return map;
+    unsigned k = 0;
+    for (size_t i = 0; i < group; ++i) k += groups[i].is_part();
+    return map + 256u * (k + 1);
+}
+
+std::vector<unsigned> AtlasLayout::view_ids(size_t group) const {
+    std::vector<unsigned> out;
+    if (group < groups.size())
+        for (unsigned m : groups[group].maps) out.push_back(view_id(group, m));
+    return out;
+}
+
+std::bitset<64 * 64> AtlasLayout::chunk_mask(size_t group, unsigned map) const {
+    std::bitset<64 * 64> b;
+    if (group >= groups.size()) return b;
+    const AtlasGroup& G = groups[group];
+    if (G.is_part()) {
+        for (int cy = 0; cy < 64; ++cy)
+            for (int cx = 0; cx < 64; ++cx)
+                if (G.part_has(cx, cy)) b[size_t(cy) * 64 + cx] = true;
+        return b;
+    }
+    b.set();
+    for (const AtlasGroup& P : groups)
+        if (P.is_part() && P.maps.size() == 1 && P.maps[0] == map)
+            for (int cy = 0; cy < 64; ++cy)
+                for (int cx = 0; cx < 64; ++cx)
+                    if (P.part_has(cx, cy)) b[size_t(cy) * 64 + cx] = false;
+    return b;
+}
+
+std::vector<MapFootprint> AtlasLayout::view_footprints(const std::vector<MapFootprint>& fps) const {
+    std::vector<MapFootprint> out = fps;  // the maps in no group stay as they are
+    if (!has_parts()) return out;
+    out.clear();
+    std::map<unsigned, const MapFootprint*> by;
+    for (const MapFootprint& f : fps) by[f.map] = &f;
+    std::set<unsigned> grouped;
+    for (size_t g = 0; g < groups.size(); ++g)
+        for (unsigned m : groups[g].maps) {
+            auto it = by.find(m);
+            if (it == by.end()) continue;
+            grouped.insert(m);
+            const std::bitset<64 * 64> mask = chunk_mask(g, m);
+            MapFootprint f = *it->second;
+            f.map = view_id(g, m);
+            f.occ &= mask;
+            f.cx0 = f.cy0 = 64;
+            f.cx1 = f.cy1 = -1;
+            f.chunks = 0;
+            for (int cy = 0; cy < 64; ++cy)
+                for (int cx = 0; cx < 64; ++cx) {
+                    const size_t i = size_t(cy) * 64 + cx;
+                    if (!mask[i]) { f.count[i] = 0; continue; }
+                    if (!f.occ[i]) continue;
+                    ++f.chunks;
+                    f.cx0 = std::min(f.cx0, cx); f.cy0 = std::min(f.cy0, cy);
+                    f.cx1 = std::max(f.cx1, cx); f.cy1 = std::max(f.cy1, cy);
+                }
+            out.push_back(std::move(f));
+        }
+    for (const MapFootprint& f : fps)
+        if (!grouped.count(f.map)) out.push_back(f);
+    return out;
 }
 
 MapFootprint compute_footprint(const GameData& d, unsigned m) {
@@ -414,13 +496,25 @@ AtlasLayout generate_atlas_layout(const GameData& d) {
 
 std::vector<std::pair<unsigned, std::bitset<64 * 64>>> atlas_exclusions(const AtlasLayout& layout,
                                                                         const std::vector<MapFootprint>& fps) {
+    // Per view id (a piece of a map is drawn apart from the rest of it), the footprints masked.
+    const std::vector<MapFootprint> vfps = layout.view_footprints(fps);
     std::map<unsigned, const MapFootprint*> fp;
-    for (const MapFootprint& f : fps) fp[f.map] = &f;
+    for (const MapFootprint& f : vfps) fp[f.map] = &f;
     struct Owner { int count = -1; unsigned map = 0; };
+    // A piece's chunks are never drawn by its map's main group, nor the rest of the map by the piece.
+    auto add_masks = [&](std::map<unsigned, std::bitset<64 * 64>>& ex) {
+        if (!layout.has_parts()) return;
+        for (size_t gi = 0; gi < layout.groups.size(); ++gi)
+            for (unsigned m : layout.groups[gi].maps) {
+                const std::bitset<64 * 64> mask = layout.chunk_mask(gi, m);
+                if (!mask.all()) ex[layout.view_id(gi, m)] |= ~mask;
+            }
+    };
     std::unordered_map<long long, Owner> owner;
     auto each = [&](auto fn) {
-        for (const AtlasGroup& g : layout.groups)
-            for (unsigned m : g.maps) {
+        for (size_t gi = 0; gi < layout.groups.size(); ++gi)
+            for (unsigned m : layout.view_ids(gi)) {
+                const AtlasGroup& g = layout.groups[gi];
                 auto it = fp.find(m);
                 if (it == fp.end()) continue;
                 const MapFootprint& f = *it->second;
@@ -441,11 +535,12 @@ std::vector<std::pair<unsigned, std::bitset<64 * 64>>> atlas_exclusions(const At
         each([&](unsigned m, int, int, long long k, int c) { at[k].push_back({m, c}); });
         each([&](unsigned m, int cx, int cy, long long k, int c) {
             for (auto [o, oc] : at[k])
-                if (o != m && partner.count({m, o}) && (oc > c || (oc == c && o < m))) {
+                if (o != m && partner.count({m & 0xFFu, o & 0xFFu}) && (oc > c || (oc == c && o < m))) {
                     ex[m][size_t(cy) * 64 + cx] = true;
                     break;
                 }
         });
+        add_masks(ex);
         return {ex.begin(), ex.end()};
     }
     each([&](unsigned m, int, int, long long k, int c) {
@@ -455,6 +550,7 @@ std::vector<std::pair<unsigned, std::bitset<64 * 64>>> atlas_exclusions(const At
     each([&](unsigned m, int cx, int cy, long long k, int) {
         if (owner[k].map != m) ex[m][size_t(cy) * 64 + cx] = true;
     });
+    add_masks(ex);
     return {ex.begin(), ex.end()};
 }
 
@@ -475,6 +571,7 @@ std::string AtlasLayout::to_json() const {
         if (g.dz) o << ", " << g.dz;  // [dx, dy] or [dx, dy, dz]
         o << "]";
         if (g.layer) o << ", \"layer\": " << g.layer;
+        if (g.is_part()) o << ", \"part\": " << json(g.part).dump();
         if (!g.extra.empty()) {
             json x = json::parse(g.extra, nullptr, false);
             if (x.is_object())
@@ -507,10 +604,28 @@ bool AtlasLayout::from_json(const std::string& text, std::string& err) {
             err = "group \"" + a.name + "\" has no maps";
             return false;
         }
+        if (g.contains("part")) {
+            const json& p = g["part"];
+            bool ok = p.is_array() && !p.empty() && g["maps"].size() == 1;
+            if (ok)
+                for (const json& r : p) {
+                    ok = ok && r.is_array() && r.size() == 4;
+                    if (!ok) break;
+                    std::array<int, 4> b{};
+                    for (size_t k = 0; k < 4; ++k) {
+                        ok = ok && r[k].is_number_integer() && r[k].get<int>() >= 0 && r[k].get<int>() < 64;
+                        if (ok) b[k] = r[k].get<int>();
+                    }
+                    ok = ok && b[0] <= b[2] && b[1] <= b[3];
+                    if (ok) a.part.push_back(b);
+                }
+            if (!ok) { err = "group \"" + a.name + "\": \"part\" must be chunk boxes [[cx0, cy0, cx1, cy1], ...] of its one map"; return false; }
+        }
         for (const json& m : g["maps"]) {
             if (!m.is_number_unsigned() || m.get<unsigned>() > 255) { err = "group \"" + a.name + "\": bad map number"; return false; }
             unsigned mn = m.get<unsigned>();
-            if (!seen.insert(mn).second) { err = "map " + std::to_string(mn) + " is in two groups"; return false; }
+            // A map is in one group, and may also give pieces to others ("part").
+            if (!a.is_part() && !seen.insert(mn).second) { err = "map " + std::to_string(mn) + " is in two groups"; return false; }
             a.maps.push_back(mn);
         }
         if (g.contains("offset")) {
@@ -530,10 +645,23 @@ bool AtlasLayout::from_json(const std::string& text, std::string& err) {
         }
         json x = json::object();
         for (auto& [k, v] : g.items())
-            if (k != "name" && k != "label" && k != "maps" && k != "offset" && k != "layer" && k != "source" && k != "derived")
+            if (k != "name" && k != "label" && k != "maps" && k != "offset" && k != "layer" && k != "source" && k != "derived" && k != "part")
                 x[k] = v;
         if (!x.empty()) a.extra = x.dump();
         l.groups.push_back(std::move(a));
+    }
+    for (size_t i = 0; i < l.groups.size(); ++i) {
+        const AtlasGroup& P = l.groups[i];
+        if (!P.is_part()) continue;
+        if (!seen.count(P.maps[0])) { err = "piece \"" + P.name + "\": map " + std::to_string(P.maps[0]) + " is in no group of its own"; return false; }
+        for (size_t k = i + 1; k < l.groups.size(); ++k) {
+            const AtlasGroup& Q = l.groups[k];
+            if (!Q.is_part() || Q.maps[0] != P.maps[0]) continue;
+            for (const auto& r : Q.part)
+                for (int cy = r[1]; cy <= r[3]; ++cy)
+                    for (int cx = r[0]; cx <= r[2]; ++cx)
+                        if (P.part_has(cx, cy)) { err = "pieces \"" + P.name + "\" and \"" + Q.name + "\" share chunks of map " + std::to_string(P.maps[0]); return false; }
+        }
     }
     if (j.contains("seams") && j["seams"].is_array())
         for (const json& sm : j["seams"])

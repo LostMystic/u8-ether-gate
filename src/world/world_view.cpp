@@ -91,6 +91,7 @@ void WorldView::render(CurrentMap& map, Surface8& surf, const int cam[3], const 
     for (int cy = 0; cy < CurrentMap::kChunks; ++cy)
         for (int cx = 0; cx < CurrentMap::kChunks; ++cx) {
             if (!map.is_fast(cx, cy)) continue;
+            if (opt.hidden_chunks && (*opt.hidden_chunks)[size_t(cy) * 64 + size_t(cx)]) continue;
             for (uint32_t idx : map.chunk(cx, cy)) add_item(map.item(idx), idx);
         }
     if (opt.extra)

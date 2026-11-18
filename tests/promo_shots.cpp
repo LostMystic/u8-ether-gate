@@ -193,7 +193,7 @@ void scene_spellbook(const GameData& d) {
     u.shot("spellbook");
 }
 
-// The Avatar's sheet with the virtue octagon, and a companion's (her portrait head).
+// The Avatar's sheet with the virtue octagon, and a companion's (his large portrait, equipment icons).
 void scene_sheets(const GameData& d) {
     Promo u(d);
     party_up(u);
@@ -213,12 +213,12 @@ void scene_sheets(const GameData& d) {
         if (g->closed) continue;
         if (auto* pd = dynamic_cast<PaperdollGump*>(g.get())) {
             if (pd->owner == 1) { pd->x = 4; pd->y = 4; }
-            else if (pd->owner == varn) { pd->x = 150; pd->y = 92; }
+            else if (pd->owner == varn) { pd->x = 320 - 4 - pd->w; pd->y = 200 - 4 - pd->h; }  // his wide sheet
         } else if (!dynamic_cast<SpellbookGump*>(g.get())) {
             g->closed = true;  // the packs
         }
     }
-    u.mouse(300, 190);
+    u.mouse(300, 14);  // the pointer over the world, off the sheets
     u.shot("sheets");
 }
 

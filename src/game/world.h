@@ -515,6 +515,8 @@ public:
     // Turns the stitched world on (loads the layout file; false and Original if it cannot) or off.
     bool set_world_mode(bool stitched_on, const std::string& layout_path);
     std::string world_layout_path;  // set by the application (engine/data/world_layout.json)
+    std::string credits_dir;        // set by the application: data/credits (the Ether Gate credits)
+    std::function<bool(const std::string&)> open_url;  // set by the application (platform open_url); empty: links do nothing
     // The options-page row "World: Stitched / Original maps" (setting "world_mode").
     static void register_world_options();
     // The options-page row "Original bug fixes: On / Off" (setting "bug_fixes", default On;
@@ -613,6 +615,17 @@ private:
     void load_map_items(unsigned map, bool cachein);
     void stitch_frame();  // world_stitch.cpp: pending / edge crossings, the neighbours' scenery
     bool stitch_portal(const Item& egg) const;
+    // A teleporter of a road seam (the maps were moved apart and a road joins them): idle in the
+    // stitched world while the road is in it; walking off the road's end crosses instead.
+    bool stitch_road_portal(const Item& e) const;
+    // After a World option change: the live map's road items added / taken away (NOTES.md "The
+    // docks road"); `before` = the roads that were on.
+    void sync_roads(const std::vector<std::string>& before);
+    // The layout's hidden cells (map_patches::set_hidden) on in the stitched world, off in the
+    // Original maps; the live map is loaded again when its own hidden cells changed (as a crossing
+    // does: nonfixed items kept, processes of the old map ended).
+    void sync_hidden(const std::string& sig_before);
+    void reload_live_map();
     int pending_cross_ = -1, pending_cross_egg_ = -1;
     // Where the Avatar last stood on the current map's own scenery (an edge crossing needs him to
     // have walked off it: a teleport or a script putting him on bare ground never crosses).

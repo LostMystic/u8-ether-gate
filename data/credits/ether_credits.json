@@ -1,0 +1,153 @@
+{
+ "notes": [
+  "The Ether Gate credits (game/ether_credits.h): the people of the game's own credits (STATIC/ECREDITS.DAT) in its order, with their credited roles, a photo where one was found (data/credits/photos/<photo>.png, made by tools/credit_photos.py) and a line in the spirit of their work ('note'). The original credits stay one click away.",
+  "fx: how a name appears. fade, glow (a gold shimmer runs through it), type (typed letter by letter), paint (a brush stroke wipes it in), runes (letters tumble until they settle), build (letters drop into place), wave (letters ride a sound wave), stamp (checked off), echo (an echo settles onto it). A section's fx is the default for its people.",
+  "Photos: see 'closing' for their sources and licences. Anyone who would like their photo or name changed or removed: an issue on the project's GitHub page, and it is done."
+ ],
+ "opening": ["In honour of the people", "who made", "^ULTIMA VIII: PAGAN", "Origin Systems, Austin, Texas", "1994"],
+ "sections": [
+  {"title": "Ultima 8 Credits", "fx": "fade", "people": [
+   {"name": "Richard Garriott", "role": "Producer", "note": "Lord British himself", "photo": "richard-garriott", "fx": "glow", "link": "https://richardgarriott.com/"},
+   {"name": "Mike McShaffry", "role": "Director", "note": "He steered the whole voyage", "photo": "mike-mcshaffry", "link": "https://en.wikipedia.org/wiki/Mike_McShaffry"},
+   {"name": "Dallas Snell", "role": "General Manager", "note": "Who kept Origin's ships sailing", "photo": "dallas-snell", "link": "https://wcnews.com/news/update/10890"},
+   {"name": "Andrew P. Morris", "role": "Game Designer", "note": "Who dreamt the Titans' world", "link": "https://www.mobygames.com/person/5716/"},
+   {"name": "John Watson", "role": "Game Designer", "note": "Who kindled Pyros and the Sorcerers. In memoriam, 2007", "photo": "john-watson", "link": "https://www.wcnews.com/articles/johnwatson.shtml"},
+   {"name": "Tony Zurovec", "role": "Lead Programmer", "note": "Forger of the kernel and the clash of steel", "photo": "tony-zurovec", "link": "https://robertsspaceindustries.com/en/comm-link/transmission/13960-Meet-Tony-Zurovec"},
+   {"name": "Kay Gilmore", "role": "Product Support Manager", "note": "Champion of the players", "photo": "kay-gilmore"},
+   {"name": "Donna Mehnert", "role": "Quality Assurance Supervisor", "note": "Marshal of the bug hunt", "photo": "donna-mehnert"}
+  ]},
+  {"title": "Programming Team", "fx": "type", "people": [
+   {"name": "Rob Corell", "role": "Sound system integration, Unk support, Flic player, Introduction, Endgame, Speech pack", "note": "And the voice of Apathas"},
+   {"name": "Jason Ely", "role": "Gumps, Endgame, Main menu, Thaumaturge spells, Flic player, Credits and Quotes, World editor", "note": "He wrote the first of these credits", "photo": "jason-ely", "link": "https://ultimacodex.com/interviews/we-had-a-lot-of-fun-with-the-other-explosives-an-interview-with-jason-ely/"},
+   {"name": "Mike McShaffry", "role": "User interface, Event manager, Network file system, World editor, Execution scene", "note": "Who built the gallows of the opening", "photo": "mike-mcshaffry", "link": "https://en.wikipedia.org/wiki/Mike_McShaffry"},
+   {"name": "Herman Miller", "role": "World physics, Miscellaneous usecode, Optimizations, World editor", "note": "Who taught Pagan to fall", "photo": "herman-miller", "link": "https://wiki.ultimacodex.com/wiki/Herman_Miller"},
+   {"name": "Zack Simpson", "role": "Shape compression, Unk usecode compiler design, Shape cache, Memory management", "note": "Who made every shape fit", "photo": "zack-simpson", "link": "https://www.marcottelab.org/index.php/People"},
+   {"name": "Jeff Wilson", "role": "Skipdraw, Protected mode libraries", "note": "Who opened the gates of protected mode", "photo": "jeff-wilson"},
+   {"name": "Tony Zurovec", "role": "Kernel, DOS Extender enhancements, Memory management system, Animation system, Combat system", "note": "The heartbeat under every step", "photo": "tony-zurovec", "link": "https://robertsspaceindustries.com/en/comm-link/transmission/13960-Meet-Tony-Zurovec"}
+  ]},
+  {"title": "Additional Programmers", "fx": "type", "people": [
+   {"name": "Phil Eberz", "role": "Speech packs"},
+   {"name": "Lance Grooms", "role": "Digital sound system", "photo": "lance-grooms"},
+   {"name": "Aaron Martin", "role": "Interactive music system, Digital sound system", "note": "Who taught the music to listen", "photo": "aaron-martin"}
+  ]},
+  {"title": "Art Team", "fx": "paint", "people": [
+   {"name": "Bob Cook", "role": "Terrain, Cloth Map", "note": "Who laid the stones of Pagan", "link": "https://www.mobygames.com/person/4634/"},
+   {"name": "Beverly Garland", "role": "3D-rendered characters, Items, Endgame pieces, User interface gumps, Ancient Ones", "note": "Who gave the Ancient Ones their faces", "photo": "beverly-garland", "link": "https://www.mobygames.com/person/3800/beverly-garland/"},
+   {"name": "Denis Loubet", "role": "Introduction, End game, The Avatar, Cover Art, Documentation art, Pyros, Stratos", "note": "Who painted the Avatar on the box", "photo": "denis-loubet", "link": "https://en.wikipedia.org/wiki/Denis_Loubet"},
+   {"name": "Dicko Mather", "role": "Monster rendering, Items, Lithos", "note": "Who brought the monsters to life", "photo": "dicko-mather"},
+   {"name": "Steve Powers", "role": "Items"},
+   {"name": "Micael Priest", "role": "Item Management, Fonts, Items, User interface gumps", "note": "He drew the letters you are reading. In memoriam, 2018", "photo": "micael-priest", "link": "https://en.wikipedia.org/wiki/Micael_Priest"},
+   {"name": "Jonathan Price", "role": "Items, Terrain"},
+   {"name": "Brent Poer", "role": "3D-rendered characters, Hydros", "note": "Who raised Hydros from the deep", "photo": "brent-poer"},
+   {"name": "Matt Sheffield", "role": "Terrain", "group": "group-laser-quest-1996", "caption": "Laser Quest, 1996, left to right: Eric Willmar, Brian Allen, Matt Sheffield, Ruben Garza, Jason Ely, Brian Martin, Bob White and Joe Rabbit.", "link": "https://www.imdb.com/name/nm0790795/"}
+  ]},
+  {"title": "Writing Team", "fx": "runes", "people": [
+   {"name": "Sheri L. Graner", "role": "Stratos, Theurgist and Tenebraen conversations and books", "note": "Who gave the wind its words", "photo": "sheri-graner-ray", "link": "https://en.wikipedia.org/wiki/Sheri_Graner_Ray"},
+   {"name": "Melanie Green", "role": "Books, Scrolls, Plaques", "note": "Keeper of the written word", "photo": "melanie-green"},
+   {"name": "Brian Martin", "role": "Lithos, Necromancer and Tenebraen conversations and books", "note": "Who spoke for the dead", "photo": "brian-martin", "caption": "As the Bearded Lady, hosting Origin's talent show, 1994", "link": "https://ultimacodex.com/interviews/a-small-win-for-the-scruffy-geeks-an-interview-with-brian-martin/"},
+   {"name": "Andrew P. Morris", "role": "Hydros, Ancient Ones, Mythran, Tenebraen conversations and books", "link": "https://www.mobygames.com/person/5716/"},
+   {"name": "Steve Powers", "role": "Books"},
+   {"name": "Mark Vittek", "role": "Tombstones, Books", "note": "Every epitaph in the graveyard", "photo": "mark-vittek", "link": "https://wcnews.com/news/update/10892"},
+   {"name": "John Watson", "role": "Pyros, Sorcerer conversations and books", "photo": "john-watson", "link": "https://www.wcnews.com/articles/johnwatson.shtml"}
+  ]},
+  {"title": "Design Team", "fx": "build", "people": [
+   {"name": "Jason Ely", "role": "Maps: Elemental planes", "photo": "jason-ely", "link": "https://ultimacodex.com/interviews/we-had-a-lot-of-fun-with-the-other-explosives-an-interview-with-jason-ely/"},
+   {"name": "Melanie Green", "role": "Maps: Docks, Fisherman's Reef, Catacombs, Carthax Lake, Elemental planes", "photo": "melanie-green"},
+   {"name": "Brian Martin", "role": "Lithos scene, Maps: Graveyard and Ancient Necromancers, Herdsman's Valley, Western Tenebrae, Stone Cove", "photo": "brian-martin", "link": "https://ultimacodex.com/interviews/a-small-win-for-the-scruffy-geeks-an-interview-with-brian-martin/"},
+   {"name": "Mike McShaffry", "role": "Execution scene", "photo": "mike-mcshaffry", "link": "https://en.wikipedia.org/wiki/Mike_McShaffry"},
+   {"name": "Herman Miller", "role": "Map: Shrine of the Ancient Ones", "photo": "herman-miller", "link": "https://wiki.ultimacodex.com/wiki/Herman_Miller"},
+   {"name": "Andrew P. Morris", "role": "Hydros scene, Ancient Ones and Khumash-Gor scenes, Map assistance: Shrine, Mythran's Plateau, Carthax Lake", "link": "https://www.mobygames.com/person/5716/"},
+   {"name": "Steve Powers", "role": "Animation training for Creatures, Characters, and Avatar", "note": "Who taught the Avatar to move"},
+   {"name": "Mark Vittek", "role": "Stratos scene, Theurgist spells, Maps: Central and east Tenebrae, Mythran's plateau, Hall of the Mountain King, Argentrock Isle, Maps, usecode", "photo": "mark-vittek", "link": "https://wcnews.com/news/update/10892"},
+   {"name": "John Watson", "role": "Pyros and Daemon scenes, Usecode library, Sorcerer spells, Sorcerer Maps", "photo": "john-watson", "link": "https://www.wcnews.com/articles/johnwatson.shtml"}
+  ]},
+  {"title": "Sound Team", "fx": "wave", "people": [
+   {"name": "Randy Buck", "role": "Speech recording and processing", "note": "Who caught every voice", "photo": "randy-buck"},
+   {"name": "Neno Vugrinec", "role": "Music", "note": "The music of Pagan"},
+   {"name": "John Tipton", "role": "Additional FM conversions, Additional digital sound effects processing"},
+   {"name": "Kirk Winterrowd", "role": "Digital sound effects, FM conversions, Digital Speech processing", "note": "And the roar of Pyros. In memoriam, 2025", "group": "group-britannia-manor-1992", "caption": "Kirk Winterrowd (left, in the werewolf mask) and Heather Barclay before opening night of Britannia Manor, Richard Garriott's haunted house, 1992.", "link": "https://www.wcnews.com/news/9327"}
+  ]},
+  {"title": "Quality Assurance", "fx": "stamp", "people": [
+   {"name": "Don Derouen", "role": "Quality Assurance Project Leader", "note": "Captain of the testers", "photo": "don-derouen"},
+   {"name": "Dee Starns", "role": "English Project Leader, Product Support", "group": "group-ec-1993", "caption": "Origin's Employee Committee, 1993. Front, left to right: Dee Starns, David Ladyman, Steve Muchow, Sean Murphy, Sharon Miller, Bart Hosier, Wendy White. Back row: Roswitha Shoemake, Mark Holley, Kathie Lambdin, Jennifer Davis, Andrea Brannan, Curtis Wood."},
+   {"name": "Mark Franz", "role": "Playtesting, Product Support", "group": "group-franz-culver", "caption": "Mark Franz and Tyson Culver at an Origin cookout (the newsletter does not say which is which)."},
+   {"name": "Andrew Hofmann", "role": "Playtesting, Product Support"},
+   {"name": "Michelle Lindner", "role": "Playtesting, Product Support", "group": "group-customer-service-1992", "caption": "Origin Customer Service, 1992. Back row, left to right: Marie Williams, Michelle Lindner, Rebecca Heidt, Donna Mehnert. Front: Allan Davis, Chuck Zoch, Michael Madewell, Kay Gilmore."},
+   {"name": "Dan Orzulak", "role": "Playtesting, Product Support"},
+   {"name": "Tobin Shelton", "role": "Playtesting, Product Support", "photo": "tobin-shelton"},
+   {"name": "Eddie Stringer", "role": "Playtesting, Product Support"},
+   {"name": "Todd Wachhaus", "role": "Playtesting, Product Support"}
+  ]},
+  {"title": "Documentation and Packaging", "fx": "paint", "people": [
+   {"name": "Al Carnley", "role": "Fiction Manual Layout"},
+   {"name": "Mike Harrison", "role": "Director of Marketing", "photo": "mike-harrison"},
+   {"name": "David Ladyman", "role": "Editor", "note": "Whose red pen kept Pagan honest", "photo": "david-ladyman", "link": "https://en.wikipedia.org/wiki/David_Ladyman"},
+   {"name": "Mike McShaffry", "role": "Player's guide", "photo": "mike-mcshaffry", "link": "https://en.wikipedia.org/wiki/Mike_McShaffry"},
+   {"name": "Melissa Mead", "role": "Editing, Play Guide, Reference Guide"},
+   {"name": "Andrew P. Morris", "role": "Fiction manual", "link": "https://www.mobygames.com/person/5716/"},
+   {"name": "Jennifer Davis", "role": "Box Layout", "photo": "jennifer-davis"}
+  ]},
+  {"title": "Special Thanks", "fx": "fade", "people": [
+   {"name": "Melinda Bordelon", "role": "Art items"},
+   {"name": "Andrea Brannan", "role": "Exceptional Team Support", "group": "group-ec-1993", "caption": "Origin's Employee Committee, 1993. Front, left to right: Dee Starns, David Ladyman, Steve Muchow, Sean Murphy, Sharon Miller, Bart Hosier, Wendy White. Back row: Roswitha Shoemake, Mark Holley, Kathie Lambdin, Jennifer Davis, Andrea Brannan, Curtis Wood."},
+   {"name": "Russell Byrd", "role": "Pre-Alpha QA Project Leader", "photo": "russell-byrd", "caption": "Giving blood at Origin's Blood Flood, 1992"},
+   {"name": "Michelle Caddel", "role": "Executive Assistant to the Producer", "photo": "michelle-caddel"},
+   {"name": "Jim Greer", "role": "Initial item structure", "photo": "jim-greer", "link": "https://www.kongregate.com/pages/jim-greer"},
+   {"name": "Shelly Hollen", "role": "Art items"},
+   {"name": "Albert Mayer", "role": "Ultima 8 Tech support", "photo": "albert-mayer"},
+   {"name": "Kai Stringer", "role": "Human Resources", "photo": "kai-stringer"},
+   {"name": "Johari Templin", "role": "Art items"}
+  ]},
+  {"title": "English Voice Actors", "fx": "echo", "people": [
+   {"name": "Rob Corell", "role": "Apathas"},
+   {"name": "Bill Johnson", "role": "The Guardian", "note": "\"Avatar...\"", "photo": "bill-johnson", "link": "https://en.wikipedia.org/wiki/Bill_Johnson_(film_and_television_actor)"},
+   {"name": "Keith Kelly", "role": "Odion"},
+   {"name": "John King", "role": "Lithos"},
+   {"name": "Ev Lunning", "role": "Khumash-Gor", "photo": "ev-lunning", "link": "https://www.imdb.com/name/nm0526775/"},
+   {"name": "Diane Perella", "role": "Stratos", "photo": "diane-perella", "link": "https://www.imdb.com/name/nm0673259/"},
+   {"name": "Lauri Raymond", "role": "Amoras", "link": "https://www.imdb.com/name/nm0713313/"},
+   {"name": "Christina Saur", "role": "Hydros"},
+   {"name": "Eric Willmar", "role": "Laugh of the Changeling", "group": "group-laser-quest-1996", "caption": "Laser Quest, 1996, left to right: Eric Willmar, Brian Allen, Matt Sheffield, Ruben Garza, Jason Ely, Brian Martin, Bob White and Joe Rabbit."},
+   {"name": "Kirk Winterrowd", "role": "Pyros", "group": "group-britannia-manor-1992", "link": "https://www.wcnews.com/news/9327"}
+  ]},
+  {"title": "Translations", "fx": "fade", "people": [
+   {"name": "Jean-Marc Chemla", "role": "Assistant to the Director"},
+   {"name": "Jennie Evans", "role": "European Coordinator"}
+  ]},
+  {"title": "French Version", "fx": "fade", "people": [
+   {"name": "Betty Peltier", "role": "French Translator"},
+   {"name": "Stephane Radoux", "role": "French Documentation"},
+   {"name": "Starr Long", "role": "French Project Leader, Product Support", "note": "Later the producer of Ultima Online", "photo": "starr-long", "link": "https://en.wikipedia.org/wiki/Starr_Long"},
+   {"name": "Gad Benett", "role": "French Playtesting, Product Support"},
+   {"name": "Jean-Pierre Demessant", "role": "French Playtesting, Product Support; voice of Khumash-Gor"},
+   {"name": "Dominique Jumeau", "role": "French Playtesting, Product Support"},
+   {"name": "Jean-Marc Chemla", "role": "Voice of the Guardian"},
+   {"name": "Bertrand Conquelet", "role": "Voice of Apathas"},
+   {"name": "Patricia Fabre", "role": "Voice of Stratos"},
+   {"name": "Florence Gomar", "role": "Voice of Hydros"},
+   {"name": "Cristian Hiltenbrand", "role": "Voice of Lithos"},
+   {"name": "Didier Jumeau", "role": "Voice of Odion"},
+   {"name": "Valérie Revault", "role": "Voice of Amoras"},
+   {"name": "Alain Thomas", "role": "Voice of Pyros"}
+  ]},
+  {"title": "German Version", "fx": "fade", "people": [
+   {"name": "Kirsten Vaughan", "role": "German Translator"},
+   {"name": "Rolf D. Busch", "role": "German Fictional Manual, German Playtester; voice of the Guardian and Khumash-Gor", "photo": "rolf-d-busch", "link": "https://de.wikipedia.org/wiki/Rolf_D._Busch"},
+   {"name": "Sean Mustakas", "role": "German Project Leader, Product Support"},
+   {"name": "Roswitha Shoemake", "role": "German Playtester, Product Support"},
+   {"name": "Werner Althaus", "role": "Voice of Pyros"},
+   {"name": "Daniela Herloff", "role": "Voice of Stratos"},
+   {"name": "Klaus F. Michlmayr", "role": "Voice of Apathas"},
+   {"name": "Gerhard W. Schoen", "role": "Voice of Lithos"},
+   {"name": "Thomas A. Simon", "role": "Voice of Odion"},
+   {"name": "Julia Stielow", "role": "Voice of Amoras"},
+   {"name": "Kathrin Tucker", "role": "Voice of Hydros"}
+  ]}
+ ],
+ "closing": [
+  {"heading": "Very Special Thanks", "lines": ["To all the family members, significant others, and friends, who know who they are.", "This product would never have been possible without their support."]},
+  {"heading": "U8 Ether Gate", "lines": ["A new engine for Pagan, thirty years on", "Mod author", "^Mark Barazzuol", "with Claude by Anthropic"]},
+  {"heading": "The Photographs", "lines": ["Most are from Origin's staff newsletter Point of Origin (1991-98), from the scans kept by Wing Commander CIC, and from the Ultima Codex.", "Starr Long: Eugenie Bagur Long, CC BY-SA 4.0. Sheri Graner Ray: Official GDC, CC BY 2.0. Rolf D. Busch: Arguile, CC BY-SA 3.0 DE. All from Wikimedia Commons.", "Others: Cloud Imperium Games, Pocket Gamer, the Marcotte Lab, the Austin Chronicle and TMDB.", "If you are here and would like your photo changed or taken out, tell us on the project's GitHub page and it will be."]},
+  {"heading": "", "lines": ["^Thank you."]}
+ ]
+}

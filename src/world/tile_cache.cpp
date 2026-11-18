@@ -77,12 +77,12 @@ void TileCache::set_show_editor(bool on) {
 
 void TileCache::clear_map(unsigned map) {
     for (auto it = tiles_.begin(); it != tiles_.end();) {
-        if ((it->first >> 56) == map) {
+        if ((it->first >> 48) == (map & 0xFFFF)) {
             bytes_ -= it->second.px.size() * 4;
             it = tiles_.erase(it);
         } else ++it;
     }
-    if (loaded_ && loaded_->map_number() == map) loaded_dirty_ = true;
+    if (loaded_ && loaded_id_ == map) loaded_dirty_ = true;
 }
 
 void TileCache::set_exclusion(unsigned map, const std::bitset<64 * 64>& chunks) {
@@ -106,7 +106,7 @@ TileCache::MapState& TileCache::state(unsigned map) {
     if (s.ready) return s;
     s.ready = true;
     s.grid.assign(size_t(kGW) * kGH, 0);
-    MapFootprint f = compute_footprint(data_, map);
+    MapFootprint f = compute_footprint(data_, map & 0xFF);
     s.sx0 = s.sy0 = 1 << 30;
     s.sx1 = s.sy1 = -(1 << 30);
     for (int cy = f.cy0; cy <= f.cy1; ++cy)
@@ -164,8 +164,9 @@ const TileCache::Tile* TileCache::get(unsigned map, int level, int tx, int ty) {
 void TileCache::render_block(unsigned map, int bx, int by) {
     double t0 = now_ms();
     if (!loaded_) loaded_ = std::make_unique<CurrentMap>(data_);
-    if (loaded_->map_number() != map || loaded_dirty_) {
-        loaded_->load(map);
+    if (loaded_id_ != map || loaded_dirty_) {
+        loaded_->load(map & 0xFF);
+        loaded_id_ = map;
         loaded_dirty_ = false;
         if (fixed_only_)
             for (int cy = 0; cy < 64; ++cy)

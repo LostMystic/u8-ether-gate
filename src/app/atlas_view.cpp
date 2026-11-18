@@ -26,7 +26,8 @@ constexpr uint32_t kBackground = 0xFF0A0B12u;
 }  // namespace
 
 AtlasView::AtlasView(const GameData& data, std::vector<ShapeFont>& fonts) : data_(data), fonts_(fonts), cache_(data) {
-    fps_ = compute_footprints(data);
+    raw_fps_ = compute_footprints(data);
+    fps_ = raw_fps_;
 }
 
 void AtlasView::load_layout(const std::string& path) {
@@ -59,10 +60,11 @@ void AtlasView::load_layout(const std::string& path) {
 }
 
 void AtlasView::refresh_exclusions() {
+    fps_ = layout_.view_footprints(raw_fps_);
     std::map<unsigned, std::bitset<64 * 64>> ex;
-    for (const AtlasGroup& g : layout_.groups)
-        for (unsigned m : g.maps) ex[m];
-    excl_ = atlas_exclusions(layout_, fps_);
+    for (size_t gi = 0; gi < layout_.groups.size(); ++gi)
+        for (unsigned m : layout_.view_ids(gi)) ex[m];
+    excl_ = atlas_exclusions(layout_, raw_fps_);
     for (auto& [m, b] : excl_) ex[m] = b;
     for (auto& [m, b] : ex) cache_.set_exclusion(m, b);
 }
@@ -73,7 +75,7 @@ std::vector<PlacedMap> AtlasView::placed() const {
         if (!on_layer(g)) continue;
         int sx, sy;
         atlas_screen_offset(g.dx, g.dy, sx, sy);
-        for (unsigned m : g.maps) out.push_back({m, sx, sy});
+        for (unsigned m : ids_of(g)) out.push_back({m, sx, sy});
     }
     return out;
 }
@@ -81,7 +83,7 @@ std::vector<PlacedMap> AtlasView::placed() const {
 void AtlasView::group_screen_box(const AtlasGroup& g, int& l, int& t, int& r, int& b) const {
     l = t = std::numeric_limits<int>::max();
     r = b = std::numeric_limits<int>::min();
-    for (unsigned m : g.maps)
+    for (unsigned m : ids_of(g))
         for (const MapFootprint& f : fps_) {
             if (f.map != m) continue;
             int x0 = f.cx0 * 512 + g.dx, x1 = (f.cx1 + 1) * 512 + g.dx;
@@ -111,7 +113,7 @@ void AtlasView::show_all() {
 }
 
 void AtlasView::show(unsigned map, int x, int y, int z, int level) {
-    int gi = layout_.group_of(map);
+    int gi = layout_.group_at_point(map, x, y);
     level_ = std::clamp(level, 0, TileCache::kMaxLevel);
     if (gi < 0) { show_all(); return; }
     const AtlasGroup& g = layout_.groups[size_t(gi)];
@@ -134,7 +136,8 @@ bool AtlasView::hit(long nx, long ny, unsigned& map, int& group, int at[3]) cons
         if (!on_layer(g)) continue;
         int ox, oy;
         atlas_screen_offset(g.dx, g.dy, ox, oy);
-        for (auto mit = g.maps.rbegin(); mit != g.maps.rend(); ++mit) {
+        const std::vector<unsigned> ids = ids_of(g);
+        for (auto mit = ids.rbegin(); mit != ids.rend(); ++mit) {
             const MapFootprint* f = nullptr;
             for (const MapFootprint& q : fps_)
                 if (q.map == *mit) f = &q;
@@ -148,7 +151,7 @@ bool AtlasView::hit(long nx, long ny, unsigned& map, int& group, int at[3]) cons
                 if (x < 0 || y < 0 || x >= 32768 || y >= 32768) continue;
                 int cx = int(x / 512), cy = int(y / 512);
                 if (!f->has(cx, cy) || (exb && (*exb)[size_t(cy) * 64 + cx])) continue;
-                map = *mit;
+                map = *mit & 0xFFu;
                 group = gi;
                 at[0] = int(x); at[1] = int(y); at[2] = z;
                 return true;
@@ -340,7 +343,7 @@ void AtlasView::draw_overlay(RgbaCanvas& c, long vx0, long vy0, int level, bool 
         bool hot = !ghost && (int(gi) == hover_group_ || int(gi) == drag_group_);
         uint32_t col = hot ? 0xFFFFE060u : ghost ? (g.layer > layer_ ? 0xFF6A4A2Au : 0xFF2A4A6Au) : g.from_data ? 0xFF3A5E8Cu : 0xFF5A5A66u;
         double wx = 0, wy = 0, wn = 0;
-        for (unsigned m : g.maps)
+        for (unsigned m : ids_of(g))
             for (const MapFootprint& fp : fps_) {
                 if (fp.map != m) continue;
                 // The map's ground rectangle as an isometric diamond.
@@ -439,7 +442,7 @@ void AtlasView::render(std::vector<uint32_t>& out, double budget_ms) {
 }
 
 bool AtlasView::marker_pixel(int& u, int& v) const {
-    int gi = layout_.group_of(mk_map_);
+    int gi = layout_.group_at_point(mk_map_, mk_[0], mk_[1]);
     if (gi < 0) return false;
     const AtlasGroup& g = layout_.groups[size_t(gi)];
     int sx, sy;

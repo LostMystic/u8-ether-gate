@@ -1,5 +1,7 @@
 // Pagan engine. Copyright (c) 2026 Mark B. Licensed under the GNU GPL v3 or later, see LICENSE.
 #include "game/critpath.h"
+#include "world/world_space.h"
+#include "world/map_patches.h"
 
 #include <algorithm>
 #include <climits>
@@ -531,6 +533,13 @@ CritGuide CritPath::guide(const CritContext& c) const {
     g.x = l.x;
     g.y = l.y;
     g.z = l.z;
+    // A road joins the two maps in the stitched world: walk to its end instead of the teleporter.
+    if (int rx, ry, rz; l.from_map == am && c.road_end(am, l.to_map, rx, ry, rz)) {
+        g.have_point = true;
+        g.x = rx;
+        g.y = ry;
+        g.z = rz;
+    }
     g.route = route(c, am, tm);
     g.line2 = "Go to " + map_name(l.to_map);
     if (l.to_map != tm) g.line2 += " (on the way to " + map_name(tm) + ")";
@@ -549,6 +558,17 @@ CritGuide CritPath::guide(const CritContext& c) const {
 // The live world
 
 void WorldCritContext::observe() { w_.visited_maps.insert(w_.map().map_number()); }
+
+bool WorldCritContext::road_end(unsigned from, unsigned to, int& x, int& y, int& z) const {
+    if (!w_.stitch || !w_.stitched()) return false;
+    const WorldSeam* s = w_.stitch->seam(from, to);
+    if (!s || s->basis != "road" || !map_patches::road_active(s->road)) return false;
+    const int* e = from == s->a ? s->end_a : s->end_b;
+    x = e[0];
+    y = e[1];
+    z = e[2];
+    return true;
+}
 
 bool WorldCritContext::visited_map(unsigned map) const { return w_.visited_maps.count(map) != 0; }
 

@@ -379,6 +379,7 @@ private:
 private:
     WorldView view_;
     WorldView::Options opt_;
+    std::bitset<64 * 64> hidden_chunks_;  // opt_.hidden_chunks: the map's other pieces
     SaveStore saves_;
     bool hud_ = false;
     bool quit_ = false;

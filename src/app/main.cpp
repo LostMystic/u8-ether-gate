@@ -853,6 +853,9 @@ int main(int argc, char** argv) {
         // New map content (world/map_patches.h); without the file the built-in copy stays.
         f = find_data_file(argc > 0 ? argv[0] : nullptr, "patches/map_content.json");
         if (!f.empty() && !map_patches::load_file(f, err)) PG_LOG("map patches: %s: %s", f.c_str(), err.c_str());
+        // Roads of the stitched world (on only while its layout names them; World::set_world_mode).
+        f = find_data_file(argc > 0 ? argv[0] : nullptr, "patches/world_roads.json");
+        if (!f.empty() && !map_patches::load_roads_file(f, err)) PG_LOG("world roads: %s: %s", f.c_str(), err.c_str());
     }
 
     std::string layout_path = r->opt.atlas_layout.empty() ? find_atlas_layout(argc > 0 ? argv[0] : nullptr) : r->opt.atlas_layout;
@@ -860,6 +863,10 @@ int main(int argc, char** argv) {
         // --world stitched with the viewer / atlas / export: the stitched world's layout (layers).
         std::string wl = r->opt.world_layout.empty() ? find_data_file(argc > 0 ? argv[0] : nullptr, "world_layout.json") : r->opt.world_layout;
         if (!wl.empty()) layout_path = wl;
+        // Its roads are drawn too (the game turns them on with the stitched world).
+        WorldLayoutFile wf;
+        std::string e2;
+        if (!wl.empty() && wf.load(wl, e2)) { map_patches::set_active_roads(wf.roads()); wf.activate_hidden(&r->data); }
     }
     if (!r->opt.write_layout.empty()) {
         AtlasLayout l = generate_atlas_layout(r->data);
@@ -1055,6 +1062,12 @@ int main(int argc, char** argv) {
             else if (!party.banter->load_dir(f.substr(0, f.find_last_of('/')), err)) PG_LOG("banter: %s", err.c_str());
             party.enabled = r->opt.companions >= 0 ? r->opt.companions == 1 : Config::global().get_bool("companions", true);
             party.show_bar = Config::global().get_bool("party_bar", true);
+        }
+        {
+            // The Ether Gate credits (game/ether_credits.h): data/credits.
+            std::string f = find_data_file(argc > 0 ? argv[0] : nullptr, "credits/ether_credits.json");
+            if (!f.empty()) r->game->world().credits_dir = f.substr(0, f.find_last_of('/'));
+            r->game->world().open_url = [](const std::string& u) { return open_url(u); };
         }
         {
             // Levels and XP (game/leveling.h): the data files and the "Leveling" setting.

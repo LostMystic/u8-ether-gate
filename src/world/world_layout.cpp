@@ -12,9 +12,11 @@
 #include <sstream>
 #include <unordered_map>
 
+#include "data/compat.h"
 #include "data/gamedata.h"
 #include "data/mapfile.h"
 #include "json/json.hpp"
+#include "world/map_patches.h"
 #include "world/world_space.h"
 
 namespace pg {
@@ -33,8 +35,8 @@ const MapKind kKinds[] = {
     {24, -1, "tunnel", "Lava River tunnel"}, {25, -1, "tunnel", "Lava River tunnel"}, {26, 0, "surface", "Carthax Lake"},
     {28, -1, "interior", "Carthax Lake breaking ground"}, {31, -1, "cave", "Hall of the Mountain King"},
     {37, 0, "surface", "Argentrock Isle"}, {39, 0, "surface", "West Tenebrae"}, {40, 0, "surface", "Central Tenebrae"},
-    {41, 0, "surface", "East Tenebrae"}, {43, 2, "plane", "Ethereal Plane"}, {44, 2, "plane", "Plane of Fire"},
-    {45, 2, "plane", "Plane of Water"}, {46, 2, "plane", "Plane of Air"}, {47, 2, "plane", "Plane of Earth"},
+    {41, 0, "surface", "East Tenebrae"}, {43, kPlanesLayer, "plane", "Ethereal Plane"}, {44, kPlanesLayer, "plane", "Plane of Fire"},
+    {45, kPlanesLayer, "plane", "Plane of Water"}, {46, kPlanesLayer, "plane", "Plane of Air"}, {47, kPlanesLayer, "plane", "Plane of Earth"},
     {49, -1, "catacombs", "Catacombs level"}, {50, -1, "catacombs", "Upper Catacombs"},
     {51, -2, "catacombs", "Lower Catacombs"}, {54, -2, "shrine", "Shrine of the Ancient Ones"},
     {57, -2, "catacombs", "Pit of the Dead"}, {62, -2, "catacombs", "Ancient Necromancers"},
@@ -107,6 +109,13 @@ const WorldSeam* WorldLayoutFile::seam(unsigned m1, unsigned m2) const {
     return nullptr;
 }
 
+std::vector<std::string> WorldLayoutFile::roads() const {
+    std::vector<std::string> v;
+    for (const WorldSeam& s : seams)
+        if (s.basis == "road" && !s.road.empty()) v.push_back(s.road);
+    return v;
+}
+
 bool WorldLayoutFile::from_json(const std::string& text, std::string& err) {
     WorldLayoutFile w;
     if (!w.atlas.from_json(text, err)) return false;
@@ -143,6 +152,13 @@ bool WorldLayoutFile::from_json(const std::string& text, std::string& err) {
                     }
                     m.portals.push_back(q);
                 }
+            m.road = s.value("road", std::string());
+            auto end3 = [&](const char* k, int* out) {
+                if (s.contains(k) && s[k].is_array() && s[k].size() == 3)
+                    for (int q = 0; q < 3; ++q) out[q] = s[k][size_t(q)].get<int>();
+            };
+            end3("end_a", m.end_a);
+            end3("end_b", m.end_b);
             m.derived = s.value("derived", "");
             w.seams.push_back(m);
         }
@@ -179,6 +195,19 @@ bool WorldLayoutFile::from_json(const std::string& text, std::string& err) {
             v.derived = s.value("derived", "");
             w.variants.push_back(v);
         }
+    if (j.contains("hidden") && j["hidden"].is_array())
+        for (const json& s : j["hidden"]) {
+            if (!s.is_object() || !s.contains("rows") || !s["rows"].is_array()) continue;
+            WorldHidden h;
+            h.map = s.value("map", 0u);
+            for (const json& r : s["rows"])
+                if (r.is_array() && r.size() == 3) h.rows.push_back({r[0].get<int>(), r[1].get<int>(), r[2].get<int>()});
+            if (s.contains("keep_ground") && s["keep_ground"].is_array())
+                for (const json& r : s["keep_ground"])
+                    if (r.is_array() && r.size() == 3) h.ground_rows.push_back({r[0].get<int>(), r[1].get<int>(), r[2].get<int>()});
+            h.derived = s.value("derived", "");
+            if (h.map && !h.rows.empty()) w.hidden.push_back(std::move(h));
+        }
     w.layout_revision = j.value("layout_revision", j.contains("seams") ? 1 : 0);
     if (j.contains("layers") && j["layers"].is_object())
         for (auto& [k, v] : j["layers"].items())
@@ -203,7 +232,11 @@ std::string WorldLayoutFile::extra_json() const {
         const WorldSeam& s = seams[i];
         o << (i ? ",\n    " : "\n    ") << "{\"maps\": [" << s.a << ", " << s.b << "], \"offset\": [" << s.dx << ", " << s.dy
           << (s.dz ? ", " + std::to_string(s.dz) : std::string()) << "], \"votes\": " << s.votes << ", \"basis\": " << json(s.basis).dump() << ", \"strip\": [" << s.strip[0] << ", " << s.strip[1] << ", " << s.strip[2] << ", "
-          << s.strip[3] << "], \"mode\": \"walk\", \"portals\": [";
+          << s.strip[3] << "], \"mode\": \"walk\", ";
+        if (!s.road.empty())
+            o << "\"road\": " << json(s.road).dump() << ", \"end_a\": [" << s.end_a[0] << ", " << s.end_a[1] << ", " << s.end_a[2]
+              << "], \"end_b\": [" << s.end_b[0] << ", " << s.end_b[1] << ", " << s.end_b[2] << "], ";
+        o << "\"portals\": [";
         for (size_t k = 0; k < s.portals.size(); ++k) {
             const WorldPortal& p = s.portals[k];
             o << (k ? ", " : "") << "{\"map\": " << p.map << ", \"to_map\": " << p.to_map << ", \"id\": " << p.id << ", \"at\": ["
@@ -229,6 +262,18 @@ std::string WorldLayoutFile::extra_json() const {
           << v.global_width << "], \"when_zero\": " << v.when_zero << ", \"when_nonzero\": " << v.when_nonzero
           << ", \"derived\": " << json(v.derived).dump() << "}";
     }
+    o << "\n  ],\n  \"hidden\": [";
+    for (size_t i = 0; i < hidden.size(); ++i) {
+        const WorldHidden& h = hidden[i];
+        o << (i ? ",\n    " : "\n    ") << "{\"map\": " << h.map << ", \"derived\": " << json(h.derived).dump() << ", \"rows\": [";
+        for (size_t k = 0; k < h.rows.size(); ++k)
+            o << (k ? "," : "") << (k % 12 == 0 ? "\n      " : " ") << "[" << h.rows[k][0] << ", " << h.rows[k][1] << ", " << h.rows[k][2] << "]";
+        o << "],\n     \"keep_ground\": [";
+        for (size_t k = 0; k < h.ground_rows.size(); ++k)
+            o << (k ? "," : "") << (k % 12 == 0 ? "\n      " : " ") << "[" << h.ground_rows[k][0] << ", " << h.ground_rows[k][1] << ", "
+              << h.ground_rows[k][2] << "]";
+        o << "]}";
+    }
     o << "\n  ],\n  \"layers\": {";
     bool first = true;
     for (auto& [k, v] : layer_names) {
@@ -247,6 +292,28 @@ std::string WorldLayoutFile::to_json() const {
     std::string x = extra_json();
     // extra_json is "{...}": splice its members in.
     return base + ",\n  " + x.substr(1, x.size() - 2) + "\n}\n";
+}
+
+void WorldLayoutFile::activate_hidden(const GameData* d) const {
+    std::vector<std::pair<unsigned, std::vector<map_patches::HiddenRow>>> hid;
+    if (d)
+        for (const WorldHidden& h : hidden) {
+            if (!compat::fixed_map_known(h.map)) continue;  // made for the maps as shipped
+            std::vector<map_patches::HiddenRow> rows;
+            for (const auto& r : h.rows) rows.push_back({r[0], r[1], r[2], false});
+            for (const auto& r : h.ground_rows) rows.push_back({r[0], r[1], r[2], true});
+            hid.push_back({h.map, std::move(rows)});
+        }
+    map_patches::set_hidden(d, hid);
+}
+
+const std::vector<LayoutMove>& layout_moves() {
+    static const std::vector<LayoutMove> v = {
+        {4, 6, 21505, -31280, 21504, -31744},
+        {4, 7, -2025, -24057, -2048, -24064},
+        {5, 3, 2048, 12800, 9728, 23040},
+    };
+    return v;
 }
 
 WorldLayoutFile generate_world_layout(const GameData& d, const std::string& links_text) {
@@ -368,11 +435,11 @@ WorldLayoutFile generate_world_layout(const GameData& d, const std::string& link
     {40, 0, 0, 0, 0, "root: original coordinates (Central Tenebrae)", nullptr},
     {39, -8192, -512, 0, 0, nullptr, nullptr},
     {41, 2048, 0, 0, 0, nullptr, nullptr},
-    {3, 2048, 12800, 0, 0, nullptr, nullptr},
+    {3, 9728, 23040, 0, 0, "Tenebrae docks and shore: moved 15 chunks east and 20 south of their seam with map 40 (2048,12800) so they overlap nothing (the user, 2026-11-17: \"move the shore south and build a walk down through the walls; space things out so you don't have to stamp over anything\"); the docks map carries its own copy of the city's south wall and the street inside it, which now stand south of the city as an outer wall. Map 4's coast reaches far south, so straight south it would have to go 44 chunks; 20 south and 15 east is the nearest spot clear of every map's items (pagan_overlaps). Joined to Central Tenebrae by the docks road (seam basis road, data/roads/road_docks.json)", nullptr},
     {4, -14336, 3072, 0, 0, nullptr, nullptr},
     {5, 19456, -12288, 0, 0, nullptr, nullptr},
-    {7, -2025, -24057, 0, 40, "seam with map 40 (walkable; layer 0): Herdsman's Valley is the northern part of Tenebrae, the fields beyond the north wall (the fan map draws it there). Exact offset of the gate teleporters both ways (map 40 egg id 0 at 13054,2322 -> map 7 at 15071,26239; map 7 egg id 3 at 15103,26815 -> map 40 at 13070,2618; averaged): map 7's own copy of the north wall lines up with the city's, so walking north out of the gate is walking on into the valley; its ground (z 8) is trimmed up 40 to the city's (z 48)", nullptr},
-    {6, 21505, -31280, 0, 40, "seam with map 5 (walkable; layer 0): the Cemetery is the far end of the East Road, east of Tenebrae (the fan map draws them as one coast). Exact offset of the 5 <-> 6 teleporters both ways (map 5 egg id 1 at 7423,10943 -> map 6 at 5375,29823; map 6 egg id 1 at 5375,30367 -> map 5 at 7424,11264; averaged): the road's wall runs on into the Cemetery's, so walking up the road walks on into the Cemetery; its ground (z 8) is trimmed up 40 to the road's (z 48)", nullptr},
+    {7, -2048, -24064, 0, 40, "seam with map 40 (walkable; layer 0): Herdsman's Valley is the northern part of Tenebrae, the fields beyond the north wall (the fan map draws it there). Placed by the gate teleporters (map 40 egg id 0 at 13054,2322 -> map 7 at 15071,26239; map 7 egg id 3 at 15103,26815 -> map 40 at 13070,2618; averaged: -2025,-24057), then aligned by the overlap report (2026-11-17): its copies of Tenebrae line up exactly 23,7 units off that (470 identical items with maps 39, 40 and 41), on the chunk grid: map 7's own copy of the north wall lines up with the city's, so walking north out of the gate is walking on into the valley; its ground (z 8) is trimmed up 40 to the city's (z 48)", nullptr},
+    {6, 21504, -31744, 0, 40, "seam with map 5 (walkable; layer 0): the Cemetery is the far end of the East Road, east of Tenebrae (the fan map draws them as one coast). Placed by the 5 <-> 6 teleporters (map 5 egg id 1 at 7423,10943 -> map 6 at 5375,29823; map 6 egg id 1 at 5375,30367 -> map 5 at 7424,11264; averaged: 21505,-31280), then aligned by the overlap report (2026-11-17): 1631 identical items of the two maps line up exactly 1,464 units off that, on the chunk grid: the road's wall runs on into the Cemetery's, so walking up the road walks on into the Cemetery; its ground (z 8) is trimmed up 40 to the road's (z 48)", nullptr},
     {8, -41344, -1920, 0, 0, "Plateau: west of Fisherman's Reef and north-west of Tenebrae, as on the fan map (its main plateau centred on the fan map's plateau, world -19221,14045), then the nearest free spot (20 chunks off) so it overlaps nothing on its layer; the 7 <-> 8 mountain path stays a teleport (at its exact offset the plateau's path piece would lie over map 7 and West Tenebrae)", nullptr},
     {16, 25408, -82624, 0, 0, "fan map: Carthax Lake: the grey isle with the storm in the east of the fan map, between Daemon's Crag (north) and Argentrock (south); its content centred there (layer 0); linked by its teleports", nullptr},
     {21, 43136, -19328, 0, 0, "fan map: Stone Cove: the walled cove with the pool on the south-east coast of the fan map, south-east of the Cemetery; its content centred there (layer 0), then the nearest free spot (1 chunk off) so it overlaps nothing on its layer; linked by its teleports", nullptr},
@@ -389,11 +456,11 @@ WorldLayoutFile generate_world_layout(const GameData& d, const std::string& link
     {62, 41792, -58976, -2, 0, "Ancient Necromancers (layer -2): under the Upper Catacombs at the exact offset of the 50 -> 62 teleporter (map 50 egg id 5 at 24479,2783 -> map 62 at 1695,14655)", nullptr},
     {51, -4794, -38390, -2, 0, "Lower Catacombs (layer -2): under the Upper Catacombs, from the offset of the 50 -> 51 teleporter (map 50 egg id 7 at 11074,8910 -> map 51 at 28732,4804), then the nearest free spot (12 chunks off) so it overlaps nothing on its layer, placed together with its seam partner 57", nullptr},
     {57, -2746, -41974, -2, 0, nullptr, nullptr},
-    {43, -45056, -45056, 1, 0, "the Ethereal Plane (layer 1, the planes): reached by the Ethereal Travel spell and the blackrock, not by walking; above Tenebrae", nullptr},
-    {44, -58784, -65760, 1, 0, "elemental plane (layer 1, the planes): beside the Ethereal Plane, from the offset of its teleporter there, then the nearest free spot (11 chunks off) so it overlaps nothing on its layer", nullptr},
-    {45, -61843, -35211, 1, 0, "elemental plane (layer 1, the planes): beside the Ethereal Plane, from the offset of its teleporter there, then the nearest free spot (20 chunks off) so it overlaps nothing on its layer", nullptr},
-    {46, -35021, -42049, 1, 0, "elemental plane (layer 1, the planes): beside the Ethereal Plane, from the offset of its teleporter there, then the nearest free spot (18 chunks off) so it overlaps nothing on its layer", nullptr},
-    {47, -68553, -44829, 1, 0, "elemental plane (layer 1, the planes): beside the Ethereal Plane, from the offset of its teleporter there, then the nearest free spot (33 chunks off) so it overlaps nothing on its layer", nullptr},
+    {43, -45056, -45056, kPlanesLayer, 0, "the Ethereal Plane (layer 100, the planes): reached by the Ethereal Travel spell and the blackrock, not by walking; above Tenebrae", nullptr},
+    {44, -58784, -65760, kPlanesLayer, 0, "elemental plane (layer 100, the planes): beside the Ethereal Plane, from the offset of its teleporter there, then the nearest free spot (11 chunks off) so it overlaps nothing on its layer", nullptr},
+    {45, -61843, -35211, kPlanesLayer, 0, "elemental plane (layer 100, the planes): beside the Ethereal Plane, from the offset of its teleporter there, then the nearest free spot (20 chunks off) so it overlaps nothing on its layer", nullptr},
+    {46, -35021, -42049, kPlanesLayer, 0, "elemental plane (layer 100, the planes): beside the Ethereal Plane, from the offset of its teleporter there, then the nearest free spot (18 chunks off) so it overlaps nothing on its layer", nullptr},
+    {47, -68553, -44829, kPlanesLayer, 0, "elemental plane (layer 100, the planes): beside the Ethereal Plane, from the offset of its teleporter there, then the nearest free spot (33 chunks off) so it overlaps nothing on its layer", nullptr},
     {20, -40960, 45568, 0, 0, "unplaced: no link in the data or the usecode (map_index.md 1); parked in the Unplaced row south of the island (in the sea beyond Fisherman's Reef), each its own movable group", "unused test map (596 fixed items: a stone floor and ruins)"},
     {29, -17408, 46080, 0, 0, "unplaced: no link in the data or the usecode (map_index.md 1); parked in the Unplaced row south of the island (in the sea beyond Fisherman's Reef), each its own movable group", "unused test map (150 fixed items)"},
     {33, -10240, 21504, 0, 0, "unplaced: no link in the data or the usecode (map_index.md 1); parked in the Unplaced row south of the island (in the sea beyond Fisherman's Reef), each its own movable group", "unused test map (131 fixed items)"},
@@ -440,13 +507,36 @@ WorldLayoutFile generate_world_layout(const GameData& d, const std::string& link
     static const Declared kDeclared[] = {
         {7, 40, "declared seam: Herdsman's Valley (7) is Tenebrae beyond its north wall; the two gate teleporters (map 40 egg id 0 "
                 "at 13054,2322 -> map 7 at 15071,26239; map 7 egg id 3 at 15103,26815 -> map 40 at 13070,2618) agree on the offset "
-                "within 16 units, map 7's copy of the north wall lines up with the city's (the fan map shows them as one town), "
+                "within 16 units (the exact offset, 23,7 from theirs, is where the maps' identical items line up), map 7's copy of the north wall lines up with the city's (the fan map shows them as one town), "
                 "so walking out of the north gate walks on into the valley."},
         {5, 6, "declared seam: the Cemetery (6) is the far end of the East Road (5); the two teleporters (map 5 egg id 1 at "
-               "7423,10943 -> map 6 at 5375,29823; map 6 egg id 1 at 5375,30367 -> map 5 at 7424,11264) agree on the offset "
-               "within 223 units, and the road's coast wall runs on into the Cemetery's (one coast on the fan map), so walking "
+               "7423,10943 -> map 6 at 5375,29823; map 6 egg id 1 at 5375,30367 -> map 5 at 7424,11264) give the join roughly (the "
+               "exact offset, 464 units from theirs, is where 1631 identical items of the two maps line up), and the road's coast wall runs on into the Cemetery's (one coast on the fan map), so walking "
                "up the road walks on into the Cemetery."},
     };
+    // Seams by a road (the maps moved apart and joined by a built road, part of one of them; its
+    // teleporters stay idle in the stitched world): replaces any vote seam of the pair.
+    struct Road { unsigned a, b; const char* id; int end_a[3], end_b[3]; const char* why; };
+    static const Road kRoads[] = {
+        {3, 40, "road_docks", {11519, 600, 48}, {21247, 23480, 48},
+         "road seam: the docks (3) moved south and east of the city so that nothing overlaps; the docks road (map patch group "
+         "road_docks of map 40, data/roads/road_docks.json) runs from Central Tenebrae's south street down between the West and "
+         "East districts' walls, east along the gap and south to the hedge path inside the docks' own wall. The two gate "
+         "teleporters stay idle in the stitched world: walking off the road's end onto the docks' ground (and back) crosses."},
+    };
+    for (const Road& rd : kRoads) {
+        if (!gof.count(rd.a) || !gof.count(rd.b)) continue;
+        seams.erase(std::remove_if(seams.begin(), seams.end(), [&](const WorldSeam& x) { return x.a == rd.a && x.b == rd.b; }), seams.end());
+        WorldSeam sm;
+        sm.a = rd.a; sm.b = rd.b;
+        const Placed &A = pl[size_t(gof[sm.a])], &B = pl[size_t(gof[sm.b])];
+        sm.dx = B.dx - A.dx; sm.dy = B.dy - A.dy; sm.dz = B.trim - A.trim;
+        sm.basis = "road";
+        sm.road = rd.id;
+        for (int q = 0; q < 3; ++q) { sm.end_a[q] = rd.end_a[q]; sm.end_b[q] = rd.end_b[q]; }
+        sm.derived = rd.why;
+        seams.push_back(sm);
+    }
     for (const Declared& dcl : kDeclared) {
         if (!gof.count(dcl.a) || !gof.count(dcl.b)) continue;
         WorldSeam s;
@@ -559,7 +649,7 @@ WorldLayoutFile generate_world_layout(const GameData& d, const std::string& link
                        {0, "the surface, as on the whole-island fan map (Tenebrae with Herdsman's Valley, the docks, Fisherman's Reef, "
                            "the East Road, the Cemetery, the Plateau, Stone Cove, Carthax Lake, Argentrock Isle, Daemon's Crag) and the "
                            "Unplaced row south of the island"},
-                       {1, "the planes (ethereal, fire, water, air, earth): reached by spells, above the island"}};
+                       {kPlanesLayer, "the planes and realms (ethereal, fire, water, air, earth): reached by spells, not by walking; layer 100, far above the island, so layers 1 to 99 stay free for towers, peaks and other places above ground"}};
     for (const AtlasGroup& g : out.atlas.groups)
         if (!out.layer_names.count(g.layer)) out.layer_names[g.layer] = fmt("overflow layer %d (moved off a taken layer)", g.layer);
     return out;
@@ -567,8 +657,10 @@ WorldLayoutFile generate_world_layout(const GameData& d, const std::string& link
 
 std::vector<std::string> check_world_layout(const WorldLayoutFile& l, const std::vector<MapFootprint>& fps) {
     std::vector<std::string> out;
+    // Per view id: a piece of a map (AtlasGroup::part) occupies only its chunks, the map's group the rest.
+    const std::vector<MapFootprint> vfps = l.atlas.view_footprints(fps);
     std::map<unsigned, const MapFootprint*> fp;
-    for (const MapFootprint& f : fps) fp[f.map] = &f;
+    for (const MapFootprint& f : vfps) fp[f.map] = &f;
     for (const MapFootprint& f : fps)
         if (l.atlas.group_of(f.map) < 0) out.push_back(fmt("map %u is in no group", f.map));
     // Seam clusters may overlap (the duplicated strip is drawn once, from the map that covers it).
@@ -583,7 +675,7 @@ std::vector<std::string> check_world_layout(const WorldLayoutFile& l, const std:
     for (size_t g = 0; g < l.atlas.groups.size(); ++g) {
         const AtlasGroup& G = l.atlas.groups[g];
         MapFootprint u;
-        for (unsigned m : G.maps) {
+        for (unsigned m : l.atlas.view_ids(g)) {
             if (!fp.count(m)) continue;
             const MapFootprint& f = *fp[m];
             u.occ |= f.occ;
@@ -607,7 +699,7 @@ std::vector<std::string> check_world_layout(const WorldLayoutFile& l, const std:
             if (H.layer == G.layer || std::abs(H.dz - G.dz) >= kLayerZ) continue;
             Occupancy one;
             MapFootprint hu;
-            for (unsigned m : H.maps) {
+            for (unsigned m : l.atlas.view_ids(h)) {
                 if (!fp.count(m)) continue;
                 const MapFootprint& f = *fp[m];
                 hu.cx0 = std::min(hu.cx0, f.cx0); hu.cy0 = std::min(hu.cy0, f.cy0);
@@ -629,7 +721,9 @@ std::vector<std::string> check_world_layout(const WorldLayoutFile& l, const std:
         if (B.dx - A.dx != s.dx || B.dy - A.dy != s.dy)
             out.push_back(fmt("seam %u/%u: group offsets differ by %d,%d, the seam says %d,%d", s.a, s.b, B.dx - A.dx, B.dy - A.dy, s.dx, s.dy));
         if (s.basis == "votes" && s.votes < 40) out.push_back(fmt("seam %u/%u: only %d votes", s.a, s.b, s.votes));
-        if (s.basis != "votes" && s.basis != "teleport edge") out.push_back(fmt("seam %u/%u: unknown basis %s", s.a, s.b, s.basis.c_str()));
+        if (s.basis != "votes" && s.basis != "teleport edge" && s.basis != "road")
+            out.push_back(fmt("seam %u/%u: unknown basis %s", s.a, s.b, s.basis.c_str()));
+        if (s.basis == "road" && s.road.empty()) out.push_back(fmt("seam %u/%u: a road seam with no road", s.a, s.b));
     }
     for (const WorldLink& k : l.links)
         if ((k.has_from && l.atlas.group_of(k.from_map) < 0) || l.atlas.group_of(k.to_map) < 0)

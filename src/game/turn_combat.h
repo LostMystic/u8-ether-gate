@@ -43,8 +43,22 @@ public:
     void load_settings();            // from Config (players get turn-based by default)
 
     // --- Tunables
-    // World units a Move may cover: 300 (about 37 feet; the user asked for 3-4x the first 80).
-    static constexpr int kMoveRange = 300;
+    // World units a Move may cover. The Avatar and the companions: 600 (the user's number of
+    // 2026-11-17; 300 before, 80 before 2026-11-06). Monsters: in proportion to how fast their
+    // walk is beside the Avatar's (walk_speed), rounded to 25, within kMinMonsterMove..kMoveRange.
+    static constexpr int kMoveRange = 600;
+    static constexpr int kMinMonsterMove = 100;
+    // World units per animation tick of a shape's walk (its advance when it has no walk), along
+    // a straight direction; 0 if it has neither.
+    static double walk_speed(const struct GameData& d, unsigned shape);
+    // A monster shape's Move range (its walk against the Avatar's).
+    static int monster_move_range(const struct GameData& d, unsigned shape);
+    // The Move range of this fighter (leveling's DEX bonus included for the party).
+    int move_range(uint16_t id) const;
+    // Flee: after fleeing no fight starts by itself for this long (C still starts one).
+    static constexpr int kFleeGraceFrames = 5 * 30;
+    int flee_grace = 0;          // game frames left
+    int free_attacks = 0;        // free attacks made on fleeing (tests)
     static constexpr int kAreaMargin = 64;     // encounter area: the screen plus this (game pixels)
     // A turn that is not over after this long ends with "<name> missed its turn" (the user's
     // limit: 15 s, at the game's 30 frames a second; the speed-up does not shorten it, and the time
@@ -73,7 +87,7 @@ public:
         bool party = false;       // the Avatar, a companion, a summoned ally
         bool controllable = false;
         int dex = 0, tiebreak = 0;
-        bool waited = false, defending = false, keep_auto = false;
+        bool defending = false, keep_auto = false;
     };
     const std::vector<Fighter>& order() const { return order_; }
     int current_index() const { return idx_; }
@@ -143,8 +157,14 @@ public:
     bool cmd_cast(const CastOption& o, uint16_t target);
     bool cmd_use(uint16_t item);
     bool cmd_defend();
-    bool cmd_wait();
     bool cmd_auto(bool keep);
+    // The whole party runs: every foe in reach of a party member gets one free attack, then the
+    // fight ends (kFled), combat mode ends, and for kFleeGraceFrames no fight starts by itself
+    // and foes' blows do no harm (the player can start one with C).
+    bool cmd_flee();
+    // Auto off for everyone: Party Auto and every Keep on Auto (the Auto button while one is on).
+    bool any_auto() const;
+    void cancel_auto();
     bool cmd_end_turn();
 
     // --- Pacing: world frames to run this game frame (enemy / Auto turns run faster).
@@ -152,7 +172,7 @@ public:
     bool speed_held = false;  // the UI's speed-up button is held
 
     // --- Results (tests, the log)
-    enum End { kNone, kVictory, kDefeat, kEscape, kFallback, kAborted };
+    enum End { kNone, kVictory, kDefeat, kEscape, kFallback, kAborted, kFled };
     End last_end = kNone;
     int fights = 0;
     std::vector<uint16_t> turn_history;    // fighter ids in the order their turns began
@@ -185,6 +205,11 @@ private:
     void finish_action();
     void cmd_defend_now(uint16_t id);
     void turn_timed_out();
+    void flee_attacks();          // the free attacks of a flight, one foe at a time
+    std::vector<uint16_t> flee_queue_;  // foes still to make their free attack
+    bool fleeing_ = false;
+    std::vector<uint16_t> flee_foes_;   // foes left standing by a flight, set hunting when the grace ends
+    void wake_flee_foes();
     bool asking_player() const;   // a target cursor, an answer menu or a window waits for the player
     void leave_combat();          // the end of a fight: weapons away, peaceful stance and music
     void realtime_calm();         // real time: all foes gone, combat mode ends
@@ -193,7 +218,7 @@ private:
     bool ai_heal(Actor& a);
     bool ai_cast(Actor& a, uint16_t target);
     bool busy(uint16_t id) const;
-    bool settled() const;
+    bool settled() const;  // the acting character's action is over (current(), or a free attack's foe)
     bool valid_fighter(uint16_t id) const;
     bool in_area(const Actor& from, const Actor& o, int margin) const;
     std::vector<uint16_t> party_actors() const;

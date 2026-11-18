@@ -11,6 +11,7 @@
 #include "core/log.h"
 
 #ifdef __EMSCRIPTEN__
+#include <emscripten.h>
 #include <emscripten/html5.h>
 #endif
 
@@ -375,6 +376,17 @@ bool Platform::open_audio(int rate, AudioCallback cb) {
     audio_rate_ = have.freq;
     SDL_PauseAudioDevice(audio_dev_, 0);
     return true;
+}
+
+bool open_url(const std::string& url) {
+    if (url.rfind("https://", 0) != 0 && url.rfind("http://", 0) != 0) return false;
+    PG_LOG("open url: %s", url.c_str());
+#ifdef __EMSCRIPTEN__
+    EM_ASM({ window.open(UTF8ToString($0), '_blank', 'noopener'); }, url.c_str());
+    return true;
+#else
+    return SDL_OpenURL(url.c_str()) == 0;
+#endif
 }
 
 }  // namespace pg

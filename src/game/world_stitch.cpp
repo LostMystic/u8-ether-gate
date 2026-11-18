@@ -12,7 +12,9 @@
 #include "game/party.h"
 #include "game/processes.h"
 #include "game/turn_combat.h"
+#include "game/variants.h"
 #include "game/world.h"
+#include "world/map_patches.h"
 #include "world/world_space.h"
 
 namespace pg {
@@ -25,16 +27,26 @@ bool World::stitched_by_default() { return false; }
 
 bool World::set_world_mode(bool on, const std::string& path) {
     pending_cross_ = pending_cross_egg_ = -1;
+    const std::vector<std::string> roads_before = stitch ? stitch->layout().roads() : std::vector<std::string>{};
+    const std::string hidden_before = map_patches::hidden_signature(map_.map_number());
     if (!on) {
         if (stitch) PG_LOG("world: original maps");
         stitch.reset();
         neighbors.reset();
+        map_patches::set_active_roads({});
+        map_patches::set_hidden(nullptr, {});
+        sync_roads(roads_before);
+        sync_hidden(hidden_before);
         return true;
     }
     if (!compat::world_known()) {
         compat::off("the stitched world", "this copy's maps differ from the ones its layout was made for");
         stitch.reset();
         neighbors.reset();
+        map_patches::set_active_roads({});
+        map_patches::set_hidden(nullptr, {});
+        sync_roads(roads_before);
+        sync_hidden(hidden_before);
         return false;
     }
     std::string p = path.empty() ? world_layout_path : path;
@@ -44,14 +56,88 @@ bool World::set_world_mode(bool on, const std::string& path) {
         PG_LOG("world: no stitched layout (%s); original maps", p.empty() ? "no world_layout.json" : err.c_str());
         stitch.reset();
         neighbors.reset();
+        map_patches::set_active_roads({});
+        map_patches::set_hidden(nullptr, {});
+        sync_roads(roads_before);
+        sync_hidden(hidden_before);
         return false;
     }
     world_layout_path = p;
     PG_LOG("world: stitched (%s: %zu groups, %zu seams, %zu teleport links)", p.c_str(), ws->layout().atlas.groups.size(),
            ws->layout().seams.size(), ws->layout().links.size());
+    // The layout's roads (map patch groups, NOTES.md "The docks road") are part of their maps from
+    // the next time a map loads; one that is not loaded leaves its seam's teleporters working.
+    std::vector<std::string> roads;
+    for (const std::string& r : ws->layout().roads()) {
+        if (map_patches::road_loaded(r)) roads.push_back(r);
+        else PG_LOG("world: road %s is not loaded (data/patches/world_roads.json); its teleporters stay", r.c_str());
+    }
+    map_patches::set_active_roads(roads);
+    ws->layout().activate_hidden(&data_);
     stitch = std::move(ws);
     neighbors = std::make_unique<NeighborStream>(data_);
+    sync_roads(roads_before);
+    sync_hidden(hidden_before);
     return true;
+}
+
+// After the World option changes: the live map gets or loses its road items at once (the patch
+// groups' sync, as for the Underworld option), and an Avatar standing on a road that is going away
+// is put just inside the gate it leads from (the seam teleporter's arrival egg in this map).
+void World::sync_roads(const std::vector<std::string>& before) {
+    if (!map_.map_number()) return;
+    Actor* av = avatar();
+    for (const map_patches::Group& g : map_patches::groups()) {
+        if (!g.road || g.map != map_.map_number() || map_patches::road_active(g.id)) continue;
+        if (std::find(before.begin(), before.end(), g.id) == before.end() || !av) continue;
+        int x0 = 1 << 30, y0 = 1 << 30, x1 = -1, y1 = -1;
+        for (const ItemRecord& r : g.items) {
+            x0 = std::min(x0, int(r.x) - 128); y0 = std::min(y0, int(r.y) - 128);
+            x1 = std::max(x1, int(r.x)); y1 = std::max(y1, int(r.y));
+        }
+        bool on_road = false;
+        for (const ItemRecord& r : g.items)
+            if (av->x > r.x - 128 && av->x <= r.x && av->y > r.y - 128 && av->y <= r.y) { on_road = true; break; }
+        if (!on_road) continue;
+        // The arrival egg (frame 1) of a teleporter from a map this road joins to here.
+        for (size_t i = 512; i < objs_.slots(); ++i) {
+            const Item* it = objs_.get(uint16_t(i));
+            if (!it || it->chunk < 0 || data_.typeflags.get(it->shape).family() != kFamTeleportEgg || it->frame != 1) continue;
+            const int ex = it->x, ey = it->y, ez = it->z;
+            bool near_road = ex >= x0 - 2048 && ex <= x1 + 2048 && ey >= y0 - 2048 && ey <= y1 + 2048;
+            if (!near_road) continue;
+            kernel_.kill(1, kProcAny);
+            move_to(1, ex, ey, ez);
+            PG_LOG("world: the road %s is gone (Original maps): the Avatar is put inside the gate at %d,%d,%d", g.id.c_str(), ex, ey, ez);
+            break;
+        }
+    }
+    underworld::sync_entrance(*this);
+}
+
+void World::sync_hidden(const std::string& sig_before) {
+    if (!map_.map_number() || map_patches::hidden_signature(map_.map_number()) == sig_before) return;
+    PG_LOG("world: map %u's hidden cells changed (%zu now): loading it again", map_.map_number(),
+           map_patches::hidden_count(map_.map_number()));
+    reload_live_map();
+}
+
+void World::reload_live_map() {
+    const unsigned m = map_.map_number();
+    if (!m) return;
+    gumps.close_item_dependent();
+    save_map_items();
+    kernel_.kill_for_map_change();
+    for (uint16_t pid = 1; pid < 32767; ++pid)  // a fresh egg hatcher (load_map_items adds one)
+        if (auto* p = dynamic_cast<EggHatcherProcess*>(kernel_.get(pid))) p->fail();
+    load_map_items(m, true);
+    if (camera_followed() != 1) camera_follow(1);
+}
+
+bool World::stitch_road_portal(const Item& e) const {
+    if (!stitch) return false;
+    const WorldSeam* s = stitch->seam(map_.map_number(), e.mapnum);
+    return s && s->basis == "road" && map_patches::road_active(s->road);
 }
 
 void World::register_world_options() {
@@ -96,8 +182,8 @@ bool World::cross_seam(unsigned to, int egg_id) {
     stitch->to_local(to, w, lp);
     if (lp[0] < 0 || lp[1] < 0 || lp[0] >= 32768 || lp[1] >= 32768 || lp[2] < 0 || lp[2] > 255) return false;
     int fdx, fdy, fdz, tdx, tdy, tdz;
-    stitch->offset(from, fdx, fdy, fdz);
-    stitch->offset(to, tdx, tdy, tdz);
+    stitch->offset_at(from, av->x, av->y, fdx, fdy, fdz);
+    stitch->offset_at(to, lp[0], lp[1], tdx, tdy, tdz);
     // The ids of this map's teleporters into `to` (their arrival eggs there, for hatch_arrival_eggs).
     std::vector<unsigned> arrival_ids;
     for (size_t i = 512; i < objs_.slots(); ++i) {
@@ -216,13 +302,13 @@ void World::hatch_arrival_eggs(const std::vector<unsigned>& ids, int egg_id) {
     // The arrival egg: the teleporter's own, else (walked over the edge) the nearest of the old
     // map's teleporters into this one.
     const Item* dest = nullptr;
-    long best = 1L << 40;
+    long long best = 1LL << 40;  // (long is 32 bits in the web build)
     for (size_t i = 512; i < objs_.slots(); ++i) {
         const Item* it = objs_.get(uint16_t(i));
         if (!it || it->chunk < 0 || data_.typeflags.get(it->shape).family() != kFamTeleportEgg || it->frame != 1) continue;
         unsigned id = it->quality & 0xFF;
         if (egg_id >= 0 ? int(id) != egg_id : std::find(ids.begin(), ids.end(), id) == ids.end()) continue;
-        long d = std::labs(long(it->x) - av->x) + std::labs(long(it->y) - av->y);
+        long long d = std::llabs((long long)it->x - av->x) + std::llabs((long long)it->y - av->y);
         if (d < best) { best = d; dest = it; }
     }
     if (!dest) return;

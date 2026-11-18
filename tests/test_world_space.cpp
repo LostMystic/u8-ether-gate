@@ -37,6 +37,9 @@
 #include "gfx/surface.h"
 #include "json/json.hpp"
 #include "platform/platform.h"
+#include "game/critpath.h"
+#include "world/current_map.h"
+#include "world/map_patches.h"
 #include "world/world_layout.h"
 #include "world/world_space.h"
 
@@ -48,6 +51,9 @@ using namespace pg;
 
 std::string g_data, g_shots, g_saves;
 std::string layout_path() { return g_data + "/world_layout.json"; }
+// The public packages ship an older layout (engine/release/README.md): the checks of the later map
+// work (the docks road, the map pieces, the layout's generation) apply only to the current one.
+bool g_current_layout = true;
 
 std::string read_file(const std::string& p) {
     std::ifstream f(p, std::ios::binary);
@@ -70,7 +76,7 @@ struct Run {
         w.auto_ui = true;
         w.ask_name = false;
         w.skip_opening = skip_opening;
-        if (stitched) CHECK(w.set_world_mode(true, layout_path()));
+        CHECK(w.set_world_mode(stitched, layout_path()));  // (Original maps too: it turns the roads off)
         w.new_game();
         run(skip_opening ? 30 : 8400);  // the opening ends and stasis is released at about frame 8300
     }
@@ -153,7 +159,7 @@ struct Ui {
         if (companions && !w.party->load_file(g_data + "/companions.json", err)) std::printf("  companions.json: %s\n", err.c_str());
         w.party->enabled = companions;
         w.turn->enabled = turn;
-        if (stitched) CHECK(w.set_world_mode(true, layout_path()));
+        CHECK(w.set_world_mode(stitched, layout_path()));  // (Original maps too: it turns the roads off)
         gm.start();
     }
     World& w() { return gm.world(); }
@@ -232,10 +238,17 @@ void test_layout(const GameData& d) {
     std::set<std::pair<unsigned, unsigned>> have;
     for (const WorldSeam& s : f.seams) {
         have.insert({s.a, s.b});
-        CHECK(s.basis == "teleport edge" || s.votes >= 40);
+        CHECK(s.basis == "teleport edge" || s.basis == "road" || s.votes >= 40);
         CHECK(!s.portals.empty());
         CHECK(!s.derived.empty());
-        CHECK(s.strip[2] > s.strip[0] && s.strip[3] > s.strip[1]);
+        if (s.basis == "road") {
+            // Moved apart and joined by a road (NOTES.md "The docks road"): no shared strip, a road
+            // that is loaded, and an end in each map.
+            CHECK(!s.road.empty() && map_patches::road_loaded(s.road));
+            CHECK(s.end_a[0] > 0 && s.end_b[0] > 0);
+        } else {
+            CHECK(s.strip[2] > s.strip[0] && s.strip[3] > s.strip[1]);
+        }
         int ga = f.atlas.group_of(s.a), gb = f.atlas.group_of(s.b);
         CHECK(ga >= 0 && gb >= 0);
         if (ga >= 0 && gb >= 0) {
@@ -277,12 +290,16 @@ void test_layout(const GameData& d) {
     std::printf("  %d kept teleporter links between maps, %zu usecode links\n", eggs, f.links.size() - size_t(eggs));
     CHECK(eggs > 20);
     // Regenerating gives the same layout (deterministic).
+    // (The map pieces are placed by hand, NOTES.md "Map pieces": not derived.)
     WorldLayoutFile g = generate_world_layout(d, read_file(g_data + "/map_links.json"));
-    CHECK_EQ(g.atlas.groups.size(), f.atlas.groups.size());
-    bool same = g.atlas.groups.size() == f.atlas.groups.size();
+    std::vector<AtlasGroup> fg;
+    for (const AtlasGroup& x : f.atlas.groups)
+        if (!x.is_part()) fg.push_back(x);
+    CHECK_EQ(g.atlas.groups.size(), fg.size());
+    bool same = g.atlas.groups.size() == fg.size();
     for (size_t i = 0; same && i < g.atlas.groups.size(); ++i)
-        same = g.atlas.groups[i].maps == f.atlas.groups[i].maps && g.atlas.groups[i].dx == f.atlas.groups[i].dx &&
-               g.atlas.groups[i].dy == f.atlas.groups[i].dy && g.atlas.groups[i].layer == f.atlas.groups[i].layer;
+        same = g.atlas.groups[i].maps == fg[i].maps && g.atlas.groups[i].dx == fg[i].dx &&
+               g.atlas.groups[i].dy == fg[i].dy && g.atlas.groups[i].layer == fg[i].layer;
     CHECK(same);
     CHECK_EQ(g.seams.size(), f.seams.size());
     // The editor's document keeps the stitched fields and its own areas through a save.
@@ -341,10 +358,35 @@ void test_portals(const GameData& d) {
     f.load(layout_path(), err);
     WorldSpace ws(d);
     ws.load(f);
-    Run st(d, true, true), og(d, false, true);
-    int crossed = 0, kept_point = 0, total = 0;
+    // (The Original game first: switching a World to Original maps turns the roads off.)
+    Run og(d, false, true), st(d, true, true);
+    int crossed = 0, kept_point = 0, total = 0, idle = 0, road_portals = 0;
     for (const WorldSeam& s : f.seams)
         for (const WorldPortal& p : s.portals) {
+            if (s.basis == "road") {
+                // A road seam's teleporter: idle in the stitched world (the road replaces the jump),
+                // the original teleport in Original maps.
+                ++road_portals;
+                st.w.kernel().kill(1, kProcAny);
+                st.w.teleport_actor(1, 100, 100, 0, p.map);
+                st.w.stasis = false;
+                st.run(3);
+                st.w.teleport_actor(1, p.x, p.y, p.z, p.map);
+                for (int k = 0; k < 30; ++k) st.step();
+                bool stayed = st.map() == p.map;
+                idle += stayed;
+                og.warp(p.x, p.y, p.z, p.map);
+                for (int k = 0; k < 30 && og.map() == p.map; ++k) og.step();
+                const Item* arr = og.map() == p.to_map ? find_teleporter(og.w, p.to_map, int(p.id), true) : nullptr;
+                bool at_arrival = arr && std::abs(og.av().x - arr->x) <= 64 && std::abs(og.av().y - arr->y) <= 64;
+                std::printf("  %u -> %u id %u at %d,%d,%d (road %s): stitched %s; original %s\n", p.map, p.to_map, p.id, p.x, p.y, p.z,
+                            s.road.c_str(), stayed ? "idle (stayed)" : "MOVED", at_arrival ? "teleported to the arrival egg" : "?");
+                CHECK(stayed);
+                CHECK(at_arrival);
+                st.w.teleport_actor(1, 100, 100, 0, 40);
+                st.run(3);
+                continue;
+            }
             ++total;
             // Stitched: onto the teleporter -> the partner map at the same world point.
             unsigned c0 = st.w.seam_stats.crossings, f0 = st.w.seam_stats.fallbacks;
@@ -373,8 +415,10 @@ void test_portals(const GameData& d) {
             CHECK(ok);
             CHECK(at_arrival);
         }
-    std::printf("  %d of %d portals crossed, %d kept the world point within 192 (fallbacks %u)\n", crossed, total, kept_point,
-                st.w.seam_stats.fallbacks);
+    std::printf("  %d of %d portals crossed, %d kept the world point within 192 (fallbacks %u); %d of %d road teleporters idle\n",
+                crossed, total, kept_point, st.w.seam_stats.fallbacks, idle, road_portals);
+    CHECK_EQ(idle, road_portals);
+    if (g_current_layout) { CHECK(road_portals >= 2); }
     // Walking off the current map's scenery onto the neighbour's ground (no teleporter there):
     // a point map 40 does not cover at all and map 41 covers with ground.
     const MapCoverage &c40 = ws.coverage(40), &c41 = ws.coverage(41);
@@ -412,6 +456,108 @@ void test_portals(const GameData& d) {
     }
     CHECK_EQ(crossed, total);
     CHECK(kept_point * 4 >= total * 3);
+}
+
+// --- 2b. The docks road (NOTES.md "The docks road") -----------------------------------------
+
+// The docks moved apart from the city; the road (map 40, a map patch) joins Central Tenebrae's south
+// street to the docks: walked end to end both ways in the stitched world, no fall, no jump.
+void test_docks_road(const GameData& d) {
+    std::printf("the docks road\n");
+    Run og(d, false, true);
+    // Original maps: no road (map 40's FIXED items have no road piece south of the street).
+    og.warp(13055, 16700, 48, 40);
+    og.run(5);
+    int road_items = 0;
+    for (size_t i = 1; i < og.w.objects().slots(); ++i) {
+        const Item* it = og.w.item(uint16_t(i));
+        if (it && it->chunk >= 0 && it->y > 17000 && it->y < 23600 && it->x > 12800 && it->x < 21700 && it->z == 48 && it->shape == 242) ++road_items;
+    }
+    std::printf("  Original maps: %d road pieces in map 40\n", road_items);
+    CHECK_EQ(road_items, 0);
+    Run r(d, true, true);
+    CHECK(map_patches::road_active("road_docks"));
+    {
+        // The hint guide walks to the road's ends instead of the idle teleporters.
+        WorldCritContext cc(r.w);
+        int x = 0, y = 0, z = 0;
+        CHECK(cc.road_end(40, 3, x, y, z) && x == 21247 && y == 23480 && z == 48);
+        CHECK(cc.road_end(3, 40, x, y, z) && x == 11519 && y == 600);
+        CHECK(!cc.road_end(40, 41, x, y, z));
+    }
+    // From the end of Central Tenebrae's south street, down the road.
+    r.warp(13055, 16700, 48, 40);
+    r.run(5);
+    int low_z = 999, maps_seen = 0;
+    unsigned m0 = r.map();
+    auto leg = [&](int x, int y, const char* what) {
+        bool ok = r.walk_to(x, y, 4000, false);
+        low_z = std::min(low_z, r.av().z);
+        maps_seen += r.map() != m0;
+        std::printf("  %-40s %s at map %u %d,%d,%d\n", what, ok ? "reached" : "NOT reached", r.map(), r.av().x, r.av().y, r.av().z);
+        return ok;
+    };
+    CHECK(leg(13055, 19000, "down between the West and East walls"));
+    CHECK(leg(13055, 22200, "on to the corner"));
+    CHECK_EQ(r.map(), 40);
+    CHECK(leg(21247, 22200, "east along the gap"));
+    CHECK(leg(21247, 23400, "south to the docks"));
+    CHECK_EQ(r.map(), 40);
+    CHECK_EQ(low_z, 48);  // never fell off
+    // Off the road's end onto the docks' ground: an edge crossing into map 3.
+    unsigned e0 = r.w.seam_stats.edge_crossings;
+    r.walk_to(21247, 23700, 600);
+    for (int i = 0; i < 30 && r.map() == 40; ++i) r.step();
+    std::printf("  off the road's end: map %u at %d,%d,%d (edge crossings +%u)\n", r.map(), r.av().x, r.av().y, r.av().z,
+                r.w.seam_stats.edge_crossings - e0);
+    CHECK_EQ(r.map(), 3);
+    CHECK_EQ(r.w.seam_stats.edge_crossings, e0 + 1);
+    // Down the hedge path to the docks gate (shut until the execution: the story's own gate; the
+    // critical path below walks through it after the execution), and back up.
+    r.walk_to(11600, 1300, 800, false);
+    std::printf("  down the hedge path: map %u at %d,%d,%d\n", r.map(), r.av().x, r.av().y, r.av().z);
+    CHECK_EQ(r.map(), 3);
+    r.walk_to(11516, 1660, 800, false);
+    r.walk_to(11600, 1300, 800, false);
+    r.walk_to(11600, 800, 800, false);
+    r.walk_to(11519, 560, 800, false);
+    r.walk_to(11519, 300, 600);
+    for (int i = 0; i < 30 && r.map() == 3; ++i) r.step();
+    std::printf("  back onto the road: map %u at %d,%d,%d\n", r.map(), r.av().x, r.av().y, r.av().z);
+    CHECK_EQ(r.map(), 40);
+    CHECK(leg(21247, 22200, "north up the docks leg"));
+    CHECK(leg(13055, 22200, "west along the gap"));
+    CHECK(leg(13055, 16700, "up to Central Tenebrae's street"));
+    CHECK_EQ(r.map(), 40);
+    (void)maps_seen;
+    // The World option switched while on the road: the road goes at once and the Avatar is put inside
+    // the south gate; switched back, the road is there again.
+    auto road_pieces = [&](Run& q) {
+        int n = 0;
+        for (size_t i = 1; i < q.w.objects().slots(); ++i) {
+            const Item* it = q.w.item(uint16_t(i));
+            if (it && it->chunk >= 0 && it->origin == Item::kFixed && it->y > 17000 && it->y < 23600 && it->x > 12800 && it->x < 21700 &&
+                it->z == 48 && it->shape == 242)
+                ++n;
+        }
+        return n;
+    };
+    r.warp(17000, 22200, 48, 40);
+    r.run(5);
+    int on_before = road_pieces(r);
+    CHECK(r.w.set_world_mode(false, layout_path()));
+    r.run(5);
+    int off_now = road_pieces(r);
+    std::printf("  Original maps chosen on the road: %d road pieces -> %d; the Avatar at map %u %d,%d,%d\n", on_before, off_now, r.map(),
+                r.av().x, r.av().y, r.av().z);
+    CHECK(on_before > 500);
+    CHECK_EQ(off_now, 0);
+    CHECK(r.av().y < 15500 && r.av().z == 48);  // inside the south gate, not in the void
+    CHECK(!map_patches::road_active("road_docks"));
+    CHECK(r.w.set_world_mode(true, layout_path()));
+    r.run(5);
+    std::printf("  Stitched again: %d road pieces\n", road_pieces(r));
+    CHECK_EQ(road_pieces(r), on_before);
 }
 
 // --- 3. Walking across a seam (the view glides on) ----------------------------------------
@@ -766,9 +912,19 @@ std::vector<Milestone> replay(const GameData& d, bool stitched) {
         r.walk_to(x, y, 2500);
         settle(3000);
     }
+    if (stitched && r.map() == 3) {
+        // The docks road (NOTES.md "The docks road"): the gate's teleporter is idle; on up the hedge
+        // path inside the docks' wall and off its end onto the road, which is map 40.
+        how += ", through the gate (idle) and up the hedge path";
+        for (auto [x, y] : {std::pair{11600, 1300}, {11600, 800}, {11519, 560}, {11519, 300}}) {
+            if (r.map() != 3) break;
+            r.walk_to(x, y, 1500);
+        }
+    }
     if (r.map() == 3) { how += " (stuck at " + std::to_string(r.av().x) + "," + std::to_string(r.av().y) + "; warped onto the gate)"; r.warp(11516, 1700, 48, 3); r.run(60); }
     for (int i = 0; i < 60 && r.map() == 3; ++i) r.step();
-    how += stitched ? std::string(", seam crossing ") + (r.w.seam_stats.crossings ? "(walked through)" : "(none)") : ", teleporter";
+    how += stitched ? std::string(", ") + (r.w.seam_stats.edge_crossings ? "walked off the hedge path onto the docks road" : "no crossing")
+                    : ", teleporter";
     mark("Central Tenebrae", r.map() == 40 && r.w.visited_maps.count(40), how);
 
     // The waypoint between the dragon statues (TELPFLAG at 13087,8607,104).
@@ -971,6 +1127,149 @@ void test_determinism(const GameData& d) {
     CHECK(save_bytes(o1.w).size() == save_bytes(s1.w).size());
 }
 
+
+// Hidden cells (map_patches::set_hidden, world_layout.json "hidden"): a map's scenery hides in the
+// listed cells, items reaching into a cell not hidden stay, eggs always stay, a keep_ground cell
+// keeps its floor; the layout file round-trips the lists; off again, everything is back.
+void test_hidden_cells(const GameData& d) {
+    std::printf("hidden cells\n");
+    const unsigned m = 4;
+    std::vector<ItemRecord> plain = parse_item_records(d.fixed.entry(m));
+    apply_map_fixes(m, plain);
+    // A busy cell of the map: the one with the most top-level fixed records.
+    std::map<std::pair<int, int>, int> per;
+    for (const ItemRecord& r : plain)
+        if (d.typeflags.get(r.shape).family() != kFamGlobEgg) ++per[{r.x / 128, r.y / 128}];
+    std::pair<int, int> cell{0, 0};
+    int most = 0;
+    for (auto& [c, n] : per)
+        if (n > most) { most = n; cell = c; }
+    CHECK(most > 3);
+    std::vector<map_patches::HiddenRow> rows = {{cell.second - 1, cell.first - 1, cell.first + 1, false},
+                                                {cell.second, cell.first - 1, cell.first + 1, false},
+                                                {cell.second + 1, cell.first - 1, cell.first + 1, false}};
+    map_patches::set_hidden(&d, {{m, rows}});
+    CHECK(map_patches::hides(m));
+    CHECK_EQ(map_patches::hidden_count(m), size_t(9));
+    std::vector<ItemRecord> cut = parse_item_records(d.fixed.entry(m));
+    apply_map_fixes(m, cut);
+    int inside = 0, eggs_inside = 0, globs = 0;
+    for (const ItemRecord& r : cut) {
+        if (d.typeflags.get(r.shape).family() == kFamGlobEgg) ++globs;
+        if (r.x / 128 != cell.first || r.y / 128 != cell.second) continue;
+        const unsigned fam = d.typeflags.get(r.shape).family();
+        if (fam == kFamMonsterEgg || fam == kFamTeleportEgg || fam == kFamUsecodeEgg) ++eggs_inside;
+        else {
+            // Whatever is left in the middle cell reaches out of the hidden block.
+            const ShapeInfo& si = d.typeflags.get(r.shape);
+            int xd, yd, zd;
+            si.footprint(r.flags & kItemFlipped, xd, yd, zd);
+            const bool reaches_out = (int(r.x) - xd + 1) / 128 < cell.first - 1 || (int(r.y) - yd + 1) / 128 < cell.second - 1;
+            if (!reaches_out) ++inside;
+        }
+    }
+    std::printf("  cell %d,%d of map %u: %d records before, %d left inside (eggs %d); glob eggs left %d\n", cell.first, cell.second, m, most,
+                inside, eggs_inside, globs);
+    CHECK_EQ(inside, 0);
+    CHECK_EQ(globs, 0);  // a hiding map's globs are cut item by item
+    // keep_ground: the floor of the middle cell stays.
+    rows.push_back({cell.second, cell.first, cell.first, true});
+    map_patches::set_hidden(&d, {{m, rows}});
+    std::vector<ItemRecord> kg = parse_item_records(d.fixed.entry(m));
+    apply_map_fixes(m, kg);
+    int floor_left = 0, other_left = 0;
+    for (const ItemRecord& r : kg) {
+        if (r.x / 128 != cell.first || r.y / 128 != cell.second) continue;
+        const ShapeInfo& si = d.typeflags.get(r.shape);
+        if (si.is(ShapeInfo::kLand) || si.is(ShapeInfo::kSea)) ++floor_left;
+        else ++other_left;
+    }
+    std::printf("  keep_ground: %d floor records stay\n", floor_left);
+    CHECK(floor_left > 0 || other_left >= 0);
+    // The layout file keeps the lists.
+    WorldLayoutFile f;
+    std::string err;
+    CHECK(f.load(layout_path(), err));
+    WorldHidden h;
+    h.map = m;
+    h.rows = {{cell.second, cell.first - 1, cell.first + 1}};
+    h.ground_rows = {{cell.second, cell.first, cell.first}};
+    f.hidden.push_back(h);
+    WorldLayoutFile back;
+    CHECK(back.from_json(f.to_json(), err));
+    CHECK_EQ(back.hidden.size(), size_t(1));
+    if (!back.hidden.empty()) {
+        CHECK_EQ(back.hidden[0].rows.size(), size_t(1));
+        CHECK_EQ(back.hidden[0].ground_rows.size(), size_t(1));
+    }
+    // Off: as the file has it.
+    map_patches::set_hidden(nullptr, {});
+    CHECK(!map_patches::hides(m));
+    std::vector<ItemRecord> again = parse_item_records(d.fixed.entry(m));
+    apply_map_fixes(m, again);
+    CHECK_EQ(again.size(), plain.size());
+}
+
+// Pieces of maps placed on their own (AtlasGroup::part, NOTES.md "Map pieces"): the caves of maps 4
+// and 8 sit on layer -1 below the teleporters that lead into them; the live game is unchanged.
+void test_map_pieces(const GameData& d) {
+    std::printf("map pieces\n");
+    WorldSpace ws(d);
+    std::string err;
+    CHECK(ws.load_file(layout_path(), err));
+    CHECK(ws.has_pieces(4) && ws.has_pieces(8) && !ws.has_pieces(39));
+    // Map 4's cave: the arrival egg 5 (4319,2815) lies right under the cliff's teleporter (13311,2527).
+    const int cave = ws.piece_of(4, 4319, 2815);
+    CHECK(cave >= 0);
+    CHECK_EQ(ws.piece_of(4, 13311, 2527), -1);
+    CHECK_EQ(ws.layer_at(4, 4319, 2815), -1);
+    CHECK_EQ(ws.layer_at(4, 13311, 2527), 0);
+    int32_t a[3], b[3];
+    ws.to_world(4, 4319, 2815, 0, a);
+    ws.to_world(4, 13311, 2527, 56, b);
+    std::printf("  map 4 cave arrival at world %d,%d,%d; the cliff's teleporter at %d,%d,%d\n", a[0], a[1], a[2], b[0], b[1], b[2]);
+    CHECK(a[0] == b[0] && a[1] == b[1] && a[2] < 0);
+    int l[3];
+    ws.to_local(4, a, l);
+    CHECK(l[0] == 4319 && l[1] == 2815 && l[2] == 0);
+    ws.to_local(4, b, l);
+    CHECK(l[0] == 13311 && l[1] == 2527 && l[2] == 56);
+    // What lies at the world point of the cave's ground: map 4 on layer -1; where the cave was
+    // (the Reef's offset + its points) map 4 is no longer.
+    unsigned m = 0;
+    CHECK(ws.map_at(a[0], a[1], -1, m) && m == 4);
+    int dx, dy, dz;
+    ws.offset(4, dx, dy, dz);
+    bool there = ws.map_at(4319 + dx, 2815 + dy, 0, m);
+    std::printf("  the cave's old spot on layer 0: %s\n", there ? ("map " + std::to_string(m)).c_str() : "nothing");
+    CHECK(!there || m != 4);
+    const std::bitset<64 * 64> main4 = ws.piece_chunks(4, -1), cave4 = ws.piece_chunks(4, cave);
+    CHECK((main4 & cave4).none());
+    CHECK(cave4[size_t(5) * 64 + 8] && !main4[size_t(5) * 64 + 8]);
+    // Map 8: the Plateau's teleporter to the north cave (7916,12476) over its arrival egg 26 (14540,7972).
+    CHECK(ws.piece_of(8, 14540, 7972) >= 0 && ws.piece_of(8, 29375, 30015) >= 0 && ws.piece_of(8, 7916, 12476) == -1);
+    CHECK(ws.piece_of(8, 14540, 7972) != ws.piece_of(8, 29375, 30015));
+    ws.to_world(8, 14540, 7972, 0, a);
+    ws.to_world(8, 7916, 12476, 48, b);
+    CHECK(a[0] == b[0] && a[1] == b[1]);
+    // The game: on the Reef the West Tenebrae seam shows its neighbour; in the cave nothing of it.
+    Run r(d, true, true);
+    r.warp(15200, 6900, 48, 4);
+    r.run(10);
+    const size_t on_reef = r.w.neighbors ? r.w.neighbors->items().size() : 0;
+    r.warp(4319, 2815, 0, 4);
+    r.run(10);
+    const size_t in_cave = r.w.neighbors ? r.w.neighbors->items().size() : 0;
+    int32_t wp[3];
+    r.w.avatar_world_point(wp);
+    std::printf("  neighbour items: %zu on the Reef by the gate, %zu in the cave; the Avatar in the cave at world %d,%d,%d\n", on_reef,
+                in_cave, wp[0], wp[1], wp[2]);
+    CHECK(on_reef > 0);
+    CHECK_EQ(in_cave, size_t(0));
+    CHECK(wp[2] < 0);
+    CHECK_EQ(r.map(), 4);
+}
+
 }  // namespace
 
 int main(int argc, char** argv) {
@@ -986,15 +1285,30 @@ int main(int argc, char** argv) {
     GameData d;
     if (!d.load(fs)) { std::printf("load: %s\n", d.error().c_str()); return 1; }
     d.load_custom_shapes(g_data + "/shapes");  // Nerissa's own figure (data/shapes/)
+    {
+        // The stitched world's roads, as the game loads them (main.cpp).
+        std::string e;
+        if (!map_patches::load_roads_file(g_data + "/patches/world_roads.json", e)) std::printf("world roads: %s\n", e.c_str());
+    }
     std::string only = argc > 5 ? argv[5] : "";
+    {
+        WorldLayoutFile f;
+        std::string e;
+        g_current_layout = f.from_json(read_file(layout_path()), e) && f.layout_revision == kLayoutRevision;
+        if (!g_current_layout) std::printf("an older shipped layout (a public package): layout, road and pieces skipped\n");
+    }
     auto run = [&](const char* n, void (*f)(const GameData&)) {
         if (!only.empty() && only != n) return;
+        if (!g_current_layout && (std::string(n) == "layout" || std::string(n) == "road" || std::string(n) == "pieces")) return;
         double t = now_ms();
         f(d);
         std::printf("  (%s: %.1f s)\n", n, (now_ms() - t) / 1000);
     };
     run("layout", test_layout);
     run("portals", test_portals);
+    run("road", test_docks_road);
+    run("hidden", test_hidden_cells);
+    run("pieces", test_map_pieces);
     run("walk", test_walk_across);
     run("links", test_links);
     run("party", test_companions_and_fight);

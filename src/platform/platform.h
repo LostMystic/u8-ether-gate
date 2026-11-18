@@ -113,5 +113,7 @@ private:
 bool save_png(const std::string& path, const uint32_t* rgba, int w, int h, int scale = 1);
 // A zlib stream of the bytes (stb's deflate, kept with the PNG writer; the story checkpoints pack).
 std::vector<uint8_t> zlib_compress(const std::vector<uint8_t>& in, int quality = 12);
+// Opens a web page (http/https only) in the player's browser: a new tab on the web build.
+bool open_url(const std::string& url);
 
 }  // namespace pg

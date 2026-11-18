@@ -101,6 +101,10 @@ public:
     // resets apply to the whole selection (selected_group + these).
     std::set<int> multi;
     std::set<int> hidden_layers;  // layers switched off in the Layers panel (not drawn, not ghosted)
+    // Picture mode (reports, pagan_overlaps): render() draws only the maps of the current layer,
+    // no ghosted layers, areas, outlines or UI; with only_maps set, only those maps.
+    bool picture = false;
+    std::set<unsigned> only_maps;
     bool help = false;
     std::string message;
     int message_ticks = 0;
@@ -242,7 +246,9 @@ private:
     const GameData& data_;
     std::vector<ShapeFont> fonts_;
     TileCache cache_;
-    std::vector<MapFootprint> fps_;
+    std::vector<MapFootprint> raw_fps_;  // per map
+    std::vector<MapFootprint> fps_;      // per view id (AtlasLayout::view_footprints: map pieces apart)
+    std::vector<unsigned> ids_of(size_t gi) const { return doc.layout.atlas.view_ids(gi); }
     std::unique_ptr<EditorStorage> storage_, seed_;
     AtlasLayout fallback_;
     bool loaded_ = false, from_game_ = false, exit_ = false, autosave_ = false;

@@ -24,6 +24,7 @@
 #include "core/variants.h"
 #include "world/map_patches.h"
 #include "world/world_layout.h"
+#include "json/json.hpp"
 #include "world/current_map.h"
 #include "data/mapfile.h"
 #include "world/item.h"
@@ -43,6 +44,16 @@ std::string read_text(const std::string& path) {
 }
 
 std::string g_tmp = "editor_tmp", g_shots = "editor_shots", g_kit;
+// The public packages ship an older layout (engine/release/README.md): the checks of the later map
+// work (map pieces, the in-place update to the current generation) apply only to the current one.
+bool current_layout() {
+    std::ifstream lf(g_kit.substr(0, g_kit.find_last_of('/')) + "/world_layout.json");
+    std::stringstream ss;
+    ss << lf.rdbuf();
+    WorldLayoutFile f;
+    std::string e;
+    return f.from_json(ss.str(), e) && f.layout_revision == pg::kLayoutRevision;
+}
 
 void rmrf(const std::string& p) { std::system(("rm -rf '" + p + "'").c_str()); }
 
@@ -959,9 +970,22 @@ void test_segments(const GameData& data, EditMode& m, Driver& d) {
     if (cave_mouth && underworld_entrance() && !underworld_breach_open()) added_by_fixes[cave_mouth->map] = cave_mouth->items.size();
     size_t excluded = 0, maps = 0, items = 0, fix_changed = 0;
     bool same = true, added_ok = true;
-    for (const AtlasGroup& g : m.doc.layout.atlas.groups)
+    size_t pieces = 0;
+    for (size_t gi = 0; gi < m.doc.layout.atlas.groups.size(); ++gi) {
+        const AtlasGroup& g = m.doc.layout.atlas.groups[gi];
+        // A piece of a map (AtlasGroup::part) draws its chunks only, the map's own group the rest:
+        // nothing else is left out.
         for (unsigned mp : g.maps) {
-            excluded += m.tiles().excluded_chunks(mp);
+            const unsigned id = m.doc.layout.atlas.view_id(gi, mp);
+            const size_t by_pieces = (~m.doc.layout.atlas.chunk_mask(gi, mp)).count();
+            excluded += m.tiles().excluded_chunks(id) - by_pieces;
+            if (g.is_part()) {
+                ++pieces;
+                CHECK(id > 255 && (id & 0xFF) == mp && by_pieces > 0);
+            }
+        }
+        if (g.is_part()) continue;
+        for (unsigned mp : g.maps) {
             ++maps;
             std::vector<ItemRecord> raw = parse_item_records(data.fixed.entry(mp));
             std::vector<ItemRecord> fixed = raw;
@@ -1006,6 +1030,9 @@ void test_segments(const GameData& data, EditMode& m, Driver& d) {
             items += have.size();
             for (const auto& k : rawset) fix_changed += want.count(k) == 0;
         }
+    }
+    std::printf("  %zu map pieces drawn apart\n", pieces);
+    if (current_layout()) { CHECK_EQ(pieces, 4); }
     std::printf("  %zu maps in %zu segments: %zu items loaded = the map files' items (+ data fixes); %zu file records changed by "
                 "the data fixes (z lifts); %zu chunks excluded\n",
                 maps, m.doc.layout.atlas.groups.size(), items, fix_changed, excluded);
@@ -1036,6 +1063,7 @@ void test_segments(const GameData& data, EditMode& m, Driver& d) {
     };
     CHECK_EQ(walk(7, 40), 1);
     int x7 = m.doc.layout.atlas.groups[size_t(g7)].dx, x40 = m.doc.layout.atlas.groups[size_t(g40)].dx;
+    int y7 = m.doc.layout.atlas.groups[size_t(g7)].dy;
     std::string msg = m.drag_group_by(g7, 6000, -6000);
     std::printf("  %s\n", msg.c_str());
     CHECK(m.doc.layout.atlas.groups[size_t(g7)].dx != x7);
@@ -1055,10 +1083,10 @@ void test_segments(const GameData& data, EditMode& m, Driver& d) {
     if (!g_shots.empty()) save_png(g_shots + "/editor_segments_moved.png", d.px.data(), d.w, d.h, 1);
     // Dragged back near its old place: it snaps onto the exact seam offset and re-joins.
     msg = m.drag_group_by(g7, double(x7 - m.doc.layout.atlas.groups[size_t(g7)].dx) + 150,
-                          double(-24057 - m.doc.layout.atlas.groups[size_t(g7)].dy) - 120);
+                          double(y7 - m.doc.layout.atlas.groups[size_t(g7)].dy) - 120);
     std::printf("  %s\n", msg.c_str());
     CHECK_EQ(m.doc.layout.atlas.groups[size_t(g7)].dx, x7);
-    CHECK_EQ(m.doc.layout.atlas.groups[size_t(g7)].dy, -24057);
+    CHECK_EQ(m.doc.layout.atlas.groups[size_t(g7)].dy, y7);
     CHECK_EQ(walk(7, 40), 1);
     CHECK(msg.find("re-joined") != std::string::npos);
     // Undo twice: broken again, then back to the start (the seam mode is undone with the move).
@@ -1299,7 +1327,10 @@ void test_layers(const GameData& data) {
     m.save();
     std::string saved;
     store.load_layout([&](const StorageResult& r) { saved = r.text; });
-    CHECK(saved.find("\"layout_revision\": 2") != std::string::npos || saved.find("\"layout_revision\":2") != std::string::npos);
+    if (current_layout()) {
+        CHECK(saved.find("\"layout_revision\": " + std::to_string(kLayoutRevision)) != std::string::npos ||
+              saved.find("\"layout_revision\":" + std::to_string(kLayoutRevision)) != std::string::npos);
+    }
     test_segments(data, m, d);
     // A second load from the same storage: not stale any more.
     EditMode m2(data);
@@ -1308,6 +1339,80 @@ void test_layers(const GameData& data) {
     m2.set_budget(-1);
     CHECK(m2.load_all());
     CHECK(!m2.replaced_stale_layout());
+    // A generation-2 stored layout (planes on layer 1) with a group the user moved: only the
+    // planes go up to kPlanesLayer; the moved group stays where the user put it.
+    if (current_layout()) {
+        nlohmann::json j = nlohmann::json::parse(shipped);
+        int moved_dx = 0;
+        // Generation 2 had no map pieces (generation 6 adds them).
+        nlohmann::json kept = nlohmann::json::array();
+        for (auto& g : j["groups"])
+            if (!g.contains("part")) kept.push_back(g);
+        j["groups"] = kept;
+        for (auto& g : j["groups"]) {
+            unsigned m0 = g["maps"][0].get<unsigned>();
+            if (m0 >= 43 && m0 <= 47) { g["layer"] = 1; g["offset"][2] = 256; }
+            if (m0 == 8) { g["offset"][0] = g["offset"][0].get<int>() + 1024; moved_dx = g["offset"][0].get<int>(); }
+            // Maps 6 and 7 where generation 2 had them (before the alignment).
+            for (const LayoutMove& mv : layout_moves())
+                if (m0 == mv.map) { g["offset"][0] = mv.from_dx; g["offset"][1] = mv.from_dy; }
+        }
+        for (auto& sm : j["seams"]) {
+            unsigned a = sm["maps"][0].get<unsigned>(), b = sm["maps"][1].get<unsigned>();
+            if (a == 5 && b == 6) { sm["offset"][0] = 2049; sm["offset"][1] = -18992; }
+            if (a == 7 && b == 40) { sm["offset"][0] = 2025; sm["offset"][1] = 24057; }
+            if (a == 3 && b == 40) {  // generation 2: a vote seam, the docks touching the city
+                sm["offset"][0] = -2048; sm["offset"][1] = -12800;
+                sm["basis"] = "votes"; sm["votes"] = 93;
+                sm.erase("road"); sm.erase("end_a"); sm.erase("end_b");
+            }
+        }
+        j["layout_revision"] = 2;
+        j["layers"].erase(std::to_string(kPlanesLayer));
+        j["layers"]["1"] = "the planes";
+        MemoryStorage st2;
+        st2.save_layout(j.dump(), 0, [](const StorageResult&) {});
+        EditMode m3(data);
+        m3.set_storage(std::make_unique<Ref>(st2));
+        m3.set_seed_storage(std::make_unique<Ref>(seed));
+        m3.set_budget(-1);
+        CHECK(m3.load_all());
+        CHECK(m3.replaced_stale_layout());
+        int planes = 0;
+        for (const AtlasGroup& g : m3.doc.layout.atlas.groups) {
+            if (g.maps[0] >= 43 && g.maps[0] <= 47) {
+                ++planes;
+                CHECK_EQ(g.layer, kPlanesLayer);
+                CHECK_EQ(g.dz, kPlanesLayer * kLayerZ);
+            }
+            if (g.maps[0] == 8 && !g.is_part()) CHECK_EQ(g.dx, moved_dx);
+        }
+        CHECK_EQ(planes, 5);
+        // The shipped pieces are added at their shipped places.
+        int pieces3 = 0;
+        for (const AtlasGroup& g : m3.doc.layout.atlas.groups) pieces3 += g.is_part();
+        CHECK_EQ(pieces3, 4);
+        for (const LayoutMove& mv : layout_moves()) {
+            int gi = m3.doc.layout.atlas.group_of(mv.map);
+            CHECK(gi >= 0 && m3.doc.layout.atlas.groups[size_t(gi)].dx == mv.to_dx && m3.doc.layout.atlas.groups[size_t(gi)].dy == mv.to_dy);
+        }
+        {
+            WorldLayoutFile f3;
+            std::string e3;
+            CHECK(f3.from_json(m3.doc.layout.to_json(), e3));
+            const WorldSeam* s56 = f3.seam(5, 6);
+            const WorldSeam* s740 = f3.seam(7, 40);
+            CHECK(s56 && s56->dx == 2048 && s56->dy == -19456);
+            CHECK(s740 && s740->dx == 2048 && s740->dy == 24064);
+            const WorldSeam* s340 = f3.seam(3, 40);  // the docks moved: their seam is the docks road now
+            CHECK(s340 && s340->basis == "road" && s340->road == "road_docks" && s340->dx == -9728 && s340->dy == -23040);
+        }
+        std::vector<int> ls3 = m3.layers_in_use();
+        CHECK(std::find(ls3.begin(), ls3.end(), kPlanesLayer) != ls3.end());
+        CHECK(std::find(ls3.begin(), ls3.end(), 1) == ls3.end());
+        CHECK(m3.doc.layout.extra.find("\"layout_revision\":" + std::to_string(kLayoutRevision)) != std::string::npos);
+        std::printf("  generation 2 -> %d: planes on layer %d, maps 6 and 7 aligned, the docks moved onto their road, the moved Plateau kept\n", kLayoutRevision, kPlanesLayer);
+    }
 }
 
 }  // namespace

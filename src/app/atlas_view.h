@@ -84,7 +84,9 @@ private:
     std::vector<ShapeFont>& fonts_;
     TileCache cache_;
     AtlasLayout layout_;
-    std::vector<MapFootprint> fps_;
+    std::vector<MapFootprint> raw_fps_;  // per map
+    std::vector<MapFootprint> fps_;      // per view id (AtlasLayout::view_footprints: pieces apart)
+    std::vector<unsigned> ids_of(const AtlasGroup& g) const { return layout_.view_ids(size_t(&g - layout_.groups.data())); }
     std::vector<std::pair<unsigned, std::bitset<64 * 64>>> excl_;
     std::string path_, layout_status_;
     long cx_ = 0, cy_ = 0;  // native atlas point at the view centre

@@ -39,8 +39,9 @@ public:
 
     // --- For tests and screenshots
     enum Mode { kMenu, kPickMove, kPickTarget, kList };
-    enum Entry { kEMove, kEAttack, kECast, kEUse, kEDefend, kEWait, kEAuto, kEKeepAuto, kEEnd, kEntries };
-    static constexpr int kEPartyAuto = kEntries;  // the side panel's tenth icon (Classic: not in the menu)
+    // Block is the old Defend (and stands in for the old Wait). Auto opens a drop-down (this turn,
+    // keep on Auto, the whole party); while any Auto is on, it turns them all off instead.
+    enum Entry { kEMove, kEAttack, kECast, kEUse, kEDefend, kEAuto, kEFlee, kEEnd, kEntries };
     // A step through a grid of n icons, `cols` to a row: dx along the row (wraps in the row), dy to
     // another row (wraps, keeps the column, the last entry of a shorter row if it has to).
     static int grid_step(int cur, int n, int cols, int dx, int dy);
@@ -65,7 +66,7 @@ public:
     bool entry_on(int entry);                       // can be chosen now
     void press_entry(int entry);                    // as a click on the floating menu's entry
     void set_selected(int entry) { if (mode_ == kMenu && entry >= 0 && entry < menu_size()) sel_ = entry; }
-    int menu_size() const;                          // ten with the side panel, nine in Classic
+    int menu_size() const;                          // kEntries (the panel's icons, the Classic list)
     int menu_columns() const;                       // the panel's icons to a row; Classic: one column
     // The spell whose reach is shown (a very light circle round the caster): the one picked or
     // highlighted in the list. False if none, or it has no reach of its own (the Avatar's spell
@@ -113,7 +114,7 @@ private:
     uint16_t hover_target_ = 0, picked_target_ = 0, cursor_sel_ = 0;
     int target_sel_ = 0;
     enum Purpose { kForAttack, kForCast } purpose_ = kForAttack;
-    enum ListKind { kListCast, kListUse } list_ = kListCast;
+    enum ListKind { kListCast, kListUse, kListAuto } list_ = kListCast;
     TurnCombat::CastOption cast_;
     uint16_t last_current_ = 0;
     int frame_ = 0;

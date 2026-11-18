@@ -190,7 +190,7 @@ void HudPanel::layout(int pw) {
     monster_r_ = Rect{2, y, pw - 4, rh};
     y += rh + 3;
     if (turn_buttons()) {
-        int cols = (pw - 4) >= 10 * 16 + 9 * 2 ? 10 : 5;
+        int cols = (pw - 4) >= kButtons * 16 + (kButtons - 1) * 2 ? kButtons : (kButtons + 1) / 2;
         cols_ = cols;
         int bs = std::min(22, ((pw - 4) - (cols - 1) * 2) / cols);
         int rows = (kButtons + cols - 1) / cols;
@@ -466,8 +466,7 @@ void HudPanel::draw(Surface8& s) {
     int sel = ui.selected_entry(), act = ui.active_entry();
     for (const Btn& bt : buttons_) {
         bool on = button_enabled(bt.b);
-        bool lit = bt.b == act || (bt.b == kBPartyAuto && tc && tc->party_auto) ||
-                   (bt.b == kBKeepAuto && tc && cur && tc->keep_auto(cur));
+        bool lit = bt.b == act || (bt.b == kBAuto && tc && tc->active() && tc->any_auto());
         const Rect& r = bt.r;
         s.fill_rect(r.x, r.y, r.w, r.h, lit ? c_btn_on_ : c_btn_);
         bevel(s, r, lit);
@@ -527,13 +526,9 @@ void HudPanel::draw_tooltip(Surface8& s) {
         // Below the whole grid (over the log), so no button is covered.
         for (const Btn& bt : buttons_) anchor.h = std::max(anchor.h, bt.r.y + bt.r.h - anchor.y);
         int b = buttons_[size_t(what)].b;
-        if (b == kBPartyAuto) {
-            title = "Party Auto  (A, RB)";
-            body = kPartyAutoHelp;
-        } else {
-            title = std::string(TurnUI::entry_name(b)) + "  (" + std::to_string(b + 1) + ")";
-            body = TurnUI::entry_help(b);
-        }
+        title = std::string(TurnUI::entry_name(b)) + "  (" + std::to_string(b + 1) + ")";
+        body = TurnUI::entry_help(b);
+        if (b == kBAuto && gm_.world().turn && gm_.world().turn->any_auto()) body = std::string("Auto is on: press to turn it off. ") + kPartyAutoHelp;
         if (!button_enabled(b)) body += " Not now.";
     }
     tip_ = title + ": " + body;
@@ -568,17 +563,10 @@ void HudPanel::tick() {
 }
 
 bool HudPanel::button_enabled(int b) const {
-    World& w = gm_.world();
-    if (b == kBPartyAuto) return w.turn && w.turn->enabled && w.turn->active();
     return gm_.turn_ui().entry_on(b);
 }
 
 void HudPanel::press_button(int b) {
-    World& w = gm_.world();
-    if (b == kBPartyAuto) {
-        if (w.turn && w.turn->enabled && w.turn->active()) w.turn->toggle_party_auto();
-        return;
-    }
     gm_.turn_ui().press_entry(b);
 }
 
@@ -607,7 +595,7 @@ bool HudPanel::mouse_down(int button, int x, int y) {
         for (const Btn& bt : buttons_)
             if (bt.r.in(x, y)) {
                 if (button_enabled(bt.b)) press_button(bt.b);
-                else if (w.turn) w.turn->status = std::string(bt.b == kBPartyAuto ? "Party Auto" : TurnUI::entry_name(bt.b)) + ": not now";
+                else if (w.turn) w.turn->status = std::string(TurnUI::entry_name(bt.b)) + ": not now";
                 hover_frames_ = 0;
                 return true;
             }

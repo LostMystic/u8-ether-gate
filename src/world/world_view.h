@@ -1,6 +1,7 @@
 // Pagan engine - a clean-room reimplementation of the Ultima 8 engine.
 // Copyright (c) 2026 Mark B. Licensed under the GNU GPL v3 or later, see LICENSE.
 #pragma once
+#include <bitset>
 #include <functional>
 #include <cstdint>
 #include <vector>
@@ -50,6 +51,9 @@ public:
         // seam, already in this map's coordinates, sorted and drawn with the map's own items
         // (never picked: their id is 0). nullptr / empty = only the map.
         const std::vector<const Item*>* extra = nullptr;
+        // Chunks of the map not drawn (the stitched world: the map's pieces placed elsewhere in
+        // the world than the one the camera is in, NOTES.md "Map pieces"). nullptr = all drawn.
+        const std::bitset<64 * 64>* hidden_chunks = nullptr;
     };
 
     // camera: the camera point (cx, cy, cz). roof_probe: the point used for roof detection
